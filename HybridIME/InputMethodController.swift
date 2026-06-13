@@ -5,6 +5,7 @@ import InputMethodKit
 @MainActor
 final class InputMethodController: IMKInputController {
     private let decoder = CangjieDecoder()
+    private let bilingualDictionary = BilingualDictionary.shared
     private var buffer = ""
     private var currentCandidates: [String] = []
     private var isSelectingPunctuation = false
@@ -116,9 +117,18 @@ final class InputMethodController: IMKInputController {
 
     private func refreshComposition(client sender: Any?) {
         isSelectingPunctuation = false
-        currentCandidates = buffer.count <= 5
+        let dictionaryCandidates = bilingualDictionary.chineseCandidates(
+            for: buffer,
+            limit: 10
+        )
+        let cangjieCandidates = buffer.count <= 5
             ? decoder.candidates(for: buffer.lowercased(), limit: 10)
             : []
+        currentCandidates = mergedCandidates(
+            dictionaryCandidates,
+            cangjieCandidates,
+            limit: 10
+        )
         updateComposition()
 
         if buffer.isEmpty {
@@ -130,6 +140,21 @@ final class InputMethodController: IMKInputController {
                 client: sender as? IMKTextInput
             )
         }
+    }
+
+    private func mergedCandidates(
+        _ groups: [String]...,
+        limit: Int
+    ) -> [String] {
+        var result: [String] = []
+        var seen: Set<String> = []
+        for candidate in groups.joined() where seen.insert(candidate).inserted {
+            result.append(candidate)
+            if result.count == limit {
+                break
+            }
+        }
+        return result
     }
 
     private func clearComposition() {

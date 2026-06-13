@@ -171,6 +171,28 @@ HybridIME/CangjieData/macOS-overrides.tsv
 
 集中記錄已確認的相容修正，而不直接修改上游 Rime 碼表。
 
+## 中英雙向字典
+
+HybridIME 使用 [CC-CEDICT](https://cc-cedict.org/wiki/) 建立獨立的中英
+雙向索引。輸入完整英文詞時，中文翻譯會排在倉頡候選之前，例如輸入
+`test` 可選擇「測試」。按 Space 仍然輸出原本英文，不會自動翻譯。
+
+索引同時包含中文至英文的查詢資料，供後續中文翻譯介面使用；目前不會把
+英文翻譯混入逐碼倉頡候選，以免干擾倉頡輸入。
+
+`HybridIME/DictionaryData/dictionary-overrides.tsv` 可把已確認的翻譯候選
+移至最前，這些本地排序不會在重新生成 CC-CEDICT 索引時被覆蓋。
+
+更新字典時，從
+[MDBG CC-CEDICT 下載頁](https://www.mdbg.net/chinese/dictionary?page=cc-cedict)
+取得最新資料，再執行：
+
+```sh
+swift Scripts/build_cedict_index.swift \
+  /path/to/cedict_ts.u8 \
+  HybridIME/DictionaryData/cedict-index.tsv
+```
+
 ## 已知限制
 
 - Apple 沒有提供公開 API 讀取或調用 macOS 內建倉頡碼表。
@@ -186,3 +208,5 @@ HybridIME/CangjieData/macOS-overrides.tsv
 
 - `HybridIME/CangjieData/LICENSE-Rime-Cangjie.txt`
 - `HybridIME/CangjieData/NOTICE.txt`
+- `HybridIME/DictionaryData/LICENSE-CC-CEDICT.txt`
+- `HybridIME/DictionaryData/NOTICE-CC-CEDICT.txt`

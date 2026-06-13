@@ -267,7 +267,51 @@ replace	abc	字	候	選
 - 候選次序及重複項目較難維護。
 - 第三方原始資料與本地行為規則會混在一起。
 
-## 9. 建置及安裝
+## 9. 中英雙向字典
+
+`BilingualDictionary` 載入：
+
+```text
+HybridIME/DictionaryData/cedict-index.tsv
+```
+
+索引由 CC-CEDICT 生成，格式為：
+
+```text
+e	English key	繁體候選...
+z	繁體詞語	English candidate...
+```
+
+`e` 是英文至繁體中文索引，`z` 是繁體中文至英文索引。產生器會：
+
+1. 使用 CC-CEDICT 的繁體詞頭。
+2. 把英文釋義轉為小寫並移除括號內補充說明。
+3. 排除過長、含非英文符號或超過四個單詞的釋義。
+4. 同時保留原詞組及移除 `to`、`a`、`an`、`the` 後的常用鍵。
+5. 每個查詢鍵最多保留十個不重複候選。
+
+本地候選排序放在：
+
+```text
+HybridIME/DictionaryData/dictionary-overrides.tsv
+```
+
+支援 `add-e` 及 `add-z`，把候選依欄位次序移至指定英文或中文查詢鍵的
+最前方。此檔案不由生成器改寫。
+
+重新生成：
+
+```sh
+swift Scripts/build_cedict_index.swift \
+  /path/to/cedict_ts.u8 \
+  HybridIME/DictionaryData/cedict-index.tsv
+```
+
+目前輸入流程只接入英文至中文方向。完整英文鍵的翻譯候選排在倉頡候選
+之前；Space 維持輸出原英文。中文至英文索引已在資料層提供，待日後加入
+不干擾逐碼倉頡的觸發介面。
+
+## 10. 建置及安裝
 
 命令列建置：
 
@@ -291,15 +335,17 @@ xcodebuild \
 
 建置需要可用的 Apple Development 憑證。這不代表必須加入付費 Apple Developer Program；免費 Apple ID 亦可由 Xcode 建立個人開發憑證，但憑證及簽署限制可能不同。
 
-## 10. 已知限制
+## 11. 已知限制
 
 - 無法直接讀取或調用 Apple 的系統倉頡解碼器。
 - 與 macOS 倉頡的一致性取決於 `macOS-overrides.tsv` 已收錄的差異。
 - 候選視窗目前只顯示單頁最多十個候選，沒有翻頁功能。
 - 字形可用性取決於目前 macOS 版本及已安裝字體。
 - 目標應用程式若未提供正確插入點位置，候選視窗只能使用備用位置。
+- 英文翻譯使用精確完整詞匹配，暫不支援模糊搜尋、詞形還原或句子翻譯。
+- 中文至英文索引尚未連接至使用者操作介面。
 
-## 11. 授權與歸屬
+## 12. 授權與歸屬
 
 Rime 倉頡資料的來源及授權聲明位於：
 
@@ -309,3 +355,10 @@ HybridIME/CangjieData/NOTICE.txt
 ```
 
 更新或重新發佈碼表時，必須保留適用的第三方授權及歸屬聲明。
+
+CC-CEDICT 衍生索引的來源及 CC BY-SA 4.0 授權聲明位於：
+
+```text
+HybridIME/DictionaryData/LICENSE-CC-CEDICT.txt
+HybridIME/DictionaryData/NOTICE-CC-CEDICT.txt
+```

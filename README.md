@@ -27,6 +27,7 @@ HybridIME 是一個 macOS 中英文混合倉頡五代輸入法。
 - 支援 macOS 相容字碼及候選次序覆寫。
 - 輸入完整英文詞時顯示繁體中文翻譯候選。
 - 輸入倉頡時，在中文候選後顯示對應的英文翻譯。
+- Command、Control 及 Option 快捷鍵會交回目前應用程式。
 
 ## 候選顯示
 
@@ -63,6 +64,21 @@ mrsqf → 一口尸手火
 若游標前已有中文，HybridIME 會優先用最長中文詞組查詢。例如先輸入
 「測」，再輸入「試」的倉頡碼時，會以「測試」查詢並顯示 `test`、
 `beta`。選擇英文候選會把游標前已組成的中文詞連同目前組字替換成英文。
+
+候選排序為：
+
+1. 精確倉頡中文候選。
+2. 該中文候選的英文翻譯。
+3. 已輸入英文的中文翻譯。
+
+例如輸入 `oh`：
+
+```text
+1 入   2 conform to   3 containing   4 噢
+```
+
+其中「入」來自倉頡碼，「conform to」及「containing」是「入」的英文
+翻譯，「噢」則是英文 `oh` 的中文翻譯。
 
 標準鍵位對照：
 
@@ -192,6 +208,13 @@ HybridIME 使用 [CC-CEDICT](https://cc-cedict.org/wiki/) 建立獨立的中英
 
 `HybridIME/DictionaryData/dictionary-overrides.tsv` 可把已確認的翻譯候選
 移至最前，這些本地排序不會在重新生成 CC-CEDICT 索引時被覆蓋。
+覆寫亦可使用 `replace-e` 或 `replace-z` 完全取代指定方向的候選。
+
+## 應用程式快捷鍵
+
+包含 Command、Control 或 Option 的按鍵組合不由 HybridIME 處理，會直接
+交回目前應用程式。因此 `⌘C`、`⌘V`、`⌘X`、`⌘A`、`⌘Z`、`⌘S`、
+`⌘W` 等快捷鍵可正常使用。Shift 仍用於輸入英文大寫。
 
 更新字典時，從
 [MDBG CC-CEDICT 下載頁](https://www.mdbg.net/chinese/dictionary?page=cc-cedict)

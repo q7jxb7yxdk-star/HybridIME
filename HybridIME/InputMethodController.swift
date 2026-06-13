@@ -38,7 +38,6 @@ final class InputMethodController: IMKInputController {
 
         let modifiers = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
         if !modifiers.intersection([.command, .control, .option]).isEmpty {
-            commitDefault(to: sender)
             return false
         }
 

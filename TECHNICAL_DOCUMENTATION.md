@@ -70,7 +70,12 @@ ASCII 英文字母會轉為小寫並加入 `buffer`。每次更新後：
 | `0` | 提交第十個候選 |
 | `Delete` | 刪除緩衝區最後一個字母 |
 | `Esc` | 清除組字內容及候選視窗 |
-| `Command`、`Control` 或 `Option` 組合鍵 | 先提交英文，再把事件交回目標應用程式 |
+| `Command`、`Control` 或 `Option` 組合鍵 | 不處理事件，直接交回目標應用程式 |
+
+修飾鍵檢查在其他按鍵處理之前執行。包含 Command、Control 或 Option 的
+`keyDown` 會立即回傳 `false`，且不會同步提交、清除或修改 marked text，
+避免 InputMethodKit 中斷 `⌘C`、`⌘V`、`⌘A`、`⌘Z` 等應用程式快捷鍵。
+Shift 不在此透傳集合內，因此仍可保留英文大小寫。
 
 ### 標點符號
 
@@ -311,7 +316,8 @@ HybridIME/DictionaryData/dictionary-overrides.tsv
 ```
 
 支援 `add-e` 及 `add-z`，把候選依欄位次序移至指定英文或中文查詢鍵的
-最前方。此檔案不由生成器改寫。
+最前方。`replace-e` 及 `replace-z` 則完全取代指定方向的候選。此檔案
+不由生成器改寫。
 
 重新生成：
 
@@ -325,6 +331,15 @@ swift Scripts/build_cedict_index.swift \
 中文至英文方向會在倉頡中文候選後顯示英文翻譯；若翻譯來自游標前中文
 與當前候選組成的詞語，選取英文時會透過 `replacementRange` 一併替換
 該中文前綴及目前 marked text。
+
+當同一組字母同時命中倉頡碼與英文詞典時，完整排序是：
+
+1. 倉頡中文候選。
+2. 每個倉頡候選的英文翻譯。
+3. 英文查中文候選。
+
+例如 `oh` 先命中倉頡「入」，再顯示「入」的英文翻譯，最後顯示本地
+`replace-e` 規則指定的「噢」。
 
 ## 10. 建置及安裝
 

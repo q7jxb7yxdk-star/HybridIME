@@ -110,6 +110,23 @@ final class CandidateWindowController {
         updatePanel(client: client)
     }
 
+    func showAssociations(
+        candidates: [String],
+        client: IMKTextInput?
+    ) {
+        guard !candidates.isEmpty else {
+            hide()
+            return
+        }
+
+        codeLabel.isHidden = true
+        rootsLabel.isHidden = true
+        candidatesLabel.attributedStringValue = candidateText(candidates)
+        candidatesLabel.isHidden = false
+
+        updatePanel(client: client)
+    }
+
     private func updatePanel(client: IMKTextInput?) {
         panel.contentView?.layoutSubtreeIfNeeded()
         let fittingSize = panel.contentView?.fittingSize ?? .zero

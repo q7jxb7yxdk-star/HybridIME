@@ -11,6 +11,8 @@ HybridIME 是以 Swift、AppKit、SwiftUI 及 InputMethodKit 開發的 macOS 輸
 | `HybridIMEApp.swift` | 建立 `IMKServer`，向 macOS 註冊並啟用輸入來源 |
 | `InputMethodController.swift` | 接收按鍵事件、管理輸入緩衝區及提交文字 |
 | `CangjieDecoder.swift` | 載入倉頡碼表、套用相容規則及查詢候選 |
+| `BilingualDictionary.swift` | 載入 CC-CEDICT 中英雙向索引 |
+| `AssociationDictionary.swift` | 載入中英文聯想索引及管理本機排序 |
 | `CandidateWindowController.swift` | 建立及定位自訂候選視窗 |
 | `ContentView.swift` | 顯示 HybridIME 的說明視窗 |
 | `Info.plist` | 定義輸入法識別碼、語言、圖示及控制器類別 |
@@ -77,6 +79,24 @@ ASCII 英文字母會轉為小寫並加入 `buffer`。每次更新後：
 避免 InputMethodKit 中斷 `⌘C`、`⌘V`、`⌘A`、`⌘Z` 等應用程式快捷鍵。
 Shift 不在此透傳集合內，因此仍可保留英文大小寫。
 
+### 聯想候選狀態
+
+聯想候選不建立 marked text。提交中文或英文後，
+`showAssociations(context:language:client:)` 查詢同語言的後續候選，並以
+`CandidateAction.associate` 保存候選文字、查詢鍵及語言。
+
+| 按鍵 | 聯想狀態行為 |
+| --- | --- |
+| `Return`、`1` 至 `0` | 提交所選聯想並繼續查詢 |
+| `Esc` | 關閉聯想並清除上下文 |
+| 英文字母 | 收起聯想視窗，開始新的正常組字 |
+| 標點、Delete、其他非文字鍵 | 關閉聯想並清除上下文 |
+| Command、Control、Option 快捷鍵 | 清除聯想後透傳至應用程式 |
+
+中文聯想直接附加候選；英文聯想附加候選及一個空格。選取後會呼叫
+`AssociationDictionary.recordSelection`，把使用次數寫入目前使用者的
+`UserDefaults`。資料只在本機使用。
+
 ### 標點符號
 
 鍵盤可輸入的 ASCII 標點及符號會進入獨立的標點候選狀態。`punctuationPair(for:)` 定義半形與全形對照；逗號使用 `,`／`，`，句號使用 `.`／`。`，其他字符使用相應的全形字符。
@@ -119,6 +139,7 @@ Shift 不在此透傳集合內，因此仍可保留英文大小寫。
 - 第二列顯示每個鍵位對應的倉頡字母。
 - 第三列顯示實際輸入的英文字母碼。
 - 標點模式只顯示半形及全形候選列。
+- 聯想模式只顯示帶數字的聯想候選列，不顯示倉頡字根及輸入碼。
 
 當完整字碼尚未命中時，候選列會隱藏，但倉頡字母及英文碼會持續顯示。例如：
 
@@ -341,7 +362,53 @@ swift Scripts/build_cedict_index.swift \
 例如 `oh` 先命中倉頡「入」，再顯示「入」的英文翻譯，最後顯示本地
 `replace-e` 規則指定的「噢」。
 
-## 10. 建置及安裝
+## 10. 中英文聯想資料
+
+### 10.1 中文聯想
+
+中文資料來源為 [Rime Essay](https://github.com/rime/rime-essay)，即 Rime
+的共享詞彙表及語言模型。生成器讀取詞語及權重，把每個純中文字詞拆成：
+
+```text
+context	completion	weight...
+```
+
+例如「測試」生成 `測 → 試`，「測試結果」可生成
+`測試 → 結果`。每個上下文最多保留十個候選，按累計權重排序；詞語最長
+八字，接續內容最長四字。
+
+```sh
+swift Scripts/build_chinese_associations.swift \
+  /path/to/essay.txt \
+  HybridIME/AssociationData/chinese-associations.tsv
+```
+
+### 10.2 英文聯想
+
+英文資料只使用 Tatoeba 英文 CC0 句子匯出。生成器把句子正規化為小寫
+英文單詞，統計相鄰單詞 bigram：
+
+```text
+context	completion	count...
+```
+
+每個英文詞最多保留十個下一詞候選，按出現次數排序。
+
+```sh
+swift Scripts/build_english_associations.swift \
+  /path/to/eng_sentences_CC0.tsv \
+  HybridIME/AssociationData/english-associations.tsv
+```
+
+### 10.3 查詢與學習
+
+中文查詢由完整上下文開始逐字縮短，使用最長可命中的後綴。英文查詢使用
+最後一個英文單詞。排序時先比較使用者在 `UserDefaults` 的選取次數，再
+比較靜態權重或 bigram 次數。
+
+App 只載入生成後的索引，不打包 Rime Essay 或 Tatoeba 原始語料。
+
+## 11. 建置及安裝
 
 命令列建置：
 
@@ -365,7 +432,7 @@ xcodebuild \
 
 建置需要可用的 Apple Development 憑證。這不代表必須加入付費 Apple Developer Program；免費 Apple ID 亦可由 Xcode 建立個人開發憑證，但憑證及簽署限制可能不同。
 
-## 11. 已知限制
+## 12. 已知限制
 
 - 無法直接讀取或調用 Apple 的系統倉頡解碼器。
 - 與 macOS 倉頡的一致性取決於 `macOS-overrides.tsv` 已收錄的差異。
@@ -376,8 +443,10 @@ xcodebuild \
 - 中文至英文翻譯依賴目標應用程式正確提供 marked range、selection 及
   `attributedSubstring`；不完整支援 `NSTextInputClient` 的應用程式可能
   只能使用當前單字翻譯。
+- 英文聯想資料來自較小的 CC0 子集，罕見詞的候選可能不足。
+- 聯想目前沒有設定介面或清除個人學習資料的按鈕。
 
-## 12. 授權與歸屬
+## 13. 授權與歸屬
 
 Rime 倉頡資料的來源及授權聲明位於：
 
@@ -393,4 +462,12 @@ CC-CEDICT 衍生索引的來源及 CC BY-SA 4.0 授權聲明位於：
 ```text
 HybridIME/DictionaryData/LICENSE-CC-CEDICT.txt
 HybridIME/DictionaryData/NOTICE-CC-CEDICT.txt
+```
+
+聯想資料的來源及授權聲明位於：
+
+```text
+HybridIME/AssociationData/LICENSE-Rime-Essay.txt
+HybridIME/AssociationData/NOTICE-Rime-Essay.txt
+HybridIME/AssociationData/NOTICE-Tatoeba-CC0.txt
 ```

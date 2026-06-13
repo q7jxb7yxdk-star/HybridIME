@@ -28,6 +28,8 @@ HybridIME 是一個 macOS 中英文混合倉頡五代輸入法。
 - 輸入完整英文詞時顯示繁體中文翻譯候選。
 - 輸入倉頡時，在中文候選後顯示對應的英文翻譯。
 - Command、Control 及 Option 快捷鍵會交回目前應用程式。
+- 提交中文或英文後顯示同語言的聯想候選。
+- 聯想候選會按本機使用次數逐步調整排序。
 
 ## 候選顯示
 
@@ -216,6 +218,48 @@ HybridIME 使用 [CC-CEDICT](https://cc-cedict.org/wiki/) 建立獨立的中英
 交回目前應用程式。因此 `⌘C`、`⌘V`、`⌘X`、`⌘A`、`⌘Z`、`⌘S`、
 `⌘W` 等快捷鍵可正常使用。Shift 仍用於輸入英文大寫。
 
+## 中英文聯想
+
+提交中文後，HybridIME 會根據最後的中文詞語顯示中文聯想。例如提交
+「測」後可顯示：
+
+```text
+1 試   2 量   3 評   4 定
+```
+
+選擇「試」後，會以「測試」繼續顯示：
+
+```text
+1 用例   2 人員   3 工程師   4 開發   5 結果
+```
+
+英文聯想在按 Space 提交英文後出現。例如輸入 `thank` 並按 Space，可顯示
+`you`、`god`、`for` 等候選。選擇英文聯想後會自動加入空格並繼續聯想。
+
+- 按 `Return` 或數字鍵選擇聯想。
+- 按 `Esc` 關閉聯想。
+- 開始輸入新字時，聯想視窗會收起並進入正常組字。
+- 標點、Delete、移動游標或應用程式快捷鍵會清除聯想上下文。
+- 使用者選過的聯想會只在本機透過 `UserDefaults` 累計，提高日後排序。
+- 輸入內容及學習資料不會上傳。
+
+中文聯想資料由
+[Rime Essay](https://github.com/rime/rime-essay) 的詞彙及權重生成。英文
+聯想只使用 [Tatoeba](https://tatoeba.org/en/downloads) 的英文 CC0
+句子子集生成相鄰詞統計。
+
+重新生成：
+
+```sh
+swift Scripts/build_chinese_associations.swift \
+  /path/to/essay.txt \
+  HybridIME/AssociationData/chinese-associations.tsv
+
+swift Scripts/build_english_associations.swift \
+  /path/to/eng_sentences_CC0.tsv \
+  HybridIME/AssociationData/english-associations.tsv
+```
+
 更新字典時，從
 [MDBG CC-CEDICT 下載頁](https://www.mdbg.net/chinese/dictionary?page=cc-cedict)
 取得最新資料，再執行：
@@ -243,3 +287,6 @@ swift Scripts/build_cedict_index.swift \
 - `HybridIME/CangjieData/NOTICE.txt`
 - `HybridIME/DictionaryData/LICENSE-CC-CEDICT.txt`
 - `HybridIME/DictionaryData/NOTICE-CC-CEDICT.txt`
+- `HybridIME/AssociationData/LICENSE-Rime-Essay.txt`
+- `HybridIME/AssociationData/NOTICE-Rime-Essay.txt`
+- `HybridIME/AssociationData/NOTICE-Tatoeba-CC0.txt`

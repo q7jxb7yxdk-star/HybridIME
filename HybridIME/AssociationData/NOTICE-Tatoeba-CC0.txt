@@ -1,0 +1,10 @@
+HybridIME English association data
+
+The generated english-associations.tsv file is derived only from the English
+CC0 sentence export published by Tatoeba.
+
+Source:
+https://tatoeba.org/en/downloads
+
+The source sentences used for this index were released under CC0 1.0.
+https://creativecommons.org/publicdomain/zero/1.0/

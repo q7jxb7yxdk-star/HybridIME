@@ -1,0 +1,12 @@
+HybridIME Chinese association data
+
+The generated chinese-associations.tsv file is derived from Rime Essay,
+Rime's shared vocabulary and language model.
+
+Source:
+https://github.com/rime/rime-essay
+
+License:
+GNU Lesser General Public License version 3.0 (LGPL-3.0)
+
+The generated association index remains subject to the applicable license.

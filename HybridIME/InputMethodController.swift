@@ -7,11 +7,14 @@ final class InputMethodController: IMKInputController {
     private enum CandidateAction {
         case commit(String)
         case translate(String, replacingPrefixUTF16Length: Int)
+        case associate(AssociationDictionary.Suggestion)
 
         var text: String {
             switch self {
             case .commit(let text), .translate(let text, _):
                 text
+            case .associate(let suggestion):
+                suggestion.text
             }
         }
 
@@ -25,10 +28,14 @@ final class InputMethodController: IMKInputController {
 
     private let decoder = CangjieDecoder()
     private let bilingualDictionary = BilingualDictionary.shared
+    private let associationDictionary = AssociationDictionary.shared
     private var buffer = ""
     private var currentCandidates: [String] = []
     private var currentCandidateActions: [CandidateAction] = []
     private var isSelectingPunctuation = false
+    private var isSelectingAssociation = false
+    private var associationContext = ""
+    private var associationLanguage: AssociationDictionary.Language?
     private var lastCommittedCharacter: Character?
 
     override func handle(_ event: NSEvent!, client sender: Any!) -> Bool {
@@ -38,11 +45,16 @@ final class InputMethodController: IMKInputController {
 
         let modifiers = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
         if !modifiers.intersection([.command, .control, .option]).isEmpty {
+            dismissAssociation(clearContext: true)
             return false
         }
 
         switch event.keyCode {
         case 49:
+            if isSelectingAssociation {
+                dismissAssociation(clearContext: true)
+                return false
+            }
             guard !buffer.isEmpty else { return false }
             if isSelectingPunctuation {
                 commitCandidate(at: 0, to: sender)
@@ -51,10 +63,16 @@ final class InputMethodController: IMKInputController {
             }
             return true
         case 36, 76:
-            guard !buffer.isEmpty else { return false }
+            guard !buffer.isEmpty || isSelectingAssociation else {
+                return false
+            }
             commitCandidate(at: 0, to: sender)
             return true
         case 51:
+            if isSelectingAssociation {
+                dismissAssociation(clearContext: true)
+                return false
+            }
             guard !buffer.isEmpty else { return false }
             if isSelectingPunctuation {
                 clearComposition()
@@ -64,6 +82,10 @@ final class InputMethodController: IMKInputController {
             refreshComposition(client: sender)
             return true
         case 53:
+            if isSelectingAssociation {
+                dismissAssociation(clearContext: true)
+                return true
+            }
             guard !buffer.isEmpty else { return false }
             clearComposition()
             return true
@@ -71,7 +93,10 @@ final class InputMethodController: IMKInputController {
             break
         }
 
-        if let index = candidateIndex(for: event), !buffer.isEmpty {
+        if
+            let index = candidateIndex(for: event),
+            !buffer.isEmpty || isSelectingAssociation
+        {
             commitCandidate(at: index, to: sender)
             return true
         }
@@ -80,6 +105,7 @@ final class InputMethodController: IMKInputController {
             let character = event.characters?.first,
             let punctuation = punctuationPair(for: character)
         {
+            dismissAssociation(clearContext: true)
             if !buffer.isEmpty {
                 commitDefault(to: sender)
             }
@@ -101,12 +127,14 @@ final class InputMethodController: IMKInputController {
                 CharacterSet.letters.contains($0) && $0.isASCII
             })
         else {
+            dismissAssociation(clearContext: true)
             if !buffer.isEmpty {
                 commitDefault(to: sender)
             }
             return false
         }
 
+        dismissAssociation(clearContext: false)
         isSelectingPunctuation = false
         buffer.append(characters)
         refreshComposition(client: sender)
@@ -139,6 +167,7 @@ final class InputMethodController: IMKInputController {
     }
 
     private func refreshComposition(client sender: Any?) {
+        isSelectingAssociation = false
         isSelectingPunctuation = false
         let dictionaryCandidates = bilingualDictionary.chineseCandidates(
             for: buffer,
@@ -265,6 +294,9 @@ final class InputMethodController: IMKInputController {
         currentCandidates = []
         currentCandidateActions = []
         isSelectingPunctuation = false
+        isSelectingAssociation = false
+        associationContext = ""
+        associationLanguage = nil
         updateComposition()
         CandidateWindowController.shared.hide()
     }
@@ -296,6 +328,9 @@ final class InputMethodController: IMKInputController {
                 replacingPrefixUTF16Length: prefixLength,
                 to: sender
             )
+        case .associate(let suggestion):
+            associationDictionary.recordSelection(suggestion)
+            commitAssociation(suggestion, to: sender)
         }
     }
 
@@ -309,7 +344,26 @@ final class InputMethodController: IMKInputController {
         currentCandidates = []
         currentCandidateActions = []
         isSelectingPunctuation = false
-        CandidateWindowController.shared.hide()
+        isSelectingAssociation = false
+
+        if let language = associationLanguage(for: text) {
+            let cleanText = text.trimmingCharacters(in: .whitespacesAndNewlines)
+            let context: String
+            if associationLanguage == language, !associationContext.isEmpty {
+                context = language == .chinese
+                    ? associationContext + cleanText
+                    : cleanText
+            } else {
+                context = cleanText
+            }
+            showAssociations(
+                context: context,
+                language: language,
+                client: sender as? IMKTextInput
+            )
+        } else {
+            dismissAssociation(clearContext: true)
+        }
     }
 
     private func commitTranslation(
@@ -353,7 +407,90 @@ final class InputMethodController: IMKInputController {
         currentCandidates = []
         currentCandidateActions = []
         isSelectingPunctuation = false
+        isSelectingAssociation = false
+        showAssociations(
+            context: text,
+            language: .english,
+            client: sender as? IMKTextInput
+        )
+    }
+
+    private func commitAssociation(
+        _ suggestion: AssociationDictionary.Suggestion,
+        to sender: Any?
+    ) {
+        let insertedText = suggestion.language == .english
+            ? suggestion.text + " "
+            : suggestion.text
+        (sender as? IMKTextInput)?.insertText(
+            insertedText,
+            replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
+        )
+        lastCommittedCharacter = insertedText.last
+
+        let context = suggestion.language == .chinese
+            ? associationContext + suggestion.text
+            : suggestion.text
+        showAssociations(
+            context: context,
+            language: suggestion.language,
+            client: sender as? IMKTextInput
+        )
+    }
+
+    private func showAssociations(
+        context: String,
+        language: AssociationDictionary.Language,
+        client: IMKTextInput?
+    ) {
+        let suggestions = associationDictionary.suggestions(
+            for: context,
+            language: language,
+            limit: 10
+        )
+        guard !suggestions.isEmpty else {
+            dismissAssociation(clearContext: true)
+            return
+        }
+
+        associationContext = context
+        associationLanguage = language
+        currentCandidateActions = suggestions.map(CandidateAction.associate)
+        currentCandidates = suggestions.map(\.text)
+        isSelectingAssociation = true
+        isSelectingPunctuation = false
+        CandidateWindowController.shared.showAssociations(
+            candidates: currentCandidates,
+            client: client
+        )
+    }
+
+    private func dismissAssociation(clearContext: Bool) {
+        guard isSelectingAssociation || clearContext else { return }
+        isSelectingAssociation = false
+        currentCandidates = []
+        currentCandidateActions = []
         CandidateWindowController.shared.hide()
+        if clearContext {
+            associationContext = ""
+            associationLanguage = nil
+        }
+    }
+
+    private func associationLanguage(
+        for text: String
+    ) -> AssociationDictionary.Language? {
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return nil }
+        if trimmed.allSatisfy(isChinese) {
+            return .chinese
+        }
+        if trimmed.allSatisfy({
+            $0.isASCII && ($0.isLetter || $0 == "'" || $0.isWhitespace)
+        }) {
+            return .english
+        }
+        return nil
     }
 
     private func beginPunctuationSelection(
@@ -365,6 +502,7 @@ final class InputMethodController: IMKInputController {
         ),
         client: IMKTextInput?
     ) {
+        dismissAssociation(clearContext: true)
         let useFullWidth = characterBeforeCursor(in: client).map(isChinese) ?? false
         let defaultCandidate = useFullWidth
             ? punctuation.chineseDefault ?? punctuation.fullWidth
@@ -376,6 +514,7 @@ final class InputMethodController: IMKInputController {
         currentCandidateActions = currentCandidates.map(CandidateAction.commit)
         buffer = currentCandidates[0]
         isSelectingPunctuation = true
+        isSelectingAssociation = false
         updateComposition()
         CandidateWindowController.shared.showPunctuation(
             candidates: currentCandidates,

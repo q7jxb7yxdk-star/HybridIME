@@ -21,9 +21,10 @@ HybridIME 是以 Swift、AppKit、SwiftUI 及 InputMethodKit 開發的 macOS 輸
 
 1. 從 `Info.plist` 讀取 `InputMethodConnectionName`。
 2. 使用 bundle identifier 建立 `IMKServer`。
-3. 呼叫 `TISRegisterInputSource` 註冊應用程式。
-4. 使用 `TISCreateInputSourceList` 尋找相同 bundle identifier 的輸入來源。
-5. 呼叫 `TISEnableInputSource` 啟用找到的輸入來源。
+
+應用程式啟動時不會呼叫 `TISRegisterInputSource` 或 `TISEnableInputSource`。輸入來源的註冊及啟用只屬於安裝流程，避免 macOS 每次重新啟動輸入法程序時顯示「允許中英混合啟用中英混合」的提示。
+
+當 HybridIME 是目前選用的輸入法時，其程序由 macOS 管理。直接終止程序後，系統可能自動重新啟動；若要停止程序，應先切換至其他輸入法。
 
 主要識別碼：
 
@@ -285,6 +286,8 @@ xcodebuild \
 ```text
 ~/Library/Input Methods/HybridIME.app
 ```
+
+安裝後可透過「系統設定 > 鍵盤 > 文字輸入」加入及啟用「中英混合」。開發時如需以 Carbon Text Input Source API 重新註冊，應由外部安裝命令執行一次，不應放在應用程式啟動流程。
 
 建置需要可用的 Apple Development 憑證。這不代表必須加入付費 Apple Developer Program；免費 Apple ID 亦可由 Xcode 建立個人開發憑證，但憑證及簽署限制可能不同。
 

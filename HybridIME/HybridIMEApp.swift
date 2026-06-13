@@ -6,7 +6,6 @@
 //
 
 import AppKit
-import Carbon
 import InputMethodKit
 import SwiftUI
 
@@ -29,59 +28,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             name: connectionName,
             bundleIdentifier: bundleIdentifier
         )
-
-        registerAndEnableInputSource(
-            at: Bundle.main.bundleURL,
-            bundleIdentifier: bundleIdentifier
-        )
-    }
-
-    private func registerAndEnableInputSource(
-        at bundleURL: URL,
-        bundleIdentifier: String
-    ) {
-        let registrationStatus = TISRegisterInputSource(bundleURL as CFURL)
-        guard registrationStatus == noErr else {
-            NSLog("HybridIME registration failed: \(registrationStatus)")
-            return
-        }
-
-        guard
-            let inputSourceList = TISCreateInputSourceList(nil, true)?
-                .takeRetainedValue() as? [TISInputSource]
-        else {
-            NSLog("HybridIME could not read the input source list")
-            return
-        }
-
-        var foundMatchingSource = false
-        for inputSource in inputSourceList {
-            guard
-                let bundleIDPointer = TISGetInputSourceProperty(
-                    inputSource,
-                    kTISPropertyBundleID
-                )
-            else {
-                continue
-            }
-
-            let sourceBundleID = Unmanaged<CFString>
-                .fromOpaque(bundleIDPointer)
-                .takeUnretainedValue() as String
-            guard sourceBundleID == bundleIdentifier else {
-                continue
-            }
-
-            foundMatchingSource = true
-            let enableStatus = TISEnableInputSource(inputSource)
-            if enableStatus != noErr {
-                NSLog("HybridIME enable failed: \(enableStatus)")
-            }
-        }
-
-        if !foundMatchingSource {
-            NSLog("HybridIME registration succeeded but no input source was found")
-        }
     }
 }
 

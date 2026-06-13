@@ -174,13 +174,22 @@ final class InputMethodController: IMKInputController {
     }
 
     private func beginPunctuationSelection(
-        _ pair: (halfWidth: String, fullWidth: String),
+        _ punctuation: (
+            halfWidth: String,
+            fullWidth: String,
+            candidates: [String],
+            chineseDefault: String?
+        ),
         client: IMKTextInput?
     ) {
         let useFullWidth = characterBeforeCursor(in: client).map(isChinese) ?? false
-        currentCandidates = useFullWidth
-            ? [pair.fullWidth, pair.halfWidth]
-            : [pair.halfWidth, pair.fullWidth]
+        let defaultCandidate = useFullWidth
+            ? punctuation.chineseDefault ?? punctuation.fullWidth
+            : punctuation.halfWidth
+        currentCandidates = [defaultCandidate]
+        currentCandidates.append(
+            contentsOf: punctuation.candidates.filter { $0 != defaultCandidate }
+        )
         buffer = currentCandidates[0]
         isSelectingPunctuation = true
         updateComposition()
@@ -231,7 +240,12 @@ final class InputMethodController: IMKInputController {
 
     private func punctuationPair(
         for character: Character
-    ) -> (halfWidth: String, fullWidth: String)? {
+    ) -> (
+        halfWidth: String,
+        fullWidth: String,
+        candidates: [String],
+        chineseDefault: String?
+    )? {
         let fullWidthByHalfWidth: [Character: Character] = [
             "!": "！", "\"": "＂", "#": "＃", "$": "＄",
             "%": "％", "&": "＆", "'": "＇", "(": "（",
@@ -245,7 +259,31 @@ final class InputMethodController: IMKInputController {
         guard let fullWidth = fullWidthByHalfWidth[character] else {
             return nil
         }
-        return (String(character), String(fullWidth))
+        let candidates: [String]
+        let chineseDefault: String?
+        switch character {
+        case "[":
+            candidates = ["[", "「", "〔", "［", "【", "〖"]
+            chineseDefault = "「"
+        case "]":
+            candidates = ["]", "」", "〕", "］", "】", "〗"]
+            chineseDefault = "」"
+        case "{":
+            candidates = ["{", "『", "｛"]
+            chineseDefault = "『"
+        case "}":
+            candidates = ["}", "』", "｝"]
+            chineseDefault = "』"
+        default:
+            candidates = [String(character), String(fullWidth)]
+            chineseDefault = nil
+        }
+        return (
+            String(character),
+            String(fullWidth),
+            candidates,
+            chineseDefault
+        )
     }
 
     private func candidateIndex(for event: NSEvent) -> Int? {

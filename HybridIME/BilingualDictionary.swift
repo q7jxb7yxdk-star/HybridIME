@@ -113,6 +113,10 @@ struct BilingualDictionary {
                 )
             case "add-z":
                 moveToFront(candidates, for: key, in: &chineseToEnglish)
+            case "replace-e":
+                englishToChinese[key.lowercased()] = unique(candidates)
+            case "replace-z":
+                chineseToEnglish[key] = unique(candidates)
             default:
                 continue
             }
@@ -128,5 +132,10 @@ struct BilingualDictionary {
             table[key, default: []].removeAll { $0 == candidate }
             table[key, default: []].insert(candidate, at: 0)
         }
+    }
+
+    private static func unique(_ candidates: [String]) -> [String] {
+        var seen: Set<String> = []
+        return candidates.filter { seen.insert($0).inserted }
     }
 }

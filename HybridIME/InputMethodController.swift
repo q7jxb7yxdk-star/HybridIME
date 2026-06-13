@@ -189,10 +189,6 @@ final class InputMethodController: IMKInputController {
             result.append(action)
         }
 
-        for candidate in dictionaryCandidates {
-            append(.commit(candidate))
-        }
-
         let precedingChinese = chineseTextBeforeComposition(in: client)
         for candidate in cangjieCandidates where result.count < limit {
             append(.commit(candidate))
@@ -209,6 +205,9 @@ final class InputMethodController: IMKInputController {
                     )
                 )
             }
+        }
+        for candidate in dictionaryCandidates {
+            append(.commit(candidate))
         }
         return result
     }

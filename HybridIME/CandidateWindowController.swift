@@ -72,6 +72,7 @@ final class CandidateWindowController {
     func show(
         code: String,
         candidates: [String],
+        translationIndices: Set<Int> = [],
         client: IMKTextInput?
     ) {
         guard !code.isEmpty else {
@@ -83,7 +84,10 @@ final class CandidateWindowController {
         codeLabel.isHidden = false
         rootsLabel.stringValue = cangjieRoots(for: code)
         rootsLabel.isHidden = false
-        candidatesLabel.attributedStringValue = candidateText(candidates)
+        candidatesLabel.attributedStringValue = candidateText(
+            candidates,
+            translationIndices: translationIndices
+        )
         candidatesLabel.isHidden = candidates.isEmpty
 
         updatePanel(client: client)
@@ -135,7 +139,10 @@ final class CandidateWindowController {
         return String(code.lowercased().compactMap { roots[$0] })
     }
 
-    private func candidateText(_ candidates: [String]) -> NSAttributedString {
+    private func candidateText(
+        _ candidates: [String],
+        translationIndices: Set<Int> = []
+    ) -> NSAttributedString {
         let result = NSMutableAttributedString()
 
         for (index, candidate) in candidates.enumerated() {
@@ -161,7 +168,9 @@ final class CandidateWindowController {
                     string: candidate,
                     attributes: [
                         .font: NSFont.systemFont(ofSize: 17),
-                        .foregroundColor: NSColor.labelColor,
+                        .foregroundColor: translationIndices.contains(index)
+                            ? NSColor.secondaryLabelColor
+                            : NSColor.labelColor,
                     ]
                 )
             )

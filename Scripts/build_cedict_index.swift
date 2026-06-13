@@ -12,7 +12,9 @@ private func usage() -> Never {
     exit(2)
 }
 
-private func normalizedEnglishKeys(from definition: String) -> [String] {
+private func normalizedEnglishTerms(
+    from definition: String
+) -> (lookupKeys: [String], displayTerm: String)? {
     var text = definition.lowercased()
     text = text.replacingOccurrences(
         of: #"\([^)]*\)"#,
@@ -29,25 +31,27 @@ private func normalizedEnglishKeys(from definition: String) -> [String] {
             options: .regularExpression
         ) != nil
     else {
-        return []
+        return nil
     }
 
     text = text
         .split(whereSeparator: \.isWhitespace)
         .joined(separator: " ")
     guard text.split(separator: " ").count <= 4 else {
-        return []
+        return nil
     }
 
     var keys = [text]
+    var displayTerm = text
     for prefix in removablePrefixes where text.hasPrefix(prefix) {
         let stripped = String(text.dropFirst(prefix.count))
         if !stripped.isEmpty {
             keys.append(stripped)
+            displayTerm = stripped
         }
         break
     }
-    return keys
+    return (keys, displayTerm)
 }
 
 private func appendUnique(
@@ -97,10 +101,19 @@ for line in contents.split(whereSeparator: \.isNewline) {
         .split(separator: "/", omittingEmptySubsequences: true)
 
     for definition in definitions {
-        for english in normalizedEnglishKeys(from: String(definition)) {
-            appendUnique(traditional, to: english, in: &englishToChinese)
-            appendUnique(english, to: traditional, in: &chineseToEnglish)
+        guard let english = normalizedEnglishTerms(
+            from: String(definition)
+        ) else {
+            continue
         }
+        for key in english.lookupKeys {
+            appendUnique(traditional, to: key, in: &englishToChinese)
+        }
+        appendUnique(
+            english.displayTerm,
+            to: traditional,
+            in: &chineseToEnglish
+        )
     }
 }
 

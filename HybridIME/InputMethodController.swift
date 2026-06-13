@@ -4,10 +4,30 @@ import InputMethodKit
 @objc(HybridIMEInputController)
 @MainActor
 final class InputMethodController: IMKInputController {
+    private enum CandidateAction {
+        case commit(String)
+        case translate(String, replacingPrefixUTF16Length: Int)
+
+        var text: String {
+            switch self {
+            case .commit(let text), .translate(let text, _):
+                text
+            }
+        }
+
+        var isTranslation: Bool {
+            if case .translate = self {
+                return true
+            }
+            return false
+        }
+    }
+
     private let decoder = CangjieDecoder()
     private let bilingualDictionary = BilingualDictionary.shared
     private var buffer = ""
     private var currentCandidates: [String] = []
+    private var currentCandidateActions: [CandidateAction] = []
     private var isSelectingPunctuation = false
     private var lastCommittedCharacter: Character?
 
@@ -100,7 +120,11 @@ final class InputMethodController: IMKInputController {
 
     override func candidateSelected(_ candidateString: NSAttributedString!) {
         guard let candidateString else { return }
-        commit(candidateString.string, to: client())
+        if let index = currentCandidates.firstIndex(of: candidateString.string) {
+            commitCandidate(at: index, to: client())
+        } else {
+            commit(candidateString.string, to: client())
+        }
     }
 
     override func commitComposition(_ sender: Any!) {
@@ -124,11 +148,13 @@ final class InputMethodController: IMKInputController {
         let cangjieCandidates = buffer.count <= 5
             ? decoder.candidates(for: buffer.lowercased(), limit: 10)
             : []
-        currentCandidates = mergedCandidates(
-            dictionaryCandidates,
-            cangjieCandidates,
+        currentCandidateActions = candidateActions(
+            dictionaryCandidates: dictionaryCandidates,
+            cangjieCandidates: cangjieCandidates,
+            client: sender as? IMKTextInput,
             limit: 10
         )
+        currentCandidates = currentCandidateActions.map(\.text)
         updateComposition()
 
         if buffer.isEmpty {
@@ -137,29 +163,109 @@ final class InputMethodController: IMKInputController {
             CandidateWindowController.shared.show(
                 code: buffer,
                 candidates: currentCandidates,
+                translationIndices: Set(
+                    currentCandidateActions.indices.filter {
+                        currentCandidateActions[$0].isTranslation
+                    }
+                ),
                 client: sender as? IMKTextInput
             )
         }
     }
 
-    private func mergedCandidates(
-        _ groups: [String]...,
+    private func candidateActions(
+        dictionaryCandidates: [String],
+        cangjieCandidates: [String],
+        client: IMKTextInput?,
         limit: Int
-    ) -> [String] {
-        var result: [String] = []
+    ) -> [CandidateAction] {
+        var result: [CandidateAction] = []
         var seen: Set<String> = []
-        for candidate in groups.joined() where seen.insert(candidate).inserted {
-            result.append(candidate)
-            if result.count == limit {
-                break
+
+        func append(_ action: CandidateAction) {
+            guard result.count < limit, seen.insert(action.text).inserted else {
+                return
+            }
+            result.append(action)
+        }
+
+        for candidate in dictionaryCandidates {
+            append(.commit(candidate))
+        }
+
+        let precedingChinese = chineseTextBeforeComposition(in: client)
+        for candidate in cangjieCandidates where result.count < limit {
+            append(.commit(candidate))
+
+            let lookup = longestTranslationLookup(
+                precedingChinese: precedingChinese,
+                candidate: candidate
+            )
+            for translation in lookup.translations.prefix(2) {
+                append(
+                    .translate(
+                        translation,
+                        replacingPrefixUTF16Length: lookup.prefix.utf16.count
+                    )
+                )
             }
         }
         return result
     }
 
+    private func longestTranslationLookup(
+        precedingChinese: String,
+        candidate: String
+    ) -> (prefix: String, translations: [String]) {
+        let characters = Array(precedingChinese)
+        for length in stride(from: characters.count, through: 0, by: -1) {
+            let prefix = String(characters.suffix(length))
+            let translations = bilingualDictionary.englishCandidates(
+                for: prefix + candidate,
+                limit: 2
+            )
+            if !translations.isEmpty {
+                return (prefix, translations)
+            }
+        }
+        return ("", [])
+    }
+
+    private func chineseTextBeforeComposition(
+        in client: IMKTextInput?
+    ) -> String {
+        guard let textClient = client as? NSTextInputClient else {
+            return ""
+        }
+
+        let markedRange = textClient.markedRange()
+        let selection = textClient.selectedRange()
+        let compositionLocation = markedRange.location != NSNotFound
+            ? markedRange.location
+            : selection.location
+        guard compositionLocation != NSNotFound, compositionLocation > 0 else {
+            return ""
+        }
+
+        let maximumUTF16Length = 24
+        let start = max(0, compositionLocation - maximumUTF16Length)
+        guard let text = textClient.attributedSubstring(
+            forProposedRange: NSRange(
+                location: start,
+                length: compositionLocation - start
+            ),
+            actualRange: nil
+        )?.string else {
+            return ""
+        }
+
+        return String(text.reversed().prefix(while: isChinese).reversed())
+    }
+
     private func clearComposition() {
         buffer = ""
         currentCandidates = []
+        currentCandidateActions = []
         isSelectingPunctuation = false
         updateComposition()
         CandidateWindowController.shared.hide()
@@ -179,11 +285,20 @@ final class InputMethodController: IMKInputController {
     }
 
     private func commitCandidate(at index: Int, to sender: Any?) {
-        guard currentCandidates.indices.contains(index) else {
+        guard currentCandidateActions.indices.contains(index) else {
             commitEnglish(to: sender)
             return
         }
-        commit(currentCandidates[index], to: sender)
+        switch currentCandidateActions[index] {
+        case .commit(let text):
+            commit(text, to: sender)
+        case .translate(let text, let prefixLength):
+            commitTranslation(
+                text,
+                replacingPrefixUTF16Length: prefixLength,
+                to: sender
+            )
+        }
     }
 
     private func commit(_ text: String, to sender: Any?) {
@@ -194,6 +309,51 @@ final class InputMethodController: IMKInputController {
         lastCommittedCharacter = text.last
         buffer = ""
         currentCandidates = []
+        currentCandidateActions = []
+        isSelectingPunctuation = false
+        CandidateWindowController.shared.hide()
+    }
+
+    private func commitTranslation(
+        _ text: String,
+        replacingPrefixUTF16Length prefixLength: Int,
+        to sender: Any?
+    ) {
+        guard
+            prefixLength > 0,
+            let textClient = sender as? NSTextInputClient
+        else {
+            commit(text, to: sender)
+            return
+        }
+
+        let markedRange = textClient.markedRange()
+        let selection = textClient.selectedRange()
+        let compositionLocation = markedRange.location != NSNotFound
+            ? markedRange.location
+            : selection.location
+        guard
+            compositionLocation != NSNotFound,
+            compositionLocation >= prefixLength
+        else {
+            commit(text, to: sender)
+            return
+        }
+
+        let compositionLength = markedRange.location != NSNotFound
+            ? markedRange.length
+            : 0
+        (sender as? IMKTextInput)?.insertText(
+            text,
+            replacementRange: NSRange(
+                location: compositionLocation - prefixLength,
+                length: prefixLength + compositionLength
+            )
+        )
+        lastCommittedCharacter = text.last
+        buffer = ""
+        currentCandidates = []
+        currentCandidateActions = []
         isSelectingPunctuation = false
         CandidateWindowController.shared.hide()
     }
@@ -215,6 +375,7 @@ final class InputMethodController: IMKInputController {
         currentCandidates.append(
             contentsOf: punctuation.candidates.filter { $0 != defaultCandidate }
         )
+        currentCandidateActions = currentCandidates.map(CandidateAction.commit)
         buffer = currentCandidates[0]
         isSelectingPunctuation = true
         updateComposition()

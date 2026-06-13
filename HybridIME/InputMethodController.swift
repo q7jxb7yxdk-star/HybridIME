@@ -75,10 +75,10 @@ final class InputMethodController: IMKInputController {
         }
 
         guard
-            let characters = event.charactersIgnoringModifiers?.lowercased(),
+            let characters = event.characters,
             characters.count == 1,
             characters.unicodeScalars.allSatisfy({
-                CharacterSet.lowercaseLetters.contains($0) && $0.isASCII
+                CharacterSet.letters.contains($0) && $0.isASCII
             })
         else {
             if !buffer.isEmpty {
@@ -117,7 +117,7 @@ final class InputMethodController: IMKInputController {
     private func refreshComposition(client sender: Any?) {
         isSelectingPunctuation = false
         currentCandidates = buffer.count <= 5
-            ? decoder.candidates(for: buffer, limit: 10)
+            ? decoder.candidates(for: buffer.lowercased(), limit: 10)
             : []
         updateComposition()
 

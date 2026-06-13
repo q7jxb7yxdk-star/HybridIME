@@ -132,7 +132,7 @@ final class CandidateWindowController {
             "u": "山", "v": "女", "w": "田", "x": "難",
             "y": "卜", "z": "重",
         ]
-        return String(code.compactMap { roots[$0] })
+        return String(code.lowercased().compactMap { roots[$0] })
     }
 
     private func candidateText(_ candidates: [String]) -> NSAttributedString {

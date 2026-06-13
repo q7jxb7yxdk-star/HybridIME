@@ -1,0 +1,10 @@
+HybridIME includes Cangjie 5 dictionary data from:
+
+Rime Cangjie
+https://github.com/rime/rime-cangjie
+Commit: 52d90a1b1312e74042b38c1cbc8142defbc53171
+
+The dictionary is derived from ibus-table work by acevery (Yu Yuwei)
+under the LGPL and original public-domain work by Chu Bong-Foo.
+
+The accompanying license text is included in LICENSE-Rime-Cangjie.txt.

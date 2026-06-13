@@ -1,0 +1,6 @@
+# macOS compatibility overrides.
+# add/remove accept one or more candidates in macOS candidate order.
+# replace discards the base candidates and uses the complete supplied list.
+# operation	code	candidate...
+remove	osp	怎
+add	hsp	怎

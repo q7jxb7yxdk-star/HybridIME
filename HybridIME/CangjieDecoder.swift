@@ -1,9 +1,8 @@
 import Foundation
 import CoreText
 
-@MainActor
-struct CangjieDecoder {
-    private static let resourceNames = [
+struct CangjieDecoder: @unchecked Sendable {
+    nonisolated private static let resourceNames = [
         "cangjie5.base.dict",
         "cangjie5.extended.dict",
     ]
@@ -16,10 +15,11 @@ struct CangjieDecoder {
 
     private let table: [String: [String]]
 
-    init(bundle: Bundle = .main) {
+    nonisolated init(bundle: Bundle = .main) {
         table = Self.loadTable(from: bundle)
     }
 
+    @MainActor
     func candidates(for code: String, limit: Int = 10) -> [String] {
         guard limit > 0 else { return [] }
         return Array(
@@ -30,7 +30,9 @@ struct CangjieDecoder {
         )
     }
 
-    private static func loadTable(from bundle: Bundle) -> [String: [String]] {
+    nonisolated private static func loadTable(
+        from bundle: Bundle
+    ) -> [String: [String]] {
         var table: [String: [String]] = [:]
         var seenByCode: [String: Set<String>] = [:]
 
@@ -115,7 +117,7 @@ struct CangjieDecoder {
         return result
     }
 
-    private static func applyOverrides(
+    nonisolated private static func applyOverrides(
         from bundle: Bundle,
         to table: inout [String: [String]]
     ) {
@@ -166,7 +168,7 @@ struct CangjieDecoder {
         }
     }
 
-    private static func resourceURL(
+    nonisolated private static func resourceURL(
         named resourceName: String,
         in bundle: Bundle
     ) -> URL? {

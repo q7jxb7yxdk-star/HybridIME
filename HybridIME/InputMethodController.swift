@@ -26,9 +26,6 @@ final class InputMethodController: IMKInputController {
         }
     }
 
-    private let decoder = CangjieDecoder()
-    private let bilingualDictionary = BilingualDictionary.shared
-    private let associationDictionary = AssociationDictionary.shared
     private var buffer = ""
     private var currentCandidates: [String] = []
     private var currentCandidateActions: [CandidateAction] = []
@@ -37,6 +34,16 @@ final class InputMethodController: IMKInputController {
     private var associationContext = ""
     private var associationLanguage: AssociationDictionary.Language?
     private var lastCommittedCharacter: Character?
+
+    override func recognizedEvents(_ sender: Any!) -> Int {
+        Int(NSEvent.EventTypeMask([
+            .keyDown,
+            .leftMouseDown,
+            .leftMouseUp,
+            .leftMouseDragged,
+            .mouseCancelled,
+        ]).rawValue)
+    }
 
     override func handle(_ event: NSEvent!, client sender: Any!) -> Bool {
         guard event.type == .keyDown else {
@@ -158,7 +165,12 @@ final class InputMethodController: IMKInputController {
     }
 
     override func commitComposition(_ sender: Any!) {
-        commitDefault(to: sender)
+        commitDefault(to: sender, showingAssociations: false)
+    }
+
+    override func deactivateServer(_ sender: Any!) {
+        resetState(updatingComposition: false)
+        super.deactivateServer(sender)
     }
 
     override func composedString(_ sender: Any!) -> Any! {
@@ -172,12 +184,15 @@ final class InputMethodController: IMKInputController {
     private func refreshComposition(client sender: Any?) {
         isSelectingAssociation = false
         isSelectingPunctuation = false
-        let dictionaryCandidates = bilingualDictionary.chineseCandidates(
+        let dictionaryCandidates = bilingualDictionary?.chineseCandidates(
             for: buffer,
             limit: 10
-        )
+        ) ?? []
         let cangjieCandidates = buffer.count <= 5
-            ? decoder.candidates(for: buffer.lowercased(), limit: 10)
+            ? cangjieDecoder?.candidates(
+                for: buffer.lowercased(),
+                limit: 10
+            ) ?? []
             : []
         currentCandidateActions = candidateActions(
             dictionaryCandidates: dictionaryCandidates,
@@ -250,10 +265,10 @@ final class InputMethodController: IMKInputController {
         let characters = Array(precedingChinese)
         for length in stride(from: characters.count, through: 0, by: -1) {
             let prefix = String(characters.suffix(length))
-            let translations = bilingualDictionary.englishCandidates(
+            let translations = bilingualDictionary?.englishCandidates(
                 for: prefix + candidate,
                 limit: 2
-            )
+            ) ?? []
             if !translations.isEmpty {
                 return (prefix, translations)
             }
@@ -293,6 +308,10 @@ final class InputMethodController: IMKInputController {
     }
 
     private func clearComposition() {
+        resetState(updatingComposition: true)
+    }
+
+    private func resetState(updatingComposition: Bool) {
         buffer = ""
         currentCandidates = []
         currentCandidateActions = []
@@ -300,7 +319,9 @@ final class InputMethodController: IMKInputController {
         isSelectingAssociation = false
         associationContext = ""
         associationLanguage = nil
-        updateComposition()
+        if updatingComposition {
+            updateComposition()
+        }
         CandidateWindowController.shared.hide()
     }
 
@@ -309,22 +330,45 @@ final class InputMethodController: IMKInputController {
         commit(buffer + (appendingSpace ? " " : ""), to: sender)
     }
 
-    private func commitDefault(to sender: Any?) {
+    private func commitDefault(
+        to sender: Any?,
+        showingAssociations: Bool = true
+    ) {
         if isSelectingPunctuation {
-            commitCandidate(at: 0, to: sender)
+            commitCandidate(
+                at: 0,
+                to: sender,
+                showingAssociations: showingAssociations
+            )
         } else {
-            commitEnglish(to: sender)
+            if showingAssociations {
+                commitEnglish(to: sender)
+            } else {
+                commitWithoutAssociations(buffer, to: sender)
+            }
         }
     }
 
-    private func commitCandidate(at index: Int, to sender: Any?) {
+    private func commitCandidate(
+        at index: Int,
+        to sender: Any?,
+        showingAssociations: Bool = true
+    ) {
         guard currentCandidateActions.indices.contains(index) else {
-            commitEnglish(to: sender)
+            if showingAssociations {
+                commitEnglish(to: sender)
+            } else {
+                commitWithoutAssociations(buffer, to: sender)
+            }
             return
         }
         switch currentCandidateActions[index] {
         case .commit(let text):
-            commit(text, to: sender)
+            if showingAssociations {
+                commit(text, to: sender)
+            } else {
+                commitWithoutAssociations(text, to: sender)
+            }
         case .translate(let text, let prefixLength):
             commitTranslation(
                 text,
@@ -332,9 +376,22 @@ final class InputMethodController: IMKInputController {
                 to: sender
             )
         case .associate(let suggestion):
-            associationDictionary.recordSelection(suggestion)
+            associationDictionary?.recordSelection(suggestion)
             commitAssociation(suggestion, to: sender)
         }
+    }
+
+    private func commitWithoutAssociations(_ text: String, to sender: Any?) {
+        guard !text.isEmpty else {
+            resetState(updatingComposition: false)
+            return
+        }
+        (sender as? IMKTextInput)?.insertText(
+            text,
+            replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
+        )
+        lastCommittedCharacter = text.last
+        resetState(updatingComposition: false)
     }
 
     private func commit(_ text: String, to sender: Any?) {
@@ -446,11 +503,11 @@ final class InputMethodController: IMKInputController {
         language: AssociationDictionary.Language,
         client: IMKTextInput?
     ) {
-        let suggestions = associationDictionary.suggestions(
+        let suggestions = associationDictionary?.suggestions(
             for: context,
             language: language,
             limit: 10
-        )
+        ) ?? []
         guard !suggestions.isEmpty else {
             dismissAssociation(clearContext: true)
             return
@@ -634,5 +691,17 @@ final class InputMethodController: IMKInputController {
             return nil
         }
         return number - 1
+    }
+
+    private var cangjieDecoder: CangjieDecoder? {
+        InputResources.shared.cangjieDecoder
+    }
+
+    private var bilingualDictionary: BilingualDictionary? {
+        InputResources.shared.bilingualDictionary
+    }
+
+    private var associationDictionary: AssociationDictionary? {
+        InputResources.shared.associationDictionary
     }
 }

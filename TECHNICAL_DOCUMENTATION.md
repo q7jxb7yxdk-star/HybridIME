@@ -23,10 +23,16 @@ HybridIME 是以 Swift、AppKit、SwiftUI 及 InputMethodKit 開發的 macOS 輸
 
 1. 從 `Info.plist` 讀取 `InputMethodConnectionName`。
 2. 使用 bundle identifier 建立 `IMKServer`。
+3. 由 `InputResources` 在 detached task 背景預載倉頡、CC-CEDICT 及聯想
+   索引，完成後把不可變查詢快照發佈到 MainActor。
 
 應用程式啟動時不會呼叫 `TISRegisterInputSource` 或 `TISEnableInputSource`。輸入來源的註冊及啟用只屬於安裝流程，避免 macOS 每次重新啟動輸入法程序時顯示「允許中英混合啟用中英混合」的提示。
 
 當 HybridIME 是目前選用的輸入法時，其程序由 macOS 管理。直接終止程序後，系統可能自動重新啟動；若要停止程序，應先切換至其他輸入法。
+
+大型 TSV 合共超過 50 萬行。解碼器的檔案解析 initializer 及 loader 標記
+為 `nonisolated`，避免在切換輸入法期間同步堵塞主執行緒及輸入法選單的
+mouse tracking。載入完成前英文仍可提交，中文、翻譯及聯想候選暫時為空。
 
 主要識別碼：
 
@@ -67,6 +73,7 @@ ASCII 英文字母會轉為小寫並加入 `buffer`。每次更新後：
 | 按鍵 | 行為 |
 | --- | --- |
 | `Space` | 提交緩衝區內的英文，並附加一個空格 |
+| `Shift + Space` | 提交緩衝區內的英文，不附加空格 |
 | `Return` / 數字鍵盤 `Enter` | 提交第一個中文候選；沒有候選時提交英文 |
 | `1` 至 `9` | 提交第一至第九個候選 |
 | `0` | 提交第十個候選 |
@@ -78,6 +85,19 @@ ASCII 英文字母會轉為小寫並加入 `buffer`。每次更新後：
 `keyDown` 會立即回傳 `false`，且不會同步提交、清除或修改 marked text，
 避免 InputMethodKit 中斷 `⌘C`、`⌘V`、`⌘A`、`⌘Z` 等應用程式快捷鍵。
 Shift 不在此透傳集合內，因此仍可保留英文大小寫。
+
+### 滑鼠事件透傳
+
+`recognizedEvents(_:)` 明確宣告 `keyDown`、`leftMouseDown`、
+`leftMouseUp`、`leftMouseDragged` 及 `mouseCancelled`。事件處理器只接受
+`keyDown`，所有滑鼠事件立即回傳 `false`。
+
+這會停用 InputMethodKit 在輸入法只接收 `keyDown` 時套用的預設 mouse
+down 組字處理，確保 Google Sheets 等網頁文字客戶端收到完整左鍵序列。
+
+`commitComposition(_:)` 若由系統要求結束組字，只提交現有內容並清除
+狀態，不顯示聯想候選。`deactivateServer(_:)` 亦會隱藏候選視窗及清除
+組字、標點和聯想狀態。
 
 ### 聯想候選狀態
 
@@ -100,6 +120,16 @@ Shift 不在此透傳集合內，因此仍可保留英文大小寫。
 ### 標點符號
 
 鍵盤可輸入的 ASCII 標點及符號會進入獨立的標點候選狀態。`punctuationPair(for:)` 定義半形與全形對照；逗號使用 `,`／`，`，句號使用 `.`／`。`，其他字符使用相應的全形字符。
+
+特殊候選：
+
+```text
+$ → $  ¥  £  €  ₹  ₺  ＄
+. → .  。  ⋯⋯
+```
+
+`$` 固定以半形美元符號為首選，全形 `＄` 固定最後。`.` 仍按游標前文字
+在 `.` 與 `。` 之間切換第一候選，`⋯⋯` 固定排在其後。
 
 `characterBeforeCursor(in:)` 會透過 `NSTextInputClient.selectedRange()` 及 `attributedSubstring(forProposedRange:actualRange:)` 讀取實際游標前一個字元。若目標應用程式不支援讀取，則使用本次輸入工作階段的 `lastCommittedCharacter` 作為備用值。
 

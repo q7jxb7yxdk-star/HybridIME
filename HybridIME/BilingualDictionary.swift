@@ -1,13 +1,10 @@
 import Foundation
 
-@MainActor
-struct BilingualDictionary {
-    static let shared = BilingualDictionary()
-
+struct BilingualDictionary: @unchecked Sendable {
     private let englishToChinese: [String: [String]]
     private let chineseToEnglish: [String: [String]]
 
-    init(bundle: Bundle = .main) {
+    nonisolated init(bundle: Bundle = .main) {
         let tables = Self.loadTables(from: bundle)
         englishToChinese = tables.englishToChinese
         chineseToEnglish = tables.chineseToEnglish
@@ -25,7 +22,7 @@ struct BilingualDictionary {
         return Array((chineseToEnglish[chinese] ?? []).prefix(limit))
     }
 
-    private static func loadTables(
+    nonisolated private static func loadTables(
         from bundle: Bundle
     ) -> (
         englishToChinese: [String: [String]],
@@ -77,7 +74,7 @@ struct BilingualDictionary {
         return (englishToChinese, chineseToEnglish)
     }
 
-    private static func applyOverrides(
+    nonisolated private static func applyOverrides(
         from bundle: Bundle,
         englishToChinese: inout [String: [String]],
         chineseToEnglish: inout [String: [String]]
@@ -123,7 +120,7 @@ struct BilingualDictionary {
         }
     }
 
-    private static func moveToFront(
+    nonisolated private static func moveToFront(
         _ candidates: [String],
         for key: String,
         in table: inout [String: [String]]
@@ -134,7 +131,9 @@ struct BilingualDictionary {
         }
     }
 
-    private static func unique(_ candidates: [String]) -> [String] {
+    nonisolated private static func unique(
+        _ candidates: [String]
+    ) -> [String] {
         var seen: Set<String> = []
         return candidates.filter { seen.insert($0).inserted }
     }

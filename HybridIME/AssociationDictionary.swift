@@ -1,7 +1,6 @@
 import Foundation
 
-@MainActor
-final class AssociationDictionary {
+final class AssociationDictionary: @unchecked Sendable {
     enum Language: String {
         case chinese
         case english
@@ -13,8 +12,6 @@ final class AssociationDictionary {
         let language: Language
     }
 
-    static let shared = AssociationDictionary()
-
     private struct WeightedCandidate {
         let text: String
         let weight: Int
@@ -24,7 +21,7 @@ final class AssociationDictionary {
     private let english: [String: [WeightedCandidate]]
     private let defaults = UserDefaults.standard
 
-    private init(bundle: Bundle = .main) {
+    nonisolated init(bundle: Bundle = .main) {
         chinese = Self.loadTable(
             named: "chinese-associations",
             from: bundle
@@ -129,7 +126,7 @@ final class AssociationDictionary {
         "association.\(language.rawValue).\(key).\(candidate)"
     }
 
-    private static func loadTable(
+    nonisolated private static func loadTable(
         named name: String,
         from bundle: Bundle
     ) -> [String: [WeightedCandidate]] {

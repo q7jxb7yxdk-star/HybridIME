@@ -7,7 +7,6 @@
 
 import AppKit
 import InputMethodKit
-import SwiftUI
 
 @MainActor
 final class InputResources {
@@ -64,12 +63,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 }
 
 @main
-struct HybridIMEApp: App {
-    @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
-
-    var body: some Scene {
-        WindowGroup {
-            ContentView()
-        }
+enum HybridIMEApp {
+    @MainActor
+    static func main() {
+        let application = NSApplication.shared
+        let appDelegate = AppDelegate()
+        application.delegate = appDelegate
+        application.setActivationPolicy(.accessory)
+        application.run()
     }
 }

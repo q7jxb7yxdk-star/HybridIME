@@ -8,7 +8,7 @@ HybridIME 是以 Swift、AppKit、SwiftUI 及 InputMethodKit 開發的 macOS 輸
 
 | 元件 | 職責 |
 | --- | --- |
-| `HybridIMEApp.swift` | 建立 `IMKServer`，向 macOS 註冊並啟用輸入來源 |
+| `HybridIMEApp.swift` | 啟動背景 `NSApplication` 並建立 `IMKServer` |
 | `InputMethodController.swift` | 接收按鍵事件、管理輸入緩衝區及提交文字 |
 | `CangjieDecoder.swift` | 載入倉頡碼表、套用相容規則及查詢候選 |
 | `BilingualDictionary.swift` | 載入 CC-CEDICT 中英雙向索引 |
@@ -20,6 +20,11 @@ HybridIME 是以 Swift、AppKit、SwiftUI 及 InputMethodKit 開發的 macOS 輸
 
 ## 2. InputMethodKit 啟動流程
 
+`HybridIMEApp.main()` 不使用 SwiftUI `WindowGroup`。啟動流程直接取得
+`NSApplication.shared`、設定 `AppDelegate`、把 activation policy 設為
+`.accessory`，然後呼叫 `run()`。因此 macOS 在開機後首次選用輸入法時，
+只會啟動背景輸入法服務，不會自動建立說明視窗或顯示 Dock 圖示。
+
 `AppDelegate.applicationDidFinishLaunching` 會：
 
 1. 從 `Info.plist` 讀取 `InputMethodConnectionName`。
@@ -28,6 +33,9 @@ HybridIME 是以 Swift、AppKit、SwiftUI 及 InputMethodKit 開發的 macOS 輸
    索引，完成後把不可變查詢快照發佈到 MainActor。
 
 應用程式啟動時不會呼叫 `TISRegisterInputSource` 或 `TISEnableInputSource`。輸入來源的註冊及啟用只屬於安裝流程，避免 macOS 每次重新啟動輸入法程序時顯示「允許中英混合啟用中英混合」的提示。
+
+`ContentView.swift` 目前保留作為說明內容，但不屬於輸入法的自動啟動
+流程。若日後加入「關於 HybridIME」入口，應由明確的使用者操作建立視窗。
 
 當 HybridIME 是目前選用的輸入法時，其程序由 macOS 管理。直接終止程序後，系統可能自動重新啟動；若要停止程序，應先切換至其他輸入法。
 

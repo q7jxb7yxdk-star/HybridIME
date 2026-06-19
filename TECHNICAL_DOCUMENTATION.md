@@ -2,7 +2,7 @@
 
 ## 1. 架構概覽
 
-HybridIME 是以 Swift、AppKit、SwiftUI 及 InputMethodKit 開發的 macOS 輸入法。
+HybridIME 是以 Swift、AppKit 及 InputMethodKit 開發的 macOS 輸入法。
 
 主要元件：
 
@@ -15,7 +15,6 @@ HybridIME 是以 Swift、AppKit、SwiftUI 及 InputMethodKit 開發的 macOS 輸
 | `AssociationDictionary.swift` | 載入中英文聯想索引及管理本機排序 |
 | `SmartCandidateRanker.swift` | 記錄字碼候選選擇及提供智能預測 |
 | `CandidateWindowController.swift` | 建立及定位自訂候選視窗 |
-| `ContentView.swift` | 顯示 HybridIME 的說明視窗 |
 | `Info.plist` | 定義輸入法識別碼、語言、圖示及控制器類別 |
 
 ## 2. InputMethodKit 啟動流程
@@ -33,9 +32,6 @@ HybridIME 是以 Swift、AppKit、SwiftUI 及 InputMethodKit 開發的 macOS 輸
    索引，完成後把不可變查詢快照發佈到 MainActor。
 
 應用程式啟動時不會呼叫 `TISRegisterInputSource` 或 `TISEnableInputSource`。輸入來源的註冊及啟用只屬於安裝流程，避免 macOS 每次重新啟動輸入法程序時顯示「允許中英混合啟用中英混合」的提示。
-
-`ContentView.swift` 目前保留作為說明內容，但不屬於輸入法的自動啟動
-流程。若日後加入「關於 HybridIME」入口，應由明確的使用者操作建立視窗。
 
 當 HybridIME 是目前選用的輸入法時，其程序由 macOS 管理。直接終止程序後，系統可能自動重新啟動；若要停止程序，應先切換至其他輸入法。
 

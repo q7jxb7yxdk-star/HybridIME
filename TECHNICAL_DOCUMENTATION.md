@@ -13,6 +13,7 @@ HybridIME 是以 Swift、AppKit、SwiftUI 及 InputMethodKit 開發的 macOS 輸
 | `CangjieDecoder.swift` | 載入倉頡碼表、套用相容規則及查詢候選 |
 | `BilingualDictionary.swift` | 載入 CC-CEDICT 中英雙向索引 |
 | `AssociationDictionary.swift` | 載入中英文聯想索引及管理本機排序 |
+| `SmartCandidateRanker.swift` | 記錄字碼候選選擇及提供智能預測 |
 | `CandidateWindowController.swift` | 建立及定位自訂候選視窗 |
 | `ContentView.swift` | 顯示 HybridIME 的說明視窗 |
 | `Info.plist` | 定義輸入法識別碼、語言、圖示及控制器類別 |
@@ -72,9 +73,9 @@ ASCII 英文字母會轉為小寫並加入 `buffer`。每次更新後：
 
 | 按鍵 | 行為 |
 | --- | --- |
-| `Space` | 提交緩衝區內的英文，並附加一個空格 |
+| `Space` | 英文語境提交英文並附加空格；其他語境若有智能預測則提交該候選，否則提交英文及空格 |
 | `Shift + Space` | 提交緩衝區內的英文，不附加空格 |
-| `Return` / 數字鍵盤 `Enter` | 提交第一個中文候選；沒有候選時提交英文 |
+| `Return` / 數字鍵盤 `Enter` | 英文語境提交英文；其他語境提交第一個候選，沒有候選時提交英文 |
 | `1` 至 `9` | 提交第一至第九個候選 |
 | `0` | 提交第十個候選 |
 | `Delete` | 刪除緩衝區最後一個字母 |
@@ -85,6 +86,35 @@ ASCII 英文字母會轉為小寫並加入 `buffer`。每次更新後：
 `keyDown` 會立即回傳 `false`，且不會同步提交、清除或修改 marked text，
 避免 InputMethodKit 中斷 `⌘C`、`⌘V`、`⌘A`、`⌘Z` 等應用程式快捷鍵。
 Shift 不在此透傳集合內，因此仍可保留英文大小寫。
+
+### 英文語境與邊界提交
+
+`englishTextBeforeComposition(in:)` 讀取 marked range 前最多 64 個 UTF-16
+code units，並只檢查最近一個句號、問號、感嘆號或換行之後的片段。片段
+含 ASCII 英文字母且不含中文字時，當前組字會標記為英文語境。
+
+英文語境中的 Space 及 Return 直接提交原始英文，不套用中文智能預測。
+輸入 ASCII 標點時，既有 `commitDefault` 流程會先提交緩衝區英文，再建立
+標點候選狀態，因此 `I love you!` 的 `you` 不需要額外按 Space。句首第一個
+英文詞仍使用一般混合輸入規則；`Shift + Space` 在任何語境均可強制提交
+英文且不加入空格。
+
+### 智能候選學習
+
+`SmartCandidateRanker` 以正規化小寫字碼及候選文字為鍵，把每次實際提交
+的中文、翻譯或英文候選記錄到 `UserDefaults`。資料使用
+`smartCandidate.v2.<code>.*` key namespace，分別保存候選累計次數、最近
+選擇時間及該字碼的候選清單。
+
+同一字碼與同一候選累計達三次後即可成為預測，不使用百分比或前文情境。
+查詢時只考慮目前仍存在於候選清單的項目，依累計次數、最近選擇時間及
+文字次序決定最佳候選。`InputMethodController` 把原始英文碼及目前可見
+候選一併交給排序器，但只有可見的非英文候選才會取得
+`smartPredictionIndex`。
+
+候選視窗會在預測候選後顯示 `◆`。非英文語境按 Space 時直接提交該候選；
+英文語境維持提交英文，`Shift + Space` 則始終強制提交英文。標點及聯想
+候選不會寫入這套智能候選記錄。
 
 ### 滑鼠事件透傳
 
@@ -166,6 +196,7 @@ $ → $  ¥  £  €  ₹  ₺  ＄
 - 使用 `NSVisualEffectView` 的 `.menu` 材質。
 - 第一列在完整字碼命中時顯示最多十個帶數字的候選。
 - 英文翻譯候選使用次要文字顏色，與中文候選區分。
+- 智能預測候選在文字後顯示 `◆`。
 - 第二列顯示每個鍵位對應的倉頡字母。
 - 第三列顯示實際輸入的英文字母碼。
 - 標點模式只顯示半形及全形候選列。

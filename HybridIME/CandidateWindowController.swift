@@ -73,6 +73,7 @@ final class CandidateWindowController {
         code: String,
         candidates: [String],
         translationIndices: Set<Int> = [],
+        smartPredictionIndex: Int? = nil,
         client: IMKTextInput?
     ) {
         guard !code.isEmpty else {
@@ -86,7 +87,8 @@ final class CandidateWindowController {
         rootsLabel.isHidden = false
         candidatesLabel.attributedStringValue = candidateText(
             candidates,
-            translationIndices: translationIndices
+            translationIndices: translationIndices,
+            smartPredictionIndex: smartPredictionIndex
         )
         candidatesLabel.isHidden = candidates.isEmpty
 
@@ -158,7 +160,8 @@ final class CandidateWindowController {
 
     private func candidateText(
         _ candidates: [String],
-        translationIndices: Set<Int> = []
+        translationIndices: Set<Int> = [],
+        smartPredictionIndex: Int? = nil
     ) -> NSAttributedString {
         let result = NSMutableAttributedString()
 
@@ -182,7 +185,9 @@ final class CandidateWindowController {
             )
             result.append(
                 NSAttributedString(
-                    string: candidate,
+                    string: smartPredictionIndex == index
+                        ? "\(candidate) ◆"
+                        : candidate,
                     attributes: [
                         .font: NSFont.systemFont(ofSize: 17),
                         .foregroundColor: translationIndices.contains(index)

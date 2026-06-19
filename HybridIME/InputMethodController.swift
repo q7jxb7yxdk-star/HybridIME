@@ -29,6 +29,8 @@ final class InputMethodController: IMKInputController {
     private var buffer = ""
     private var currentCandidates: [String] = []
     private var currentCandidateActions: [CandidateAction] = []
+    private var smartPredictionIndex: Int?
+    private var isEnglishCompositionContext = false
     private var isSelectingPunctuation = false
     private var isSelectingAssociation = false
     private var associationContext = ""
@@ -65,6 +67,12 @@ final class InputMethodController: IMKInputController {
             guard !buffer.isEmpty else { return false }
             if isSelectingPunctuation {
                 commitCandidate(at: 0, to: sender)
+            } else if
+                !modifiers.contains(.shift),
+                !isEnglishCompositionContext,
+                let smartPredictionIndex
+            {
+                commitCandidate(at: smartPredictionIndex, to: sender)
             } else {
                 commitEnglish(
                     to: sender,
@@ -76,7 +84,11 @@ final class InputMethodController: IMKInputController {
             guard !buffer.isEmpty || isSelectingAssociation else {
                 return false
             }
-            commitCandidate(at: 0, to: sender)
+            if !isSelectingAssociation, isEnglishCompositionContext {
+                commitEnglish(to: sender)
+            } else {
+                commitCandidate(at: 0, to: sender)
+            }
             return true
         case 51:
             if isSelectingAssociation {
@@ -201,6 +213,16 @@ final class InputMethodController: IMKInputController {
             limit: 10
         )
         currentCandidates = currentCandidateActions.map(\.text)
+        isEnglishCompositionContext = englishTextBeforeComposition(
+            in: sender as? IMKTextInput
+        )
+        let prediction = smartCandidateRanker.prediction(
+            code: buffer,
+            availableCandidates: [buffer] + currentCandidates
+        )
+        smartPredictionIndex = prediction.flatMap {
+            currentCandidates.firstIndex(of: $0.candidate)
+        }
         updateComposition()
 
         if buffer.isEmpty {
@@ -214,6 +236,7 @@ final class InputMethodController: IMKInputController {
                         currentCandidateActions[$0].isTranslation
                     }
                 ),
+                smartPredictionIndex: smartPredictionIndex,
                 client: sender as? IMKTextInput
             )
         }
@@ -315,6 +338,8 @@ final class InputMethodController: IMKInputController {
         buffer = ""
         currentCandidates = []
         currentCandidateActions = []
+        smartPredictionIndex = nil
+        isEnglishCompositionContext = false
         isSelectingPunctuation = false
         isSelectingAssociation = false
         associationContext = ""
@@ -327,6 +352,10 @@ final class InputMethodController: IMKInputController {
 
     private func commitEnglish(to sender: Any?, appendingSpace: Bool = false) {
         guard !buffer.isEmpty else { return }
+        smartCandidateRanker.record(
+            code: buffer,
+            candidate: buffer
+        )
         commit(buffer + (appendingSpace ? " " : ""), to: sender)
     }
 
@@ -364,12 +393,14 @@ final class InputMethodController: IMKInputController {
         }
         switch currentCandidateActions[index] {
         case .commit(let text):
+            recordSmartSelection(text)
             if showingAssociations {
                 commit(text, to: sender)
             } else {
                 commitWithoutAssociations(text, to: sender)
             }
         case .translate(let text, let prefixLength):
+            recordSmartSelection(text)
             commitTranslation(
                 text,
                 replacingPrefixUTF16Length: prefixLength,
@@ -379,6 +410,20 @@ final class InputMethodController: IMKInputController {
             associationDictionary?.recordSelection(suggestion)
             commitAssociation(suggestion, to: sender)
         }
+    }
+
+    private func recordSmartSelection(_ candidate: String) {
+        guard
+            !isSelectingPunctuation,
+            !isSelectingAssociation,
+            !buffer.isEmpty
+        else {
+            return
+        }
+        smartCandidateRanker.record(
+            code: buffer,
+            candidate: candidate
+        )
     }
 
     private func commitWithoutAssociations(_ text: String, to sender: Any?) {
@@ -403,6 +448,7 @@ final class InputMethodController: IMKInputController {
         buffer = ""
         currentCandidates = []
         currentCandidateActions = []
+        smartPredictionIndex = nil
         isSelectingPunctuation = false
         isSelectingAssociation = false
 
@@ -466,6 +512,7 @@ final class InputMethodController: IMKInputController {
         buffer = ""
         currentCandidates = []
         currentCandidateActions = []
+        smartPredictionIndex = nil
         isSelectingPunctuation = false
         isSelectingAssociation = false
         showAssociations(
@@ -517,6 +564,7 @@ final class InputMethodController: IMKInputController {
         associationLanguage = language
         currentCandidateActions = suggestions.map(CandidateAction.associate)
         currentCandidates = suggestions.map(\.text)
+        smartPredictionIndex = nil
         isSelectingAssociation = true
         isSelectingPunctuation = false
         CandidateWindowController.shared.showAssociations(
@@ -530,6 +578,7 @@ final class InputMethodController: IMKInputController {
         isSelectingAssociation = false
         currentCandidates = []
         currentCandidateActions = []
+        smartPredictionIndex = nil
         CandidateWindowController.shared.hide()
         if clearContext {
             associationContext = ""
@@ -577,6 +626,7 @@ final class InputMethodController: IMKInputController {
             contentsOf: punctuation.candidates.filter { $0 != defaultCandidate }
         )
         currentCandidateActions = currentCandidates.map(CandidateAction.commit)
+        smartPredictionIndex = nil
         buffer = currentCandidates[0]
         isSelectingPunctuation = true
         isSelectingAssociation = false
@@ -608,6 +658,45 @@ final class InputMethodController: IMKInputController {
             return lastCommittedCharacter
         }
         return character
+    }
+
+    private func englishTextBeforeComposition(
+        in client: IMKTextInput?
+    ) -> Bool {
+        guard let textClient = client as? NSTextInputClient else {
+            return lastCommittedCharacter.map {
+                $0.isASCII && ($0.isLetter || $0.isNumber)
+            } ?? false
+        }
+
+        let markedRange = textClient.markedRange()
+        let selection = textClient.selectedRange()
+        let location = markedRange.location != NSNotFound
+            ? markedRange.location
+            : selection.location
+        guard
+            location != NSNotFound,
+            location > 0,
+            let text = textClient.attributedSubstring(
+                forProposedRange: NSRange(
+                    location: max(0, location - 64),
+                    length: min(64, location)
+                ),
+                actualRange: nil
+            )?.string
+        else {
+            return false
+        }
+
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return false }
+        let sentenceStart = trimmed.lastIndex {
+            ".!?。！？\n".contains($0)
+        }.map { trimmed.index(after: $0) } ?? trimmed.startIndex
+        let fragment = trimmed[sentenceStart...]
+        let latinLetters = fragment.filter { $0.isASCII && $0.isLetter }.count
+        let chineseCharacters = fragment.filter(isChinese).count
+        return latinLetters > 0 && chineseCharacters == 0
     }
 
     private func isChinese(_ character: Character) -> Bool {
@@ -703,5 +792,9 @@ final class InputMethodController: IMKInputController {
 
     private var associationDictionary: AssociationDictionary? {
         InputResources.shared.associationDictionary
+    }
+
+    private var smartCandidateRanker: SmartCandidateRanker {
+        SmartCandidateRanker.shared
     }
 }

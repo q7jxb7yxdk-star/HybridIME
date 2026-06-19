@@ -59,7 +59,10 @@ final class InputMethodController: IMKInputController {
             if isSelectingPunctuation {
                 commitCandidate(at: 0, to: sender)
             } else {
-                commitEnglish(to: sender, appendingSpace: true)
+                commitEnglish(
+                    to: sender,
+                    appendingSpace: !modifiers.contains(.shift)
+                )
             }
             return true
         case 36, 76:
@@ -504,9 +507,14 @@ final class InputMethodController: IMKInputController {
     ) {
         dismissAssociation(clearContext: true)
         let useFullWidth = characterBeforeCursor(in: client).map(isChinese) ?? false
-        let defaultCandidate = useFullWidth
-            ? punctuation.chineseDefault ?? punctuation.fullWidth
-            : punctuation.halfWidth
+        let defaultCandidate: String
+        if punctuation.chineseDefault == punctuation.halfWidth {
+            defaultCandidate = punctuation.halfWidth
+        } else {
+            defaultCandidate = useFullWidth
+                ? punctuation.chineseDefault ?? punctuation.fullWidth
+                : punctuation.halfWidth
+        }
         currentCandidates = [defaultCandidate]
         currentCandidates.append(
             contentsOf: punctuation.candidates.filter { $0 != defaultCandidate }
@@ -585,6 +593,12 @@ final class InputMethodController: IMKInputController {
         let candidates: [String]
         let chineseDefault: String?
         switch character {
+        case "$":
+            candidates = ["$", "¥", "£", "€", "₹", "₺", "＄"]
+            chineseDefault = "$"
+        case ".":
+            candidates = [".", "。", "⋯⋯"]
+            chineseDefault = nil
         case "[":
             candidates = ["[", "「", "〔", "［", "【", "〖"]
             chineseDefault = "「"

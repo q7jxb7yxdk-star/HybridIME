@@ -42,6 +42,7 @@ final class InputResources {
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private var inputMethodServer: IMKServer?
+    private var applicationDeactivationObserver: NSObjectProtocol?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         guard
@@ -58,7 +59,26 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             name: connectionName,
             bundleIdentifier: bundleIdentifier
         )
+        applicationDeactivationObserver = NSWorkspace.shared
+            .notificationCenter
+            .addObserver(
+                forName: NSWorkspace.didDeactivateApplicationNotification,
+                object: nil,
+                queue: .main
+            ) { _ in
+                MainActor.assumeIsolated {
+                    CandidateWindowController.shared.hide()
+                }
+            }
         InputResources.shared.preload()
+    }
+
+    func applicationWillTerminate(_ notification: Notification) {
+        if let applicationDeactivationObserver {
+            NSWorkspace.shared.notificationCenter.removeObserver(
+                applicationDeactivationObserver
+            )
+        }
     }
 }
 

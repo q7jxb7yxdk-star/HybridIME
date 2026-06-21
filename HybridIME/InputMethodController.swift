@@ -84,10 +84,10 @@ final class InputMethodController: IMKInputController {
             guard !buffer.isEmpty || isSelectingAssociation else {
                 return false
             }
-            if !isSelectingAssociation, isEnglishCompositionContext {
-                commitEnglish(to: sender)
-            } else {
+            if !currentCandidateActions.isEmpty {
                 commitCandidate(at: 0, to: sender)
+            } else {
+                commitEnglish(to: sender)
             }
             return true
         case 51:

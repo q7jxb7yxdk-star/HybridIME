@@ -10,7 +10,7 @@ final class SmartCandidateRanker {
     static let shared = SmartCandidateRanker()
 
     private let defaults = UserDefaults.standard
-    private let minimumSelections = 3
+    private let minimumSelections = 1
 
     private init() {}
 

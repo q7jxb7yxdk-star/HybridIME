@@ -218,7 +218,12 @@ final class InputMethodController: IMKInputController {
         )
         let prediction = smartCandidateRanker.prediction(
             code: buffer,
-            availableCandidates: [buffer] + currentCandidates
+            availableCandidates: currentCandidateActions.compactMap {
+                guard case .commit(let text) = $0, text.allSatisfy(isChinese) else {
+                    return nil
+                }
+                return text
+            }
         )
         smartPredictionIndex = prediction.flatMap {
             currentCandidates.firstIndex(of: $0.candidate)
@@ -352,10 +357,6 @@ final class InputMethodController: IMKInputController {
 
     private func commitEnglish(to sender: Any?, appendingSpace: Bool = false) {
         guard !buffer.isEmpty else { return }
-        smartCandidateRanker.record(
-            code: buffer,
-            candidate: buffer
-        )
         commit(buffer + (appendingSpace ? " " : ""), to: sender)
     }
 
@@ -416,7 +417,8 @@ final class InputMethodController: IMKInputController {
         guard
             !isSelectingPunctuation,
             !isSelectingAssociation,
-            !buffer.isEmpty
+            !buffer.isEmpty,
+            candidate.allSatisfy(isChinese)
         else {
             return
         }

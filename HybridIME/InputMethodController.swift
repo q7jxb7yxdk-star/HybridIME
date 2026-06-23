@@ -747,6 +747,12 @@ final class InputMethodController: IMKInputController {
         case ".":
             candidates = [".", "。", "⋯⋯"]
             chineseDefault = nil
+        case "*":
+            candidates = ["*", "＊", "×"]
+            chineseDefault = "*"
+        case "/":
+            candidates = ["/", "／", "÷"]
+            chineseDefault = "/"
         case "<":
             candidates = ["<", "＜", "⟵"]
             chineseDefault = "<"

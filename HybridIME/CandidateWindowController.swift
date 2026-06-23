@@ -10,6 +10,10 @@ final class CandidateWindowController {
     private let rootsLabel = NSTextField(labelWithString: "")
     private let candidatesLabel = NSTextField(labelWithString: "")
 
+    var isVisible: Bool {
+        panel.isVisible
+    }
+
     private init() {
         let contentStack = NSStackView(
             views: [candidatesLabel, rootsLabel, codeLabel]
@@ -114,6 +118,7 @@ final class CandidateWindowController {
 
     func showAssociations(
         candidates: [String],
+        smartPredictionIndex: Int? = nil,
         client: IMKTextInput?
     ) {
         guard !candidates.isEmpty else {
@@ -123,7 +128,10 @@ final class CandidateWindowController {
 
         codeLabel.isHidden = true
         rootsLabel.isHidden = true
-        candidatesLabel.attributedStringValue = candidateText(candidates)
+        candidatesLabel.attributedStringValue = candidateText(
+            candidates,
+            smartPredictionIndex: smartPredictionIndex
+        )
         candidatesLabel.isHidden = false
 
         updatePanel(client: client)

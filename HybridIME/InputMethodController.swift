@@ -6,12 +6,15 @@ import InputMethodKit
 final class InputMethodController: IMKInputController {
     private enum CandidateAction {
         case commit(String)
+        case dictionaryCommit(String)
         case translate(String, replacingPrefixUTF16Length: Int)
         case associate(AssociationDictionary.Suggestion)
 
         var text: String {
             switch self {
-            case .commit(let text), .translate(let text, _):
+            case .commit(let text),
+                 .dictionaryCommit(let text),
+                 .translate(let text, _):
                 text
             case .associate(let suggestion):
                 suggestion.text
@@ -36,6 +39,7 @@ final class InputMethodController: IMKInputController {
     private var associationContext = ""
     private var associationLanguage: AssociationDictionary.Language?
     private var lastCommittedCharacter: Character?
+    private var learnedChineseContext = ""
 
     override func recognizedEvents(_ sender: Any!) -> Int {
         Int(NSEvent.EventTypeMask([
@@ -54,6 +58,7 @@ final class InputMethodController: IMKInputController {
 
         let modifiers = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
         if !modifiers.intersection([.command, .control, .option]).isEmpty {
+            learnedChineseContext = ""
             dismissAssociation(clearContext: true)
             return false
         }
@@ -61,6 +66,10 @@ final class InputMethodController: IMKInputController {
         switch event.keyCode {
         case 49:
             if isSelectingAssociation {
+                if smartPredictionIndex == 0 {
+                    commitCandidate(at: 0, to: sender)
+                    return true
+                }
                 dismissAssociation(clearContext: true)
                 return false
             }
@@ -108,8 +117,10 @@ final class InputMethodController: IMKInputController {
                 dismissAssociation(clearContext: true)
                 return true
             }
-            guard !buffer.isEmpty else { return false }
-            clearComposition()
+            guard !buffer.isEmpty || CandidateWindowController.shared.isVisible else {
+                return false
+            }
+            cancelCompositionPreservingFocus(client: sender as? IMKTextInput)
             return true
         default:
             break
@@ -127,6 +138,7 @@ final class InputMethodController: IMKInputController {
             let character = event.characters?.first,
             let punctuation = punctuationPair(for: character)
         {
+            learnedChineseContext = ""
             dismissAssociation(clearContext: true)
             if !buffer.isEmpty {
                 commitDefault(to: sender)
@@ -281,7 +293,7 @@ final class InputMethodController: IMKInputController {
             }
         }
         for candidate in dictionaryCandidates {
-            append(.commit(candidate))
+            append(.dictionaryCommit(candidate))
         }
         return result
     }
@@ -339,6 +351,19 @@ final class InputMethodController: IMKInputController {
         resetState(updatingComposition: true)
     }
 
+    private func cancelCompositionPreservingFocus(client: IMKTextInput?) {
+        if
+            let textClient = client as? NSTextInputClient,
+            textClient.markedRange().location != NSNotFound
+        {
+            textClient.insertText(
+                "",
+                replacementRange: textClient.markedRange()
+            )
+        }
+        resetState(updatingComposition: false)
+    }
+
     private func resetState(updatingComposition: Bool) {
         buffer = ""
         currentCandidates = []
@@ -349,6 +374,7 @@ final class InputMethodController: IMKInputController {
         isSelectingAssociation = false
         associationContext = ""
         associationLanguage = nil
+        learnedChineseContext = ""
         if updatingComposition {
             updateComposition()
         }
@@ -400,6 +426,12 @@ final class InputMethodController: IMKInputController {
             } else {
                 commitWithoutAssociations(text, to: sender)
             }
+        case .dictionaryCommit(let text):
+            if showingAssociations {
+                commit(text, to: sender)
+            } else {
+                commitWithoutAssociations(text, to: sender)
+            }
         case .translate(let text, let prefixLength):
             recordSmartSelection(text)
             commitTranslation(
@@ -408,7 +440,6 @@ final class InputMethodController: IMKInputController {
                 to: sender
             )
         case .associate(let suggestion):
-            associationDictionary?.recordSelection(suggestion)
             commitAssociation(suggestion, to: sender)
         }
     }
@@ -438,6 +469,7 @@ final class InputMethodController: IMKInputController {
             replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
         )
         lastCommittedCharacter = text.last
+        learnCommittedText(text)
         resetState(updatingComposition: false)
     }
 
@@ -447,6 +479,7 @@ final class InputMethodController: IMKInputController {
             replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
         )
         lastCommittedCharacter = text.last
+        learnCommittedText(text)
         buffer = ""
         currentCandidates = []
         currentCandidateActions = []
@@ -528,6 +561,7 @@ final class InputMethodController: IMKInputController {
         _ suggestion: AssociationDictionary.Suggestion,
         to sender: Any?
     ) {
+        associationDictionary?.recordSelection(suggestion)
         let insertedText = suggestion.language == .english
             ? suggestion.text + " "
             : suggestion.text
@@ -536,6 +570,7 @@ final class InputMethodController: IMKInputController {
             replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
         )
         lastCommittedCharacter = insertedText.last
+        learnCommittedText(suggestion.text)
 
         let context = suggestion.language == .chinese
             ? associationContext + suggestion.text
@@ -566,11 +601,14 @@ final class InputMethodController: IMKInputController {
         associationLanguage = language
         currentCandidateActions = suggestions.map(CandidateAction.associate)
         currentCandidates = suggestions.map(\.text)
-        smartPredictionIndex = nil
+        smartPredictionIndex = suggestions.firstIndex {
+            $0.isMostRecentSelection
+        }
         isSelectingAssociation = true
         isSelectingPunctuation = false
         CandidateWindowController.shared.showAssociations(
             candidates: currentCandidates,
+            smartPredictionIndex: smartPredictionIndex,
             client: client
         )
     }
@@ -602,6 +640,29 @@ final class InputMethodController: IMKInputController {
             return .english
         }
         return nil
+    }
+
+    private func learnCommittedText(_ text: String) {
+        guard !text.isEmpty, text.allSatisfy(isChinese) else {
+            learnedChineseContext = ""
+            return
+        }
+
+        for character in text {
+            let continuation = String(character)
+            if !learnedChineseContext.isEmpty {
+                associationDictionary?.recordChineseSequence(
+                    context: learnedChineseContext,
+                    continuation: continuation
+                )
+            }
+            learnedChineseContext.append(character)
+            if learnedChineseContext.count > 8 {
+                learnedChineseContext.removeFirst(
+                    learnedChineseContext.count - 8
+                )
+            }
+        }
     }
 
     private func beginPunctuationSelection(
@@ -747,6 +808,9 @@ final class InputMethodController: IMKInputController {
         case ".":
             candidates = [".", "。", "⋯⋯"]
             chineseDefault = nil
+        case ",":
+            candidates = [",", "，", "、"]
+            chineseDefault = ","
         case "*":
             candidates = ["*", "＊", "×"]
             chineseDefault = "*"

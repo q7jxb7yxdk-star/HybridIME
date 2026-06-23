@@ -10,6 +10,7 @@ final class AssociationDictionary: @unchecked Sendable {
         let text: String
         let key: String
         let language: Language
+        let isMostRecentSelection: Bool
     }
 
     private struct WeightedCandidate {
@@ -20,6 +21,8 @@ final class AssociationDictionary: @unchecked Sendable {
     private let chinese: [String: [WeightedCandidate]]
     private let english: [String: [WeightedCandidate]]
     private let defaults = UserDefaults.standard
+    private var recentSelections: [String: String] = [:]
+    private var learnedChineseCandidates: [String: [String]] = [:]
 
     nonisolated init(bundle: Bundle = .main) {
         chinese = Self.loadTable(
@@ -50,10 +53,39 @@ final class AssociationDictionary: @unchecked Sendable {
                 .map(String.init) ?? ""
             lookup = english[key].map { (key, $0) }
         }
-        guard let lookup else { return [] }
+        let learnedLookup = language == .chinese
+            ? longestLearnedChineseMatch(for: context)
+            : nil
+        guard let lookup = preferredLookup(
+            staticLookup: lookup,
+            learnedLookup: learnedLookup
+        ) else {
+            return []
+        }
 
-        return lookup.candidates
+        let recentKey = recentSelectionKey(
+            language: language,
+            key: lookup.key
+        )
+        let mostRecentCandidate = recentSelections[recentKey]
+            ?? defaults.string(forKey: recentKey)
+        var candidates = lookup.candidates
+        if language == .chinese {
+            let learned = learnedCandidates(for: lookup.key)
+            let existing = Set(candidates.map(\.text))
+            candidates.append(
+                contentsOf: learned
+                    .filter { !existing.contains($0) }
+                    .map { WeightedCandidate(text: $0, weight: 0) }
+            )
+        }
+        return candidates
             .sorted {
+                let leftIsMostRecent = $0.text == mostRecentCandidate
+                let rightIsMostRecent = $1.text == mostRecentCandidate
+                if leftIsMostRecent != rightIsMostRecent {
+                    return leftIsMostRecent
+                }
                 let left = learnedCount(
                     language: language,
                     key: lookup.key,
@@ -77,7 +109,8 @@ final class AssociationDictionary: @unchecked Sendable {
                 Suggestion(
                     text: $0.text,
                     key: lookup.key,
-                    language: language
+                    language: language,
+                    isMostRecentSelection: $0.text == mostRecentCandidate
                 )
             }
     }
@@ -89,6 +122,37 @@ final class AssociationDictionary: @unchecked Sendable {
             candidate: suggestion.text
         )
         defaults.set(defaults.integer(forKey: key) + 1, forKey: key)
+        let recentKey = recentSelectionKey(
+            language: suggestion.language,
+            key: suggestion.key
+        )
+        recentSelections[recentKey] = suggestion.text
+        defaults.set(suggestion.text, forKey: recentKey)
+    }
+
+    func recordChineseSequence(context: String, continuation: String) {
+        guard
+            !context.isEmpty,
+            continuation.count == 1
+        else {
+            return
+        }
+
+        var candidates = learnedCandidates(for: context)
+        candidates.removeAll { $0 == continuation }
+        candidates.insert(continuation, at: 0)
+        if candidates.count > 10 {
+            candidates.removeLast(candidates.count - 10)
+        }
+        learnedChineseCandidates[context] = candidates
+        defaults.set(candidates, forKey: learnedCandidatesKey(context))
+
+        let recentKey = recentSelectionKey(
+            language: .chinese,
+            key: context
+        )
+        recentSelections[recentKey] = continuation
+        defaults.set(continuation, forKey: recentKey)
     }
 
     private func longestChineseMatch(
@@ -102,6 +166,49 @@ final class AssociationDictionary: @unchecked Sendable {
             }
         }
         return nil
+    }
+
+    private func longestLearnedChineseMatch(
+        for context: String
+    ) -> (key: String, candidates: [WeightedCandidate])? {
+        let key = String(context.suffix(8))
+        let candidates = learnedCandidates(for: key)
+        guard !candidates.isEmpty else {
+            return nil
+        }
+        return (
+            key,
+            candidates.map {
+                WeightedCandidate(text: $0, weight: 0)
+            }
+        )
+    }
+
+    private func preferredLookup(
+        staticLookup: (key: String, candidates: [WeightedCandidate])?,
+        learnedLookup: (key: String, candidates: [WeightedCandidate])?
+    ) -> (key: String, candidates: [WeightedCandidate])? {
+        switch (staticLookup, learnedLookup) {
+        case (nil, nil):
+            nil
+        case (let lookup?, nil), (nil, let lookup?):
+            lookup
+        case (let staticLookup?, let learnedLookup?):
+            staticLookup.key.count >= learnedLookup.key.count
+                ? staticLookup
+                : learnedLookup
+        }
+    }
+
+    private func learnedCandidates(for key: String) -> [String] {
+        if let cached = learnedChineseCandidates[key] {
+            return cached
+        }
+        let candidates = defaults.stringArray(
+            forKey: learnedCandidatesKey(key)
+        ) ?? []
+        learnedChineseCandidates[key] = candidates
+        return candidates
     }
 
     private func learnedCount(
@@ -124,6 +231,17 @@ final class AssociationDictionary: @unchecked Sendable {
         candidate: String
     ) -> String {
         "association.\(language.rawValue).\(key).\(candidate)"
+    }
+
+    private func recentSelectionKey(
+        language: Language,
+        key: String
+    ) -> String {
+        "association.\(language.rawValue).\(key).recent"
+    }
+
+    private func learnedCandidatesKey(_ key: String) -> String {
+        "association.chinese.\(key).learnedCandidates"
     }
 
     nonisolated private static func loadTable(

@@ -161,10 +161,13 @@ down 組字處理，確保 Google Sheets 等網頁文字客戶端收到完整左
 ```text
 $ → $  ¥  £  €  ₹  ₺  ＄
 . → .  。  ⋯⋯
+< → <  ＜  ⟵
+> → >  ＞  ⟶
 ```
 
 `$` 固定以半形美元符號為首選，全形 `＄` 固定最後。`.` 仍按游標前文字
-在 `.` 與 `。` 之間切換第一候選，`⋯⋯` 固定排在其後。
+在 `.` 與 `。` 之間切換第一候選，`⋯⋯` 固定排在其後。`<` 與 `>` 固定
+以半形、全形、長箭頭排序，不按中英文語境調換。
 
 `characterBeforeCursor(in:)` 會透過 `NSTextInputClient.selectedRange()` 及 `attributedSubstring(forProposedRange:actualRange:)` 讀取實際游標前一個字元。若目標應用程式不支援讀取，則使用本次輸入工作階段的 `lastCommittedCharacter` 作為備用值。
 
@@ -314,6 +317,13 @@ add	hsp	怎
 ```
 
 若候選原本已存在，會先移除舊位置，避免重複。
+
+若要把上游字碼改為 macOS 字碼，可配合 `remove` 與 `add`：
+
+```text
+remove	mwsl	面
+add	mwyl	面
+```
 
 ### `remove`
 

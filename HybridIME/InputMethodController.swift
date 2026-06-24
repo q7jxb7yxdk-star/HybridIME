@@ -65,6 +65,7 @@ final class InputMethodController: IMKInputController {
 
         switch event.keyCode {
         case 49:
+            let isShiftSpace = event.modifierFlags.contains(.shift)
             if isSelectingAssociation {
                 if smartPredictionIndex == 0 {
                     commitCandidate(at: 0, to: sender)
@@ -77,15 +78,17 @@ final class InputMethodController: IMKInputController {
             if isSelectingPunctuation {
                 commitCandidate(at: 0, to: sender)
             } else if
-                !modifiers.contains(.shift),
+                !isShiftSpace,
                 !isEnglishCompositionContext,
                 let smartPredictionIndex
             {
                 commitCandidate(at: smartPredictionIndex, to: sender)
+            } else if isShiftSpace {
+                commitWithoutAssociations(buffer, to: sender)
             } else {
                 commitEnglish(
                     to: sender,
-                    appendingSpace: !modifiers.contains(.shift)
+                    appendingSpace: true
                 )
             }
             return true

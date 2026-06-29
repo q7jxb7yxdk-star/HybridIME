@@ -78,7 +78,7 @@ ASCII 英文字母會轉為小寫並加入 `buffer`。每次更新後：
 
 | 按鍵 | 行為 |
 | --- | --- |
-| `Space` | 英文語境提交英文並附加空格；其他語境若有智能預測則提交該候選，否則提交英文及空格 |
+| `Space` | 第一候選若是 `◆` 中文智能預測則提交該候選；否則英文語境提交英文並附加空格，其他語境提交英文及空格 |
 | `Shift + Space` | 提交緩衝區內的英文，不附加空格 |
 | `Return` / 數字鍵盤 `Enter` | 提交第一個候選；沒有候選時提交英文 |
 | `1` 至 `9` | 提交第一至第九個候選 |
@@ -98,7 +98,9 @@ Shift 不在此透傳集合內，因此仍可保留英文大小寫。
 code units，並只檢查最近一個句號、問號、感嘆號或換行之後的片段。片段
 含 ASCII 英文字母且不含中文字時，當前組字會標記為英文語境。
 
-英文語境中的 Space 直接提交原始英文，不套用中文智能預測。Return
+英文語境中的 Space 通常直接提交原始英文；但若第一候選是 `◆` 標示的
+中文智能預測，`shouldCommitSmartPredictionOnSpace` 會優先提交該中文候選，
+令候選窗顯示與 Space 行為一致。Return
 仍以當前候選為優先，只有完全沒有候選時才提交英文，避免英文前文令有效
 倉頡碼被誤判為英文。輸入 ASCII 標點時，既有 `commitDefault` 流程會先提交緩衝區英文，再建立
 標點候選狀態，因此 `I love you!` 的 `you` 不需要額外按 Space。句首第一個
@@ -118,8 +120,8 @@ code units，並只檢查最近一個句號、問號、感嘆號或換行之後�
 與 `.translate` 英文翻譯不會交給排序器，也不會取得
 `smartPredictionIndex`。
 
-候選視窗會在預測候選後顯示 `◆`。非英文語境按 Space 時直接提交該候選；
-英文語境維持提交英文，`Shift + Space` 則始終強制提交英文。標點及聯想
+候選視窗會在預測候選後顯示 `◆`。若該候選已被移到第一位，Space 會直接
+提交該候選；`Shift + Space` 則始終強制提交英文。標點及聯想
 候選亦不會寫入這套智能候選記錄。
 
 ### 滑鼠事件透傳
@@ -153,7 +155,9 @@ down 組字處理，確保 Google Sheets 等網頁文字客戶端收到完整左
 中文聯想直接附加候選；英文聯想附加候選及一個空格。選取後會呼叫
 `AssociationDictionary.recordSelection`，把使用次數及最近選擇寫入目前
 使用者的 `UserDefaults`。最近選擇會立即排在相同情境的第一位，並以
-`isMostRecentSelection` 標記供候選視窗顯示 `◆`。資料只在本機使用。
+`isMostRecentSelection` 標記供候選視窗顯示 `◆`。中文聯想另會把同一選擇
+寫入最後一個中文字的 fallback key，避免完整情境鍵不同時令最近選擇排序
+失效。資料只在本機使用。
 
 ### 標點符號
 
@@ -174,6 +178,11 @@ $ → $  ¥  £  €  ₹  ₺  ＄
 `$` 固定以半形美元符號為首選，全形 `＄` 固定最後。`,`、`*`、`/`、
 `<` 與 `>` 亦不按中英文語境調換。`.` 仍按游標前文字在 `.` 與 `。`
 之間切換第一候選，`⋯⋯` 固定排在其後。
+
+`'`、`"`、`` ` ``、`;` 及 `\` 容易混淆半形與全形，因此
+`showPunctuation(candidates:displayCandidates:client:)` 可接收獨立顯示文字。
+`currentCandidateActions` 仍保存真正輸出的符號，例如候選窗顯示 `半 '`，
+實際提交仍只是 `'`。
 
 `characterBeforeCursor(in:)` 會透過 `NSTextInputClient.selectedRange()` 及 `attributedSubstring(forProposedRange:actualRange:)` 讀取實際游標前一個字元。若目標應用程式不支援讀取，則使用本次輸入工作階段的 `lastCommittedCharacter` 作為備用值。
 
@@ -200,7 +209,8 @@ $ → $  ¥  £  €  ₹  ₺  ＄
 
 ## 4. 候選視窗
 
-`CandidateWindowController` 使用無邊框、不可成為主視窗的 `NSPanel`。
+`CandidateWindowController` 使用無邊框、不可成為 key/main window 的
+`CandidatePanel`。這避免候選窗在顯示或按 `Esc` 關閉時搶走目標輸入框焦點。
 
 視窗特性：
 
@@ -213,7 +223,7 @@ $ → $  ¥  £  €  ₹  ₺  ＄
 - 智能預測候選及最近選擇的第一個聯想候選在文字後顯示 `◆`。
 - 第二列顯示每個鍵位對應的倉頡字母。
 - 第三列顯示實際輸入的英文字母碼。
-- 標點模式只顯示半形及全形候選列。
+- 標點模式只顯示半形及全形候選列；部分易混淆符號可使用「半/全」顯示標籤。
 - 聯想模式只顯示帶數字的聯想候選列，不顯示倉頡字根及輸入碼。
 
 當完整字碼尚未命中時，候選列會隱藏，但倉頡字母及英文碼會持續顯示。例如：
@@ -329,6 +339,8 @@ add	hsp	怎
 ```text
 remove	mwsl	面
 add	mwyl	面
+remove	tmlc	黃
+add	tmwc	黃
 ```
 
 ### `remove`
@@ -516,6 +528,8 @@ xcodebuild \
 ```text
 ~/Library/Input Methods/HybridIME.app
 ```
+
+開發測試時，`xcodebuild` 只會產生 DerivedData 內的 `HybridIME.app`；macOS 實際載入的是 `~/Library/Input Methods/HybridIME.app`。每次測試新版都要先覆蓋此安裝位置，再終止 `HybridIME` process，否則會繼續測到舊版。
 
 安裝後可透過「系統設定 > 鍵盤 > 文字輸入」加入及啟用「中英混合」。開發時如需以 Carbon Text Input Source API 重新註冊，應由外部安裝命令執行一次，不應放在應用程式啟動流程。
 

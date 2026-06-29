@@ -40,6 +40,7 @@ final class InputMethodController: IMKInputController {
     private var associationLanguage: AssociationDictionary.Language?
     private var lastCommittedCharacter: Character?
     private var learnedChineseContext = ""
+    private var suppressAssociationsUntilNextInput = false
 
     override func recognizedEvents(_ sender: Any!) -> Int {
         Int(NSEvent.EventTypeMask([
@@ -63,35 +64,14 @@ final class InputMethodController: IMKInputController {
             return false
         }
 
+        if isSpaceEvent(event) {
+            return handleSpace(
+                event: event,
+                client: sender
+            )
+        }
+
         switch event.keyCode {
-        case 49:
-            let isShiftSpace = event.modifierFlags.contains(.shift)
-            if isSelectingAssociation {
-                if smartPredictionIndex == 0 {
-                    commitCandidate(at: 0, to: sender)
-                    return true
-                }
-                dismissAssociation(clearContext: true)
-                return false
-            }
-            guard !buffer.isEmpty else { return false }
-            if isSelectingPunctuation {
-                commitCandidate(at: 0, to: sender)
-            } else if
-                !isShiftSpace,
-                !isEnglishCompositionContext,
-                let smartPredictionIndex
-            {
-                commitCandidate(at: smartPredictionIndex, to: sender)
-            } else if isShiftSpace {
-                commitWithoutAssociations(buffer, to: sender)
-            } else {
-                commitEnglish(
-                    to: sender,
-                    appendingSpace: true
-                )
-            }
-            return true
         case 36, 76:
             guard !buffer.isEmpty || isSelectingAssociation else {
                 return false
@@ -123,7 +103,7 @@ final class InputMethodController: IMKInputController {
             guard !buffer.isEmpty || CandidateWindowController.shared.isVisible else {
                 return false
             }
-            cancelCompositionPreservingFocus(client: sender as? IMKTextInput)
+            cancelCompositionPreservingFocus()
             return true
         default:
             break
@@ -154,9 +134,11 @@ final class InputMethodController: IMKInputController {
         }
 
         if isSelectingPunctuation {
+            suppressAssociationsUntilNextInput = false
             commitCandidate(at: 0, to: sender)
         }
 
+        suppressAssociationsUntilNextInput = false
         guard
             let characters = event.characters,
             characters.count == 1,
@@ -176,6 +158,73 @@ final class InputMethodController: IMKInputController {
         buffer.append(characters)
         refreshComposition(client: sender)
         return true
+    }
+
+    private func isSpaceEvent(_ event: NSEvent) -> Bool {
+        event.keyCode == 49 ||
+            event.characters == " " ||
+            event.characters == "\u{00A0}" ||
+            event.charactersIgnoringModifiers == " " ||
+            event.charactersIgnoringModifiers == "\u{00A0}"
+    }
+
+    private func handleSpace(
+        event: NSEvent,
+        client sender: Any?
+    ) -> Bool {
+        let isShiftSpace =
+            event.modifierFlags.contains(.shift) ||
+            event.cgEvent?.flags.contains(.maskShift) == true ||
+            event.characters == "\u{00A0}" ||
+            event.charactersIgnoringModifiers == "\u{00A0}"
+        if !isShiftSpace {
+            suppressAssociationsUntilNextInput = false
+        }
+        if isSelectingAssociation {
+            if smartPredictionIndex == 0 {
+                commitCandidate(at: 0, to: sender)
+                return true
+            }
+            dismissAssociation(clearContext: true)
+            return false
+        }
+        guard !buffer.isEmpty else { return false }
+        if isSelectingPunctuation {
+            suppressAssociationsUntilNextInput = false
+            commitCandidate(at: 0, to: sender)
+        } else if
+            !isShiftSpace,
+            shouldCommitSmartPredictionOnSpace
+        {
+            commitCandidate(at: 0, to: sender)
+        } else if
+            !isShiftSpace,
+            !isEnglishCompositionContext,
+            let smartPredictionIndex
+        {
+            commitCandidate(at: smartPredictionIndex, to: sender)
+        } else if isShiftSpace {
+            commitWithoutAssociations(
+                buffer,
+                to: sender,
+                suppressingFollowingAssociations: true
+            )
+        } else {
+            commitEnglish(
+                to: sender,
+                appendingSpace: true
+            )
+        }
+        return true
+    }
+
+    private var shouldCommitSmartPredictionOnSpace: Bool {
+        guard smartPredictionIndex == 0 else { return false }
+        guard currentCandidateActions.indices.contains(0) else { return false }
+        if case .commit(let text) = currentCandidateActions[0] {
+            return text.allSatisfy(isChinese)
+        }
+        return false
     }
 
     override func candidates(_ sender: Any!) -> [Any]! {
@@ -240,8 +289,18 @@ final class InputMethodController: IMKInputController {
                 return text
             }
         )
-        smartPredictionIndex = prediction.flatMap {
-            currentCandidates.firstIndex(of: $0.candidate)
+        if
+            let prediction,
+            let index = currentCandidateActions.firstIndex(
+                where: { $0.text == prediction.candidate }
+            )
+        {
+            let action = currentCandidateActions.remove(at: index)
+            currentCandidateActions.insert(action, at: 0)
+            currentCandidates = currentCandidateActions.map(\.text)
+            smartPredictionIndex = 0
+        } else {
+            smartPredictionIndex = nil
         }
         updateComposition()
 
@@ -354,17 +413,8 @@ final class InputMethodController: IMKInputController {
         resetState(updatingComposition: true)
     }
 
-    private func cancelCompositionPreservingFocus(client: IMKTextInput?) {
-        if
-            let textClient = client as? NSTextInputClient,
-            textClient.markedRange().location != NSNotFound
-        {
-            textClient.insertText(
-                "",
-                replacementRange: textClient.markedRange()
-            )
-        }
-        resetState(updatingComposition: false)
+    private func cancelCompositionPreservingFocus() {
+        resetState(updatingComposition: true)
     }
 
     private func resetState(updatingComposition: Bool) {
@@ -462,11 +512,16 @@ final class InputMethodController: IMKInputController {
         )
     }
 
-    private func commitWithoutAssociations(_ text: String, to sender: Any?) {
+    private func commitWithoutAssociations(
+        _ text: String,
+        to sender: Any?,
+        suppressingFollowingAssociations: Bool = false
+    ) {
         guard !text.isEmpty else {
             resetState(updatingComposition: false)
             return
         }
+        suppressAssociationsUntilNextInput = suppressingFollowingAssociations
         (sender as? IMKTextInput)?.insertText(
             text,
             replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
@@ -590,6 +645,11 @@ final class InputMethodController: IMKInputController {
         language: AssociationDictionary.Language,
         client: IMKTextInput?
     ) {
+        if suppressAssociationsUntilNextInput {
+            dismissAssociation(clearContext: true)
+            return
+        }
+
         let suggestions = associationDictionary?.suggestions(
             for: context,
             language: language,
@@ -699,8 +759,39 @@ final class InputMethodController: IMKInputController {
         updateComposition()
         CandidateWindowController.shared.showPunctuation(
             candidates: currentCandidates,
+            displayCandidates: punctuationDisplayCandidates(
+                for: currentCandidates,
+                punctuation: punctuation
+            ),
             client: client
         )
+    }
+
+    private func punctuationDisplayCandidates(
+        for candidates: [String],
+        punctuation: (
+            halfWidth: String,
+            fullWidth: String,
+            candidates: [String],
+            chineseDefault: String?
+        )
+    ) -> [String]? {
+        let labeledHalfWidthPunctuation: Set<String> = [
+            "'", "\"", "`", ";", "\\",
+        ]
+        guard labeledHalfWidthPunctuation.contains(punctuation.halfWidth) else {
+            return nil
+        }
+
+        return candidates.map { candidate in
+            if candidate == punctuation.halfWidth {
+                return "半 \(candidate)"
+            }
+            if candidate == punctuation.fullWidth {
+                return "全 \(candidate)"
+            }
+            return candidate
+        }
     }
 
     private func characterBeforeCursor(in client: IMKTextInput?) -> Character? {

@@ -63,12 +63,10 @@ final class AssociationDictionary: @unchecked Sendable {
             return []
         }
 
-        let recentKey = recentSelectionKey(
+        let mostRecentCandidate = mostRecentSelection(
             language: language,
             key: lookup.key
         )
-        let mostRecentCandidate = recentSelections[recentKey]
-            ?? defaults.string(forKey: recentKey)
         var candidates = lookup.candidates
         if language == .chinese {
             let learned = learnedCandidates(for: lookup.key)
@@ -128,6 +126,18 @@ final class AssociationDictionary: @unchecked Sendable {
         )
         recentSelections[recentKey] = suggestion.text
         defaults.set(suggestion.text, forKey: recentKey)
+
+        if
+            suggestion.language == .chinese,
+            let lastCharacter = suggestion.key.last
+        {
+            let fallbackKey = recentSelectionKey(
+                language: .chinese,
+                key: String(lastCharacter)
+            )
+            recentSelections[fallbackKey] = suggestion.text
+            defaults.set(suggestion.text, forKey: fallbackKey)
+        }
     }
 
     func recordChineseSequence(context: String, continuation: String) {
@@ -223,6 +233,31 @@ final class AssociationDictionary: @unchecked Sendable {
                 candidate: candidate
             )
         )
+    }
+
+    private func mostRecentSelection(
+        language: Language,
+        key: String
+    ) -> String? {
+        let recentKey = recentSelectionKey(
+            language: language,
+            key: key
+        )
+        if let selection = recentSelections[recentKey]
+            ?? defaults.string(forKey: recentKey)
+        {
+            return selection
+        }
+
+        guard language == .chinese, let lastCharacter = key.last else {
+            return nil
+        }
+        let fallbackRecentKey = recentSelectionKey(
+            language: .chinese,
+            key: String(lastCharacter)
+        )
+        return recentSelections[fallbackRecentKey]
+            ?? defaults.string(forKey: fallbackRecentKey)
     }
 
     private func learningKey(

@@ -1,6 +1,11 @@
 import AppKit
 import InputMethodKit
 
+private final class CandidatePanel: NSPanel {
+    override var canBecomeKey: Bool { false }
+    override var canBecomeMain: Bool { false }
+}
+
 @MainActor
 final class CandidateWindowController {
     static let shared = CandidateWindowController()
@@ -57,7 +62,7 @@ final class CandidateWindowController {
             contentStack.bottomAnchor.constraint(equalTo: background.bottomAnchor),
         ])
 
-        panel = NSPanel(
+        panel = CandidatePanel(
             contentRect: .zero,
             styleMask: [.borderless, .nonactivatingPanel],
             backing: .buffered,
@@ -101,6 +106,7 @@ final class CandidateWindowController {
 
     func showPunctuation(
         candidates: [String],
+        displayCandidates: [String]? = nil,
         client: IMKTextInput?
     ) {
         guard !candidates.isEmpty else {
@@ -110,7 +116,9 @@ final class CandidateWindowController {
 
         codeLabel.isHidden = true
         rootsLabel.isHidden = true
-        candidatesLabel.attributedStringValue = candidateText(candidates)
+        candidatesLabel.attributedStringValue = candidateText(
+            displayCandidates ?? candidates
+        )
         candidatesLabel.isHidden = false
 
         updatePanel(client: client)

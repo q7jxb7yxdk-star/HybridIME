@@ -777,7 +777,7 @@ final class InputMethodController: IMKInputController {
         )
     ) -> [String]? {
         let labeledHalfWidthPunctuation: Set<String> = [
-            "'", "\"", "`", ";", "\\", "?", "(", ")",
+            "'", "\"", "`", ";", "\\", "?", "(", ")", ":",
         ]
         guard labeledHalfWidthPunctuation.contains(punctuation.halfWidth) else {
             return nil

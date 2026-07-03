@@ -119,7 +119,7 @@ final class InputMethodController: IMKInputController {
 
         if
             let index = candidateIndex(for: event),
-            !shouldContinueCurrencyAmountInput(event),
+            !shouldContinueNumericPunctuationInput(event),
             !isInvalidPunctuationCandidateIndex(index),
             !buffer.isEmpty || isSelectingAssociation
         {
@@ -784,8 +784,27 @@ final class InputMethodController: IMKInputController {
                 for: currentCandidates,
                 punctuation: punctuation
             ),
+            shiftKeyCandidates: shiftKeyCandidates(
+                for: currentCandidates,
+                punctuation: punctuation
+            ),
             client: client
         )
+    }
+
+    private func shiftKeyCandidates(
+        for candidates: [String],
+        punctuation: (
+            halfWidth: String,
+            fullWidth: String,
+            candidates: [String],
+            chineseDefault: String?
+        )
+    ) -> [String]? {
+        guard ["$", "."].contains(punctuation.halfWidth) else {
+            return nil
+        }
+        return candidates
     }
 
     private func punctuationDisplayCandidates(
@@ -819,8 +838,10 @@ final class InputMethodController: IMKInputController {
         isSelectingPunctuation && !currentCandidateActions.indices.contains(index)
     }
 
-    private func shouldContinueCurrencyAmountInput(_ event: NSEvent) -> Bool {
-        guard isSelectingPunctuation, buffer == "$" else { return false }
+    private func shouldContinueNumericPunctuationInput(_ event: NSEvent) -> Bool {
+        guard isSelectingPunctuation, ["$", "."].contains(buffer) else {
+            return false
+        }
         guard !isShiftModified(event) else { return false }
         guard let character = event.charactersIgnoringModifiers?.first else {
             return false

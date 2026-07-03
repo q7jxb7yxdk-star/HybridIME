@@ -103,6 +103,14 @@ final class InputMethodController: IMKInputController {
             guard !buffer.isEmpty || CandidateWindowController.shared.isVisible else {
                 return false
             }
+            if shouldCommitEnglishOnEscape {
+                commitWithoutAssociations(
+                    buffer,
+                    to: sender,
+                    suppressingFollowingAssociations: true
+                )
+                return true
+            }
             cancelCompositionPreservingFocus()
             return true
         default:
@@ -111,6 +119,7 @@ final class InputMethodController: IMKInputController {
 
         if
             let index = candidateIndex(for: event),
+            !isInvalidPunctuationCandidateIndex(index),
             !buffer.isEmpty || isSelectingAssociation
         {
             commitCandidate(at: index, to: sender)
@@ -225,6 +234,17 @@ final class InputMethodController: IMKInputController {
             return text.allSatisfy(isChinese)
         }
         return false
+    }
+
+    private var shouldCommitEnglishOnEscape: Bool {
+        guard !isSelectingPunctuation else { return false }
+        guard !buffer.isEmpty else { return false }
+        return !currentCandidateActions.contains { action in
+            if case .commit(let text) = action {
+                return text.allSatisfy(isChinese)
+            }
+            return false
+        }
     }
 
     override func candidates(_ sender: Any!) -> [Any]! {
@@ -777,7 +797,7 @@ final class InputMethodController: IMKInputController {
         )
     ) -> [String]? {
         let labeledHalfWidthPunctuation: Set<String> = [
-            "'", "\"", "`", ";", "\\", "?", "(", ")", ":",
+            "'", "\"", "`", ";", "\\", "?", "(", ")", ":", "!",
         ]
         guard labeledHalfWidthPunctuation.contains(punctuation.halfWidth) else {
             return nil
@@ -792,6 +812,10 @@ final class InputMethodController: IMKInputController {
             }
             return candidate
         }
+    }
+
+    private func isInvalidPunctuationCandidateIndex(_ index: Int) -> Bool {
+        isSelectingPunctuation && !currentCandidateActions.indices.contains(index)
     }
 
     private func characterBeforeCursor(in client: IMKTextInput?) -> Character? {

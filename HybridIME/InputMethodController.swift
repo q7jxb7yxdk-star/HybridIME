@@ -119,6 +119,7 @@ final class InputMethodController: IMKInputController {
 
         if
             let index = candidateIndex(for: event),
+            !shouldContinueCurrencyAmountInput(event),
             !isInvalidPunctuationCandidateIndex(index),
             !buffer.isEmpty || isSelectingAssociation
         {
@@ -816,6 +817,20 @@ final class InputMethodController: IMKInputController {
 
     private func isInvalidPunctuationCandidateIndex(_ index: Int) -> Bool {
         isSelectingPunctuation && !currentCandidateActions.indices.contains(index)
+    }
+
+    private func shouldContinueCurrencyAmountInput(_ event: NSEvent) -> Bool {
+        guard isSelectingPunctuation, buffer == "$" else { return false }
+        guard !isShiftModified(event) else { return false }
+        guard let character = event.charactersIgnoringModifiers?.first else {
+            return false
+        }
+        return character.isNumber
+    }
+
+    private func isShiftModified(_ event: NSEvent) -> Bool {
+        event.modifierFlags.contains(.shift) ||
+            event.cgEvent?.flags.contains(.maskShift) == true
     }
 
     private func characterBeforeCursor(in client: IMKTextInput?) -> Character? {

@@ -102,8 +102,10 @@ code units，並只檢查最近一個句號、問號、感嘆號或換行之後�
 中文智能預測，`shouldCommitSmartPredictionOnSpace` 會優先提交該中文候選，
 令候選窗顯示與 Space 行為一致。Return
 仍以當前候選為優先，只有完全沒有候選時才提交英文，避免英文前文令有效
-倉頡碼被誤判為英文。輸入 ASCII 標點時，既有 `commitDefault` 流程會先提交緩衝區英文，再建立
-標點候選狀態，因此 `I love you!` 的 `you` 不需要額外按 Space。句首第一個
+倉頡碼被誤判為英文。輸入 ASCII 標點時，`commitBeforePunctuation`
+會先檢查緩衝區第一個候選；若是純中文 `.commit` 候選，先提交該中文並令標點
+預設全形，否則提交緩衝區英文並令標點預設半形。因此 `I love you!` 的
+`you` 不需要額外按 Space，而倉頡候選後接標點亦可直接得到中文標點。句首第一個
 英文詞仍使用一般混合輸入規則；`Shift + Space` 在任何語境均可強制提交
 英文且不加入空格。
 
@@ -179,8 +181,8 @@ $ → $  ¥  £  €  ₹  ₺  ＄
 > → >  ＞  ⟶
 ```
 
-`$` 固定以半形美元符號為首選，全形 `＄` 固定最後。`,`、`*`、`/`、
-`<` 與 `>` 亦不按中英文語境調換。`.` 仍按游標前文字在 `.` 與 `。`
+`$` 固定以半形美元符號為首選，全形 `＄` 固定最後。`,` 會按中英文語境
+在 `,` 與 `，` 之間調換第一候選；`*`、`/`、`<` 與 `>` 不按中英文語境調換。`.` 仍按游標前文字在 `.` 與 `。`
 之間切換第一候選，`⋯⋯` 固定排在其後。
 
 `'`、`"`、`` ` ``、`;`、`\`、`?`、`(`、`)`、`:` 及 `!` 容易混淆半形與全形，因此
@@ -188,7 +190,13 @@ $ → $  ¥  £  €  ₹  ₺  ＄
 `currentCandidateActions` 仍保存真正輸出的符號，例如候選窗顯示 `半 '`，
 實際提交仍只是 `'`。
 
-`characterBeforeCursor(in:)` 會透過 `NSTextInputClient.selectedRange()` 及 `attributedSubstring(forProposedRange:actualRange:)` 讀取實際游標前一個字元。若目標應用程式不支援讀取，則使用本次輸入工作階段的 `lastCommittedCharacter` 作為備用值。
+`punctuationFullWidthPreferenceForCurrentComposition()` 會先根據未提交的
+buffer 判斷標點語境：第一個候選若是純中文 `.commit` 候選則強制全形，
+否則強制半形。buffer 為空時，`characterBeforeCursor(in:)` 會透過
+`NSTextInputClient.selectedRange()` 及
+`attributedSubstring(forProposedRange:actualRange:)` 讀取實際游標前一個字元。
+若目標應用程式不支援讀取，則使用本次輸入工作階段的
+`lastCommittedCharacter` 作為備用值。
 
 `isChinese(_:)` 檢查 CJK Unified Ideographs、Extension A 至 H、Compatibility Ideographs 及 `〇`：
 

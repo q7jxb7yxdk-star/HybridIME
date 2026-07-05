@@ -131,13 +131,15 @@ final class InputMethodController: IMKInputController {
             let character = event.characters?.first,
             let punctuation = punctuationPair(for: character)
         {
+            let forceFullWidth = punctuationFullWidthPreferenceForCurrentComposition()
             learnedChineseContext = ""
             dismissAssociation(clearContext: true)
             if !buffer.isEmpty {
-                commitDefault(to: sender)
+                commitBeforePunctuation(to: sender)
             }
             beginPunctuationSelection(
                 punctuation,
+                forceFullWidth: forceFullWidth,
                 client: sender as? IMKTextInput
             )
             return true
@@ -479,6 +481,18 @@ final class InputMethodController: IMKInputController {
         }
     }
 
+    private func commitBeforePunctuation(to sender: Any?) {
+        if punctuationFullWidthPreferenceForCurrentComposition() == true {
+            commitCandidate(
+                at: 0,
+                to: sender,
+                showingAssociations: false
+            )
+        } else {
+            commitWithoutAssociations(buffer, to: sender)
+        }
+    }
+
     private func commitCandidate(
         at index: Int,
         to sender: Any?,
@@ -756,10 +770,13 @@ final class InputMethodController: IMKInputController {
             candidates: [String],
             chineseDefault: String?
         ),
+        forceFullWidth: Bool? = nil,
         client: IMKTextInput?
     ) {
         dismissAssociation(clearContext: true)
-        let useFullWidth = characterBeforeCursor(in: client).map(isChinese) ?? false
+        let useFullWidth = forceFullWidth
+            ?? characterBeforeCursor(in: client).map(isChinese)
+            ?? false
         let defaultCandidate: String
         if punctuation.chineseDefault == punctuation.halfWidth {
             defaultCandidate = punctuation.halfWidth
@@ -790,6 +807,18 @@ final class InputMethodController: IMKInputController {
             ),
             client: client
         )
+    }
+
+    private func punctuationFullWidthPreferenceForCurrentComposition() -> Bool? {
+        guard !buffer.isEmpty else { return nil }
+        guard
+            let firstAction = currentCandidateActions.first,
+            case .commit(let text) = firstAction,
+            text.allSatisfy(isChinese)
+        else {
+            return false
+        }
+        return true
     }
 
     private func shiftKeyCandidates(
@@ -964,7 +993,7 @@ final class InputMethodController: IMKInputController {
             chineseDefault = nil
         case ",":
             candidates = [",", "，", "、"]
-            chineseDefault = ","
+            chineseDefault = nil
         case "*":
             candidates = ["*", "＊", "×"]
             chineseDefault = "*"

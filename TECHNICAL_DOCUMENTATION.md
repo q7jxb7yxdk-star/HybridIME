@@ -364,6 +364,8 @@ remove	mwsl	面
 add	mwyl	面
 remove	tmlc	黃
 add	tmwc	黃
+remove	orbt	盒
+add	omrt	盒
 ```
 
 ### `remove`

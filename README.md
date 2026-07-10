@@ -268,7 +268,7 @@ HybridIME/CangjieData/macOS-overrides.tsv
 集中記錄已確認的相容修正，而不直接修改上游 Rime 碼表。
 
 目前相容層亦把「面」由 Rime 的 `mwsl` 調整為 macOS 倉頡碼 `mwyl`，
-並把「黃」由 `tmlc` 調整為 `tmwc`。
+把「黃」由 `tmlc` 調整為 `tmwc`，並把「盒」由 `orbt` 調整為 `omrt`。
 
 ## 中英雙向字典
 

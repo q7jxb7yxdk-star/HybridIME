@@ -889,9 +889,25 @@ final class InputMethodController: IMKInputController {
         }
 
         let selection = textClient.selectedRange()
+        guard selection.location != NSNotFound, selection.location > 0 else {
+            return lastCommittedCharacter
+        }
+
+        let contextLength = min(64, selection.location)
+        if
+            let text = textClient.attributedSubstring(
+                forProposedRange: NSRange(
+                    location: selection.location - contextLength,
+                    length: contextLength
+                ),
+                actualRange: nil
+            )?.string,
+            let character = punctuationContextCharacter(in: text)
+        {
+            return character
+        }
+
         guard
-            selection.location != NSNotFound,
-            selection.location > 0,
             let substring = textClient.attributedSubstring(
                 forProposedRange: NSRange(
                     location: selection.location - 1,
@@ -904,6 +920,24 @@ final class InputMethodController: IMKInputController {
             return lastCommittedCharacter
         }
         return character
+    }
+
+    private func punctuationContextCharacter(in text: String) -> Character? {
+        for character in text.reversed() {
+            if character.isWhitespace || character.isNewline {
+                continue
+            }
+            if isChinese(character) {
+                return character
+            }
+            if character.isASCII && (character.isLetter || character.isNumber) {
+                return character
+            }
+            if ".!?。！？,，、;；:：".contains(character) {
+                break
+            }
+        }
+        return nil
     }
 
     private func englishTextBeforeComposition(

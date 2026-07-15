@@ -1097,10 +1097,10 @@ final class InputMethodController: IMKInputController {
             candidates = ["/", "／", "÷"]
             chineseDefault = "/"
         case "<":
-            candidates = ["<", "＜", "⟵"]
+            candidates = ["<", "＜", "←"]
             chineseDefault = "<"
         case ">":
-            candidates = [">", "＞", "⟶"]
+            candidates = [">", "＞", "→"]
             chineseDefault = ">"
         case "[":
             candidates = ["[", "「", "〔", "［", "【", "〖"]

@@ -133,7 +133,9 @@ code units，並只檢查最近一個句號、問號、感嘆號或換行之後�
 
 `recognizedEvents(_:)` 明確宣告 `keyDown`、`leftMouseDown`、
 `leftMouseUp`、`leftMouseDragged` 及 `mouseCancelled`。事件處理器只接受
-`keyDown`，所有滑鼠事件立即回傳 `false`。
+`keyDown`；若 InputMethodKit 傳入 `nil` event，會清理狀態並回傳
+`false`。所有非 `keyDown` 事件直接回傳 `false`，不再同步清理組字或候選，
+避免干擾 Safari URL 欄及聽寫等文字輸入 session。
 
 這會停用 InputMethodKit 在輸入法只接收 `keyDown` 時套用的預設 mouse
 down 組字處理，確保 Google Sheets 等網頁文字客戶端收到完整左鍵序列。

@@ -304,7 +304,8 @@ HybridIME 使用 [CC-CEDICT](https://cc-cedict.org/wiki/) 建立獨立的中英
 
 HybridIME 亦會明確接收並透傳完整的左鍵按下、拖曳、放開及取消事件，
 避免 InputMethodKit 的預設 mouse down 組字處理干擾 Google Sheets 等
-網頁文字客戶端的 cell 點擊與拖曳選取。
+網頁文字客戶端的 cell 點擊與拖曳選取。非鍵盤事件會直接交回系統，不會
+清理組字狀態，以避免影響 Safari URL 欄及聽寫 session。
 
 ## 中英文聯想
 

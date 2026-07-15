@@ -55,6 +55,11 @@ final class InputMethodController: IMKInputController {
     }
 
     override func handle(_ event: NSEvent!, client sender: Any!) -> Bool {
+        guard let event else {
+            resetState(updatingComposition: false)
+            return false
+        }
+
         guard event.type == .keyDown else {
             return false
         }

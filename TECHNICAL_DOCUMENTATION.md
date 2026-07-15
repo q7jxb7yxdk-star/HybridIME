@@ -81,8 +81,8 @@ ASCII 英文字母會轉為小寫並加入 `buffer`。每次更新後：
 | `Space` | 第一候選若是 `◆` 中文智能預測則提交該候選；否則英文語境提交英文並附加空格，其他語境提交英文及空格 |
 | `Shift + Space` | 提交緩衝區內的英文，不附加空格 |
 | `Return` / 數字鍵盤 `Enter` | 提交第一個候選；沒有候選時提交英文 |
-| `1` 至 `9` | 提交第一至第九個候選 |
-| `0` | 提交第十個候選 |
+| `1` 至 `9` | 提交第一至第九個候選；字元判斷失敗時會 fallback 至主鍵盤及數字鍵盤 keyCode |
+| `0` | 提交第十個候選；支援主鍵盤及數字鍵盤 keyCode fallback |
 | `Delete` | 刪除緩衝區最後一個字母 |
 | `Esc` | 英文 buffer 無倉頡中文候選時提交英文且不加空格；否則清除 marked text 或關閉候選 |
 | `Command`、`Control` 或 `Option` 組合鍵 | 不處理事件，直接交回目標應用程式 |
@@ -98,9 +98,8 @@ Shift 不在此透傳集合內，因此仍可保留英文大小寫。
 code units，並只檢查最近一個句號、問號、感嘆號或換行之後的片段。片段
 含 ASCII 英文字母且不含中文字時，當前組字會標記為英文語境。
 
-英文語境中的 Space 通常直接提交原始英文；但若第一候選是 `◆` 標示的
-中文智能預測，`shouldCommitSmartPredictionOnSpace` 會優先提交該中文候選，
-令候選窗顯示與 Space 行為一致。Return
+英文語境中的 Space 直接提交原始英文，不套用中文智能預測，避免曾經誤選
+中文字後令 `you`、`Step` 這類英文輸入被自動取代。Return
 仍以當前候選為優先，只有完全沒有候選時才提交英文，避免英文前文令有效
 倉頡碼被誤判為英文。輸入 ASCII 標點時，`commitBeforePunctuation`
 會先檢查緩衝區第一個候選；若是純中文 `.commit` 候選，先提交該中文並令標點
@@ -121,7 +120,7 @@ code units，並只檢查最近一個句號、問號、感嘆號或換行之後�
 選擇時間及該字碼的候選清單。
 
 同一字碼與同一中文字候選選取一次後即可成為預測，不使用百分比或前文
-情境。查詢時只考慮目前仍存在的純中文 `.commit` 候選，依累計次數、最近
+情境；但 `isEnglishCompositionContext` 為 true 時不查詢排序器。查詢時只考慮目前仍存在的純中文 `.commit` 候選，依累計次數、最近
 選擇時間及文字次序決定最佳候選。原始英文、`.dictionaryCommit` 中文翻譯
 與 `.translate` 英文翻譯不會交給排序器，也不會取得
 `smartPredictionIndex`。
@@ -177,13 +176,24 @@ $ → $  ¥  £  €  ₹  ₺  ＄
 * → *  ＊  ×
 / → /  ／  ÷
 . → .  。  ⋯⋯
+` → `  ｀
+- → -  －
++ → +  ＋
+= → =  ＝
 < → <  ＜  ⟵
 > → >  ＞  ⟶
 ```
 
 `$` 固定以半形美元符號為首選，全形 `＄` 固定最後。`,` 會按中英文語境
-在 `,` 與 `，` 之間調換第一候選；`*`、`/`、`<` 與 `>` 不按中英文語境調換。`.` 仍按游標前文字在 `.` 與 `。`
+在 `,` 與 `，` 之間調換第一候選；`*`、`/`、`` ` ``、`-`、`+`、`=`、
+`<` 與 `>` 不按中英文語境調換，固定以半形為首選。`.` 仍按游標前文字在 `.` 與 `。`
 之間切換第一候選，`⋯⋯` 固定排在其後。
+
+`defaultPunctuationCandidate(for:useFullWidth:)` 負責選出第一候選。中文語境
+會優先使用 `chineseDefault`，例如 `[` 使用 `「`、`]` 使用 `」`；沒有
+`chineseDefault` 時使用一般全形符號，例如 `(` 使用 `（`、`;` 使用 `；`、
+`!` 使用 `！`、`?` 使用 `？`。若 `chineseDefault` 等於半形符號本身，則表示
+該符號固定以半形為首選。
 
 `'`、`"`、`` ` ``、`;`、`\`、`?`、`(`、`)`、`:` 及 `!` 容易混淆半形與全形，因此
 `showPunctuation(candidates:displayCandidates:client:)` 可接收獨立顯示文字。
@@ -192,14 +202,27 @@ $ → $  ¥  £  €  ₹  ₺  ＄
 
 `punctuationFullWidthPreferenceForCurrentComposition()` 會先根據未提交的
 buffer 判斷標點語境：第一個候選若是純中文 `.commit` 候選則強制全形，
-否則強制半形。buffer 為空時，`characterBeforeCursor(in:)` 會透過
+否則強制半形。buffer 為空時，`punctuationUsesFullWidthBeforeCursor(in:)`
+會透過
 `NSTextInputClient.selectedRange()` 及
 `attributedSubstring(forProposedRange:actualRange:)` 讀取游標前最多 64 個
 UTF-16 單位，並由後往前尋找最近的有效語境字元。空白及換行會略過；
 中文字會令標點預設全形，ASCII 英文字母及數字會令標點預設半形，遇到
 句末或標點分隔符則停止掃描。因此聽寫或貼上文字後再輸入標點亦可跟隨
-目標文字框內容。若目標應用程式不支援讀取，則使用本次輸入工作階段的
-`lastCommittedCharacter` 作為備用值。
+目標文字框內容。
+
+HybridIME 自己提交文字時，`setNextPunctuationContext(from:)` 會設定一次性的
+`nextPunctuationUsesFullWidth`。中文提交會令下一個標點偏全形，ASCII 英文或
+數字提交會令下一個標點偏半形；`beginPunctuationSelection` 讀取後立即清除，
+避免舊語境影響之後的聽寫輸入。
+
+若目標應用程式不支援讀取游標前文字，標點預設偏向中文，以改善聽寫中文後
+目標 app 不回傳文字內容的情況。直接鍵入數字時，HybridIME 會在 pass-through 前透過
+`punctuationUsesFullWidthForPassthroughInput(_:)` 設定
+`lastPassthroughPunctuationUsesFullWidth = false`，讓下一個標點即使讀不到
+目標文字框內容仍使用半形；字母輸入會進入 HybridIME buffer，不使用這個
+pass-through fallback，避免倉頡碼被誤記為英文語境。此狀態會在建立標點
+候選或開始新的字母 buffer 後立即清除。
 
 `isChinese(_:)` 檢查 CJK Unified Ideographs、Extension A 至 H、Compatibility Ideographs 及 `〇`：
 
@@ -369,6 +392,8 @@ remove	tmlc	黃
 add	tmwc	黃
 remove	orbt	盒
 add	omrt	盒
+remove	orq	拿
+add	omrq	拿
 ```
 
 ### `remove`

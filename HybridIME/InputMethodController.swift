@@ -39,6 +39,8 @@ final class InputMethodController: IMKInputController {
     private var associationContext = ""
     private var associationLanguage: AssociationDictionary.Language?
     private var lastCommittedCharacter: Character?
+    private var nextPunctuationUsesFullWidth: Bool?
+    private var lastPassthroughPunctuationUsesFullWidth: Bool?
     private var learnedChineseContext = ""
     private var suppressAssociationsUntilNextInput = false
 
@@ -159,6 +161,10 @@ final class InputMethodController: IMKInputController {
             })
         else {
             dismissAssociation(clearContext: true)
+            if buffer.isEmpty {
+                lastPassthroughPunctuationUsesFullWidth =
+                    punctuationUsesFullWidthForPassthroughInput(event)
+            }
             if !buffer.isEmpty {
                 commitDefault(to: sender)
             }
@@ -167,6 +173,7 @@ final class InputMethodController: IMKInputController {
 
         dismissAssociation(clearContext: false)
         isSelectingPunctuation = false
+        lastPassthroughPunctuationUsesFullWidth = nil
         buffer.append(characters)
         refreshComposition(client: sender)
         return true
@@ -303,15 +310,17 @@ final class InputMethodController: IMKInputController {
         isEnglishCompositionContext = englishTextBeforeComposition(
             in: sender as? IMKTextInput
         )
-        let prediction = smartCandidateRanker.prediction(
-            code: buffer,
-            availableCandidates: currentCandidateActions.compactMap {
-                guard case .commit(let text) = $0, text.allSatisfy(isChinese) else {
-                    return nil
+        let prediction = isEnglishCompositionContext
+            ? nil
+            : smartCandidateRanker.prediction(
+                code: buffer,
+                availableCandidates: currentCandidateActions.compactMap {
+                    guard case .commit(let text) = $0, text.allSatisfy(isChinese) else {
+                        return nil
+                    }
+                    return text
                 }
-                return text
-            }
-        )
+            )
         if
             let prediction,
             let index = currentCandidateActions.firstIndex(
@@ -562,6 +571,7 @@ final class InputMethodController: IMKInputController {
             replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
         )
         lastCommittedCharacter = text.last
+        setNextPunctuationContext(from: text)
         learnCommittedText(text)
         resetState(updatingComposition: false)
     }
@@ -572,6 +582,7 @@ final class InputMethodController: IMKInputController {
             replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
         )
         lastCommittedCharacter = text.last
+        setNextPunctuationContext(from: text)
         learnCommittedText(text)
         buffer = ""
         currentCandidates = []
@@ -637,6 +648,7 @@ final class InputMethodController: IMKInputController {
             )
         )
         lastCommittedCharacter = text.last
+        setNextPunctuationContext(from: text)
         buffer = ""
         currentCandidates = []
         currentCandidateActions = []
@@ -663,6 +675,7 @@ final class InputMethodController: IMKInputController {
             replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
         )
         lastCommittedCharacter = insertedText.last
+        setNextPunctuationContext(from: suggestion.text)
         learnCommittedText(suggestion.text)
 
         let context = suggestion.language == .chinese
@@ -740,6 +753,19 @@ final class InputMethodController: IMKInputController {
         return nil
     }
 
+    private func setNextPunctuationContext(from text: String) {
+        guard let contextCharacter = punctuationContextCharacter(in: text) else {
+            return
+        }
+        if isChinese(contextCharacter) {
+            nextPunctuationUsesFullWidth = true
+        } else if contextCharacter.isASCII &&
+            (contextCharacter.isLetter || contextCharacter.isNumber)
+        {
+            nextPunctuationUsesFullWidth = false
+        }
+    }
+
     private func learnCommittedText(_ text: String) {
         guard !text.isEmpty, text.allSatisfy(isChinese) else {
             learnedChineseContext = ""
@@ -775,16 +801,16 @@ final class InputMethodController: IMKInputController {
     ) {
         dismissAssociation(clearContext: true)
         let useFullWidth = forceFullWidth
-            ?? characterBeforeCursor(in: client).map(isChinese)
-            ?? false
-        let defaultCandidate: String
-        if punctuation.chineseDefault == punctuation.halfWidth {
-            defaultCandidate = punctuation.halfWidth
-        } else {
-            defaultCandidate = useFullWidth
-                ? punctuation.chineseDefault ?? punctuation.fullWidth
-                : punctuation.halfWidth
-        }
+            ?? punctuationUsesFullWidthBeforeCursor(in: client)
+            ?? nextPunctuationUsesFullWidth
+            ?? lastPassthroughPunctuationUsesFullWidth
+            ?? true
+        nextPunctuationUsesFullWidth = nil
+        lastPassthroughPunctuationUsesFullWidth = nil
+        let defaultCandidate = defaultPunctuationCandidate(
+            for: punctuation,
+            useFullWidth: useFullWidth
+        )
         currentCandidates = [defaultCandidate]
         currentCandidates.append(
             contentsOf: punctuation.candidates.filter { $0 != defaultCandidate }
@@ -807,6 +833,24 @@ final class InputMethodController: IMKInputController {
             ),
             client: client
         )
+    }
+
+    private func defaultPunctuationCandidate(
+        for punctuation: (
+            halfWidth: String,
+            fullWidth: String,
+            candidates: [String],
+            chineseDefault: String?
+        ),
+        useFullWidth: Bool
+    ) -> String {
+        if punctuation.chineseDefault == punctuation.halfWidth {
+            return punctuation.halfWidth
+        }
+        guard useFullWidth else {
+            return punctuation.halfWidth
+        }
+        return punctuation.chineseDefault ?? punctuation.fullWidth
     }
 
     private func punctuationFullWidthPreferenceForCurrentComposition() -> Bool? {
@@ -883,14 +927,29 @@ final class InputMethodController: IMKInputController {
             event.cgEvent?.flags.contains(.maskShift) == true
     }
 
-    private func characterBeforeCursor(in client: IMKTextInput?) -> Character? {
+    private func punctuationUsesFullWidthForPassthroughInput(
+        _ event: NSEvent
+    ) -> Bool? {
+        let characters = event.charactersIgnoringModifiers ?? event.characters
+        guard characters?.count == 1, let character = characters?.first else {
+            return nil
+        }
+        if character.isNumber {
+            return false
+        }
+        return nil
+    }
+
+    private func punctuationUsesFullWidthBeforeCursor(
+        in client: IMKTextInput?
+    ) -> Bool? {
         guard let textClient = client as? NSTextInputClient else {
-            return lastCommittedCharacter
+            return nil
         }
 
         let selection = textClient.selectedRange()
         guard selection.location != NSNotFound, selection.location > 0 else {
-            return lastCommittedCharacter
+            return nil
         }
 
         let contextLength = min(64, selection.location)
@@ -904,7 +963,7 @@ final class InputMethodController: IMKInputController {
             )?.string,
             let character = punctuationContextCharacter(in: text)
         {
-            return character
+            return isChinese(character)
         }
 
         guard
@@ -917,9 +976,9 @@ final class InputMethodController: IMKInputController {
             )?.string,
             let character = substring.last
         else {
-            return lastCommittedCharacter
+            return nil
         }
-        return character
+        return isChinese(character)
     }
 
     private func punctuationContextCharacter(in text: String) -> Character? {
@@ -1022,6 +1081,9 @@ final class InputMethodController: IMKInputController {
         case "$":
             candidates = ["$", "¥", "£", "€", "₹", "₺", "＄"]
             chineseDefault = "$"
+        case "`", "-", "+", "=":
+            candidates = [String(character), String(fullWidth)]
+            chineseDefault = String(character)
         case ".":
             candidates = [".", "。", "⋯⋯"]
             chineseDefault = nil
@@ -1065,16 +1127,62 @@ final class InputMethodController: IMKInputController {
     }
 
     private func candidateIndex(for event: NSEvent) -> Int? {
-        guard let character = event.charactersIgnoringModifiers?.first else {
-            return nil
+        if let character = event.charactersIgnoringModifiers?.first {
+            if character == "0" {
+                return 9
+            }
+            if
+                let number = character.wholeNumberValue,
+                (1...9).contains(number)
+            {
+                return number - 1
+            }
         }
-        if character == "0" {
+
+        switch event.keyCode {
+        case 18:
+            return 0
+        case 19:
+            return 1
+        case 20:
+            return 2
+        case 21:
+            return 3
+        case 23:
+            return 4
+        case 22:
+            return 5
+        case 26:
+            return 6
+        case 28:
+            return 7
+        case 25:
+            return 8
+        case 29:
             return 9
-        }
-        guard let number = character.wholeNumberValue, (1...9).contains(number) else {
+        case 83:
+            return 0
+        case 84:
+            return 1
+        case 85:
+            return 2
+        case 86:
+            return 3
+        case 87:
+            return 4
+        case 88:
+            return 5
+        case 89:
+            return 6
+        case 91:
+            return 7
+        case 92:
+            return 8
+        case 82:
+            return 9
+        default:
             return nil
         }
-        return number - 1
     }
 
     private var cangjieDecoder: CangjieDecoder? {

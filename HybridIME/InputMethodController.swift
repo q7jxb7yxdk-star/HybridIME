@@ -43,10 +43,20 @@ final class InputMethodController: IMKInputController {
     private var lastPassthroughPunctuationUsesFullWidth: Bool?
     private var learnedChineseContext = ""
     private var suppressAssociationsUntilNextInput = false
+    private var workspaceDeactivationObserver: NSObjectProtocol?
+
+    deinit {
+        if let workspaceDeactivationObserver {
+            NSWorkspace.shared.notificationCenter.removeObserver(
+                workspaceDeactivationObserver
+            )
+        }
+    }
 
     override func recognizedEvents(_ sender: Any!) -> Int {
         Int(NSEvent.EventTypeMask([
             .keyDown,
+            .flagsChanged,
             .leftMouseDown,
             .leftMouseUp,
             .leftMouseDragged,
@@ -57,6 +67,15 @@ final class InputMethodController: IMKInputController {
     override func handle(_ event: NSEvent!, client sender: Any!) -> Bool {
         guard let event else {
             resetState(updatingComposition: false)
+            return false
+        }
+
+        registerLifecycleObserversIfNeeded()
+
+        if event.type == .flagsChanged {
+            if shouldReleaseCompositionForModifierChange(event) {
+                releaseCompositionForSystemTakeover()
+            }
             return false
         }
 
@@ -125,7 +144,7 @@ final class InputMethodController: IMKInputController {
         }
 
         if shouldReleaseCompositionForSystemKey(event) {
-            releaseCompositionForSystemKey()
+            releaseCompositionForSystemTakeover()
             return false
         }
 
@@ -466,6 +485,12 @@ final class InputMethodController: IMKInputController {
         return characters.isEmpty && charactersIgnoringModifiers.isEmpty
     }
 
+    private func shouldReleaseCompositionForModifierChange(_ event: NSEvent) -> Bool {
+        guard hasActiveComposition else { return false }
+        let modifiers = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
+        return modifiers.contains(.function)
+    }
+
     private var hasActiveComposition: Bool {
         !buffer.isEmpty ||
             isSelectingPunctuation ||
@@ -473,7 +498,26 @@ final class InputMethodController: IMKInputController {
             CandidateWindowController.shared.isVisible
     }
 
-    private func releaseCompositionForSystemKey() {
+    private func releaseCompositionForSystemTakeover() {
+        resetState(updatingComposition: true)
+    }
+
+    private func registerLifecycleObserversIfNeeded() {
+        guard workspaceDeactivationObserver == nil else { return }
+        workspaceDeactivationObserver = NSWorkspace.shared.notificationCenter
+            .addObserver(
+                forName: NSWorkspace.didDeactivateApplicationNotification,
+                object: nil,
+                queue: .main
+            ) { [weak self] _ in
+                MainActor.assumeIsolated {
+                    self?.releaseCompositionForExternalSessionChange()
+                }
+            }
+    }
+
+    private func releaseCompositionForExternalSessionChange() {
+        guard hasActiveComposition else { return }
         resetState(updatingComposition: true)
     }
 

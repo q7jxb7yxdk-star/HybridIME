@@ -131,9 +131,9 @@ code units，並只檢查最近一個句號、問號、感嘆號或換行之後�
 
 ### 滑鼠事件透傳
 
-`recognizedEvents(_:)` 明確宣告 `keyDown`、`leftMouseDown`、
-`leftMouseUp`、`leftMouseDragged` 及 `mouseCancelled`。事件處理器只接受
-`keyDown`；若 InputMethodKit 傳入 `nil` event，會清理狀態並回傳
+`recognizedEvents(_:)` 明確宣告 `keyDown`、`flagsChanged`、
+`leftMouseDown`、`leftMouseUp`、`leftMouseDragged` 及 `mouseCancelled`。
+事件處理器主要處理 `keyDown`；若 InputMethodKit 傳入 `nil` event，會清理狀態並回傳
 `false`。所有非 `keyDown` 事件直接回傳 `false`，不再同步清理組字或候選，
 避免干擾 Safari URL 欄及聽寫等文字輸入 session。
 
@@ -142,12 +142,20 @@ code units，並只檢查最近一個句號、問號、感嘆號或換行之後�
 回傳 `false`。這類按鍵通常是聽寫或其他系統層輸入觸發；先釋放組字狀態可
 避免輸入法佔住文字 session，讓 macOS 接管。
 
+`flagsChanged` 只用於偵測 Fn/Globe 類聽寫觸發鍵。當 `.function` modifier
+出現且目前有 active composition 時，HybridIME 會清理 marked text 及候選視窗，
+再回傳 `false` 交回系統。
+
 這會停用 InputMethodKit 在輸入法只接收 `keyDown` 時套用的預設 mouse
 down 組字處理，確保 Google Sheets 等網頁文字客戶端收到完整左鍵序列。
 
 `commitComposition(_:)` 若由系統要求結束組字，只提交現有內容並清除
 狀態，不顯示聯想候選。`deactivateServer(_:)` 亦會隱藏候選視窗及清除
 組字、標點和聯想狀態。
+
+每個 controller 亦會觀察 `NSWorkspace.didDeactivateApplicationNotification`。
+app 或文字輸入 session 切換時若仍有 active composition，會清理 marked text
+及候選視窗，避免舊輸入狀態阻礙聽寫接管。
 
 ### 聯想候選狀態
 

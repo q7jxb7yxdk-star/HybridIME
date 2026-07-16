@@ -150,7 +150,7 @@ final class InputMethodController: IMKInputController {
 
         if
             let index = candidateIndex(for: event),
-            !shouldContinueNumericPunctuationInput(event),
+            !shouldContinuePunctuationInput(event),
             !isInvalidPunctuationCandidateIndex(index),
             !buffer.isEmpty || isSelectingAssociation
         {
@@ -645,7 +645,7 @@ final class InputMethodController: IMKInputController {
         lastCommittedCharacter = text.last
         setNextPunctuationContext(from: text)
         learnCommittedText(text)
-        resetState(updatingComposition: false)
+        resetState(updatingComposition: true)
     }
 
     private func commit(_ text: String, to sender: Any?) {
@@ -656,12 +656,7 @@ final class InputMethodController: IMKInputController {
         lastCommittedCharacter = text.last
         setNextPunctuationContext(from: text)
         learnCommittedText(text)
-        buffer = ""
-        currentCandidates = []
-        currentCandidateActions = []
-        smartPredictionIndex = nil
-        isSelectingPunctuation = false
-        isSelectingAssociation = false
+        clearMarkedCompositionAfterCommit()
 
         if let language = associationLanguage(for: text) {
             let cleanText = text.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -721,12 +716,7 @@ final class InputMethodController: IMKInputController {
         )
         lastCommittedCharacter = text.last
         setNextPunctuationContext(from: text)
-        buffer = ""
-        currentCandidates = []
-        currentCandidateActions = []
-        smartPredictionIndex = nil
-        isSelectingPunctuation = false
-        isSelectingAssociation = false
+        clearMarkedCompositionAfterCommit()
         showAssociations(
             context: text,
             language: .english,
@@ -753,11 +743,23 @@ final class InputMethodController: IMKInputController {
         let context = suggestion.language == .chinese
             ? associationContext + suggestion.text
             : suggestion.text
+        clearMarkedCompositionAfterCommit()
         showAssociations(
             context: context,
             language: suggestion.language,
             client: sender as? IMKTextInput
         )
+    }
+
+    private func clearMarkedCompositionAfterCommit() {
+        buffer = ""
+        currentCandidates = []
+        currentCandidateActions = []
+        smartPredictionIndex = nil
+        isEnglishCompositionContext = false
+        isSelectingPunctuation = false
+        isSelectingAssociation = false
+        updateComposition()
     }
 
     private func showAssociations(
@@ -946,9 +948,6 @@ final class InputMethodController: IMKInputController {
             chineseDefault: String?
         )
     ) -> [String]? {
-        guard ["$", "."].contains(punctuation.halfWidth) else {
-            return nil
-        }
         return candidates
     }
 
@@ -983,8 +982,8 @@ final class InputMethodController: IMKInputController {
         isSelectingPunctuation && !currentCandidateActions.indices.contains(index)
     }
 
-    private func shouldContinueNumericPunctuationInput(_ event: NSEvent) -> Bool {
-        guard isSelectingPunctuation, ["$", "."].contains(buffer) else {
+    private func shouldContinuePunctuationInput(_ event: NSEvent) -> Bool {
+        guard isSelectingPunctuation else {
             return false
         }
         guard !isShiftModified(event) else { return false }
@@ -1199,6 +1198,10 @@ final class InputMethodController: IMKInputController {
     }
 
     private func candidateIndex(for event: NSEvent) -> Int? {
+        if isSelectingPunctuation && !isShiftModified(event) {
+            return nil
+        }
+
         if let character = event.charactersIgnoringModifiers?.first {
             if character == "0" {
                 return 9

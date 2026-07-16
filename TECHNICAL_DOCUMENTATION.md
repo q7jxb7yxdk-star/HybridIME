@@ -137,6 +137,11 @@ code units，並只檢查最近一個句號、問號、感嘆號或換行之後�
 `false`。所有非 `keyDown` 事件直接回傳 `false`，不再同步清理組字或候選，
 避免干擾 Safari URL 欄及聽寫等文字輸入 session。
 
+若有組字、標點候選或聯想候選，而 `keyDown` 同時沒有 `characters` 及
+`charactersIgnoringModifiers`，HybridIME 會清理 marked text 及候選視窗並
+回傳 `false`。這類按鍵通常是聽寫或其他系統層輸入觸發；先釋放組字狀態可
+避免輸入法佔住文字 session，讓 macOS 接管。
+
 這會停用 InputMethodKit 在輸入法只接收 `keyDown` 時套用的預設 mouse
 down 組字處理，確保 Google Sheets 等網頁文字客戶端收到完整左鍵序列。
 

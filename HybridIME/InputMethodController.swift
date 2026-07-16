@@ -124,6 +124,11 @@ final class InputMethodController: IMKInputController {
             break
         }
 
+        if shouldReleaseCompositionForSystemKey(event) {
+            releaseCompositionForSystemKey()
+            return false
+        }
+
         if
             let index = candidateIndex(for: event),
             !shouldContinueNumericPunctuationInput(event),
@@ -451,6 +456,24 @@ final class InputMethodController: IMKInputController {
     }
 
     private func cancelCompositionPreservingFocus() {
+        resetState(updatingComposition: true)
+    }
+
+    private func shouldReleaseCompositionForSystemKey(_ event: NSEvent) -> Bool {
+        guard hasActiveComposition else { return false }
+        let characters = event.characters ?? ""
+        let charactersIgnoringModifiers = event.charactersIgnoringModifiers ?? ""
+        return characters.isEmpty && charactersIgnoringModifiers.isEmpty
+    }
+
+    private var hasActiveComposition: Bool {
+        !buffer.isEmpty ||
+            isSelectingPunctuation ||
+            isSelectingAssociation ||
+            CandidateWindowController.shared.isVisible
+    }
+
+    private func releaseCompositionForSystemKey() {
         resetState(updatingComposition: true)
     }
 

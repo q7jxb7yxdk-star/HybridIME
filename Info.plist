@@ -16,10 +16,10 @@
 	<string>$(PRODUCT_NAME)</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
-	<key>CFBundleSignature</key>
-	<string>HYIM</string>
 	<key>CFBundleShortVersionString</key>
 	<string>$(MARKETING_VERSION)</string>
+	<key>CFBundleSignature</key>
+	<string>HYIM</string>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>ComponentInputModeDict</key>
@@ -66,11 +66,11 @@
 	<string>HybridIMEInputController</string>
 	<key>InputMethodServerDelegateClass</key>
 	<string>HybridIMEInputController</string>
-	<key>LSUIElement</key>
-	<true/>
 	<key>LSBackgroundOnly</key>
 	<false/>
 	<key>LSHasLocalizedDisplayName</key>
+	<true/>
+	<key>LSUIElement</key>
 	<true/>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>

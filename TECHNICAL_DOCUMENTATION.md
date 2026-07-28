@@ -504,10 +504,18 @@ HybridIME/DictionaryData/dictionary-overrides.tsv
 重新生成：
 
 ```sh
+curl -L https://www.mdbg.net/chinese/export/cedict/cedict_1_0_ts_utf-8_mdbg.txt.gz \
+  -o /tmp/cedict_1_0_ts_utf-8_mdbg.txt.gz
+gunzip -c /tmp/cedict_1_0_ts_utf-8_mdbg.txt.gz > /tmp/cedict_ts.u8
 swift Scripts/build_cedict_index.swift \
-  /path/to/cedict_ts.u8 \
+  /tmp/cedict_ts.u8 \
   HybridIME/DictionaryData/cedict-index.tsv
 ```
+
+重新生成後，必須根據 `/tmp/cedict_ts.u8` header 同步更新
+`HybridIME/DictionaryData/NOTICE-CC-CEDICT.txt` 的 `Date` 及 `Entries`，
+再 build、安裝到 `~/Library/Input Methods/HybridIME.app` 並終止
+`HybridIME` process。
 
 完整英文鍵的中文翻譯候選排在倉頡候選之前，Space 維持輸出原英文。
 中文至英文方向會在倉頡中文候選後顯示英文翻譯；若翻譯來自游標前中文

@@ -370,6 +370,10 @@ swift Scripts/build_cedict_index.swift \
   HybridIME/DictionaryData/cedict-index.tsv
 ```
 
+目前索引使用的 CC-CEDICT 來源版本記錄在
+`HybridIME/DictionaryData/NOTICE-CC-CEDICT.txt`。更新 `cedict-index.tsv`
+後，需同步更新該 notice 的 `Date` 及 `Entries`。
+
 ## 已知限制
 
 - Apple 沒有提供公開 API 讀取或調用 macOS 內建倉頡碼表。

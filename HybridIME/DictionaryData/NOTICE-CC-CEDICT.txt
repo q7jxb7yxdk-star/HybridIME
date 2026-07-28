@@ -9,8 +9,8 @@ https://cc-cedict.org/wiki/
 
 Source data version used for the current generated index:
 CC-CEDICT version 1, subversion 0
-Date: 2026-06-12T07:40:30Z
-Entries: 125010
+Date: 2026-07-28T06:50:20Z
+Entries: 124725
 
 License:
 Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)

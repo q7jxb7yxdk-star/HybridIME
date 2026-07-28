@@ -35,6 +35,8 @@ HybridIME 是以 Swift、AppKit 及 InputMethodKit 開發的 macOS 輸入法。
 
 當 HybridIME 是目前選用的輸入法時，其程序由 macOS 管理。直接終止程序後，系統可能自動重新啟動；若要停止程序，應先切換至其他輸入法。
 
+HybridIME 使用 classic InputMethodKit `.app` 結構，而不是 `com.apple.textinputmethod-services` app extension。`LSBackgroundOnly` 必須保持 `false`，並配合 `LSUIElement=true`，否則 macOS 可能只把 bundle 當成背景 app，而不在「系統設定 > 鍵盤 > 文字輸入」列出。
+
 大型 TSV 合共超過 50 萬行。解碼器的檔案解析 initializer 及 loader 標記
 為 `nonisolated`，避免在切換輸入法期間同步堵塞主執行緒及輸入法選單的
 mouse tracking。載入完成前英文仍可提交，中文、翻譯及聯想候選暫時為空。
@@ -42,8 +44,9 @@ mouse tracking。載入完成前英文仍可提交，中文、翻譯及聯想候
 主要識別碼：
 
 ```text
-Bundle ID: com.sunnyyu.inputmethod.HybridIME
-Input source ID: com.sunnyyu.inputmethod.HybridIME.Hybrid
+Bundle ID: com.sunny.inputmethod.hybridime
+Input source ID: com.sunny.inputmethod.hybridime
+Input mode ID: com.sunny.inputmethod.hybridime.input
 Language: zh-Hant
 Keyboard layout: com.apple.keylayout.US
 ```
@@ -596,6 +599,8 @@ xcodebuild \
 開發測試時，`xcodebuild` 只會產生 DerivedData 內的 `HybridIME.app`；macOS 實際載入的是 `~/Library/Input Methods/HybridIME.app`。每次測試新版都要先覆蓋此安裝位置，再終止 `HybridIME` process，否則會繼續測到舊版。
 
 安裝後可透過「系統設定 > 鍵盤 > 文字輸入」加入及啟用「中英混合」。開發時如需以 Carbon Text Input Source API 重新註冊，應由外部安裝命令執行一次，不應放在應用程式啟動流程。
+
+若曾修改 bundle identifier、input source ID 或 input mode ID，即使 `lsregister`、`killall TextInputMenuAgent`、`killall TextInputSwitcher` 及 `killall imklaunchagent` 已執行，System Settings 仍可能看不到輸入法。實測需要重新開機後，macOS 才會刷新 Text Input / LaunchServices cache 並列出「中英混合」。
 
 建置需要可用的 Apple Development 憑證。這不代表必須加入付費 Apple Developer Program；免費 Apple ID 亦可由 Xcode 建立個人開發憑證，但憑證及簽署限制可能不同。
 

@@ -26,10 +26,10 @@
 	<dict>
 		<key>tsInputModeListKey</key>
 		<dict>
-			<key>com.sunnyyu.inputmethod.HybridIME.Hybrid</key>
+			<key>com.sunny.inputmethod.hybridime.input</key>
 			<dict>
 				<key>TISInputSourceID</key>
-				<string>com.sunnyyu.inputmethod.HybridIME.Hybrid</string>
+				<string>com.sunny.inputmethod.hybridime.input</string>
 				<key>TISIntendedLanguage</key>
 				<string>zh-Hant</string>
 				<key>tsInputModeAlternateMenuIconFileKey</key>
@@ -57,11 +57,11 @@
 		</dict>
 		<key>tsVisibleInputModeOrderedArrayKey</key>
 		<array>
-			<string>com.sunnyyu.inputmethod.HybridIME.Hybrid</string>
+			<string>com.sunny.inputmethod.hybridime.input</string>
 		</array>
 	</dict>
 	<key>InputMethodConnectionName</key>
-	<string>com.sunnyyu.inputmethod.HybridIME_Connection</string>
+	<string>com.sunny.inputmethod.hybridime_Connection</string>
 	<key>InputMethodServerControllerClass</key>
 	<string>HybridIMEInputController</string>
 	<key>InputMethodServerDelegateClass</key>
@@ -77,7 +77,7 @@
 	<key>NSSupportsSuddenTermination</key>
 	<true/>
 	<key>TISInputSourceID</key>
-	<string>com.sunnyyu.inputmethod.HybridIME</string>
+	<string>com.sunny.inputmethod.hybridime</string>
 	<key>TISIntendedLanguage</key>
 	<string>zh-Hant</string>
 	<key>tsInputMethodCharacterRepertoireKey</key>

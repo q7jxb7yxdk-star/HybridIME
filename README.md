@@ -236,12 +236,12 @@ xcodebuild \
    ~/Library/Input Methods/
    ```
 
-2. 登出並重新登入 macOS。開發期間重新註冊輸入來源後，通常不需要再次登出。
+2. 重新開機。macOS 的 Text Input / LaunchServices cache 有時只會在重啟後刷新，特別是 bundle identifier 或 input mode identifier 曾經改動時。
 3. 前往「系統設定 > 鍵盤 > 文字輸入 > 編輯」。
 4. 按 `+`，在「繁體中文」分類加入「中英混合」。
 5. 從選單列的輸入法選單切換至「中英混合」。
 
-HybridIME 啟動時不會自行註冊或啟用輸入來源。安裝或更新後只需由 macOS 加入一次；日常由系統啟動輸入法時，不會再次要求允許「中英混合」啟用自己。
+HybridIME 啟動時不會自行註冊或啟用輸入來源。安裝或更新後只需由 macOS 加入一次；日常由系統啟動輸入法時，不會再次要求允許「中英混合」啟用自己。開發測試時如 System Settings 找不到輸入法，先確認 `~/Library/Input Methods/HybridIME.app` 已更新，再重啟 macOS。
 
 HybridIME 直接建立 `NSApplication` 及 `IMKServer`，不建立一般 App 視窗。
 重新開機後首次選擇「中英混合」時，輸入法只會在背景啟動。
@@ -282,7 +282,7 @@ HybridIME/CangjieData/macOS-overrides.tsv
 
 目前相容層亦把「面」由 Rime 的 `mwsl` 調整為 macOS 倉頡碼 `mwyl`，
 把「黃」由 `tmlc` 調整為 `tmwc`，把「盒」由 `orbt` 調整為 `omrt`，
-並把「拿」由 `orq` 調整為 `omrq`。
+把「拿」由 `orq` 調整為 `omrq`，並把「樓」由 `dllv` 調整為 `dlwv`。
 
 ## 中英雙向字典
 

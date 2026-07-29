@@ -2,10 +2,7 @@ import Foundation
 import CoreText
 
 struct CangjieDecoder: @unchecked Sendable {
-    nonisolated private static let resourceNames = [
-        "cangjie5.base.dict",
-        "cangjie5.extended.dict",
-    ]
+    nonisolated private static let resourceName = "hybrid-cangjie5.dict"
     private static let glyphAvailabilityCache = NSCache<NSString, NSNumber>()
     private static let baseFont = CTFontCreateUIFontForLanguage(
         .system,
@@ -34,50 +31,36 @@ struct CangjieDecoder: @unchecked Sendable {
         from bundle: Bundle
     ) -> [String: [String]] {
         var table: [String: [String]] = [:]
-        var seenByCode: [String: Set<String>] = [:]
 
-        for resourceName in resourceNames {
+        guard
+            let url = resourceURL(in: bundle),
+            let contents = try? String(contentsOf: url, encoding: .utf8)
+        else {
+            NSLog("HybridIME could not load \(resourceName).tsv")
+            return table
+        }
+
+        for line in contents.split(whereSeparator: \.isNewline) {
+            guard line.first != "#" else { continue }
+
+            let fields = line.split(separator: "\t", omittingEmptySubsequences: false)
+            guard fields.count >= 2 else { continue }
+
+            let code = String(fields[0]).lowercased()
+            let candidates = fields.dropFirst().map(String.init)
+
             guard
-                let url = resourceURL(
-                    named: resourceName,
-                    in: bundle
-                ),
-                let contents = try? String(contentsOf: url, encoding: .utf8)
+                !code.isEmpty,
+                code.allSatisfy({ $0.isASCII && $0.isLowercase }),
+                candidates.allSatisfy({ $0.count == 1 })
             else {
-                NSLog("HybridIME could not load \(resourceName).yaml")
                 continue
             }
 
-            for line in contents.split(whereSeparator: \.isNewline) {
-                guard
-                    !line.isEmpty,
-                    line.first != "#",
-                    let tabIndex = line.firstIndex(of: "\t")
-                else {
-                    continue
-                }
-
-                let character = String(line[..<tabIndex])
-                let codeStart = line.index(after: tabIndex)
-                let code = line[codeStart...]
-                    .prefix(while: { $0 != "\t" })
-                    .lowercased()
-
-                guard
-                    character.count == 1,
-                    !code.isEmpty,
-                    code.allSatisfy({ $0.isASCII && $0.isLowercase })
-                else {
-                    continue
-                }
-
-                if seenByCode[code, default: []].insert(character).inserted {
-                    table[code, default: []].append(character)
-                }
-            }
+            var seen: Set<String> = []
+            table[code] = candidates.filter { seen.insert($0).inserted }
         }
 
-        applyOverrides(from: bundle, to: &table)
         return table
     }
 
@@ -117,68 +100,16 @@ struct CangjieDecoder: @unchecked Sendable {
         return result
     }
 
-    nonisolated private static func applyOverrides(
-        from bundle: Bundle,
-        to table: inout [String: [String]]
-    ) {
-        guard
-            let url = bundle.url(
-                forResource: "macOS-overrides",
-                withExtension: "tsv"
-            ),
-            let contents = try? String(contentsOf: url, encoding: .utf8)
-        else {
-            NSLog("HybridIME could not load macOS-overrides.tsv")
-            return
-        }
-
-        for line in contents.split(whereSeparator: \.isNewline) {
-            guard line.first != "#" else { continue }
-
-            let fields = line.split(separator: "\t", omittingEmptySubsequences: false)
-            guard fields.count >= 3 else { continue }
-
-            let operation = fields[0]
-            let code = fields[1].lowercased()
-            let candidates = fields.dropFirst(2).map(String.init)
-
-            guard
-                !code.isEmpty,
-                code.allSatisfy({ $0.isASCII && $0.isLowercase }),
-                candidates.allSatisfy({ $0.count == 1 })
-            else {
-                continue
-            }
-
-            switch operation {
-            case "add":
-                for candidate in candidates.reversed() {
-                    table[code, default: []].removeAll { $0 == candidate }
-                    table[code, default: []].insert(candidate, at: 0)
-                }
-            case "remove":
-                let candidatesToRemove = Set(candidates)
-                table[code]?.removeAll { candidatesToRemove.contains($0) }
-            case "replace":
-                var seen: Set<String> = []
-                table[code] = candidates.filter { seen.insert($0).inserted }
-            default:
-                continue
-            }
-        }
-    }
-
     nonisolated private static func resourceURL(
-        named resourceName: String,
         in bundle: Bundle
     ) -> URL? {
         bundle.url(
             forResource: resourceName,
-            withExtension: "yaml",
+            withExtension: "tsv",
             subdirectory: "CangjieData"
         ) ?? bundle.url(
             forResource: resourceName,
-            withExtension: "yaml"
+            withExtension: "tsv"
         )
     }
 }

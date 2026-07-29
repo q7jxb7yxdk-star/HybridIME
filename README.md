@@ -25,7 +25,7 @@ HybridIME 是一個 macOS 中英文混合倉頡五代輸入法。
 - 標點會立即顯示，同時保留半形及全形候選。
 - 支援 Unicode 擴展區漢字。
 - 自動略過 macOS 無法正常顯示、只能使用 `LastResort` 字體呈現的候選字。
-- 支援 macOS 相容字碼及候選次序覆寫。
+- 支援直接維護 HybridIME 專用倉頡碼表。
 - 輸入完整英文詞時顯示繁體中文翻譯候選。
 - 輸入倉頡時，在中文候選後顯示對應的英文翻譯。
 - Command、Control 及 Option 快捷鍵會交回目前應用程式。
@@ -256,12 +256,22 @@ pkill -x HybridIME
 
 ## 倉頡碼表
 
-HybridIME 依次載入：
+HybridIME 運行時只載入：
+
+```text
+HybridIME/CangjieData/hybrid-cangjie5.dict.tsv
+```
+
+這是 HybridIME 自己使用的合併碼表，由：
 
 1. `cangjie5.base.dict.yaml`：一般及較常用的倉頡五代單字。
 2. `cangjie5.extended.dict.yaml`：罕用字、異體字、相容漢字及 Unicode CJK 擴展區漢字。
 
+生成而成。
+
 基礎碼表先載入，因此同一倉頡碼下的基礎候選通常優先顯示。重複候選會被移除。
+日常修正常用字碼時，可直接修改 `hybrid-cangjie5.dict.tsv`。
+曾經修改過的倉頡碼由 `cangjie-change-log.tsv` 手動記錄。
 
 ## Rime 來源
 
@@ -272,13 +282,14 @@ HybridIME 依次載入：
 
 ## macOS 相容規則
 
-Rime 倉頡五代與 macOS 內建倉頡在部分字碼及候選次序上可能不同。HybridIME 使用：
+Rime 倉頡五代與 macOS 內建倉頡在部分字碼及候選次序上可能不同。
+HybridIME 已把確認過的 macOS 差異直接寫入：
 
 ```text
-HybridIME/CangjieData/macOS-overrides.tsv
+HybridIME/CangjieData/hybrid-cangjie5.dict.tsv
 ```
 
-集中記錄已確認的相容修正，而不直接修改上游 Rime 碼表。
+輸入法運行時只讀此檔。`cangjie-change-log.tsv` 只作人工記錄用途，輸入法不會讀取。
 
 目前相容層亦把「面」由 Rime 的 `mwsl` 調整為 macOS 倉頡碼 `mwyl`，
 把「黃」由 `tmlc` 調整為 `tmwc`，把「盒」由 `orbt` 調整為 `omrt`，

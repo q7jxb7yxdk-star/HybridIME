@@ -10,7 +10,7 @@ HybridIME 是以 Swift、AppKit 及 InputMethodKit 開發的 macOS 輸入法。
 | --- | --- |
 | `HybridIMEApp.swift` | 啟動背景 `NSApplication` 並建立 `IMKServer` |
 | `InputMethodController.swift` | 接收按鍵事件、管理輸入緩衝區及提交文字 |
-| `CangjieDecoder.swift` | 載入倉頡碼表、套用相容規則及查詢候選 |
+| `CangjieDecoder.swift` | 載入 HybridIME 專用倉頡碼表及查詢候選 |
 | `BilingualDictionary.swift` | 載入 CC-CEDICT 中英雙向索引 |
 | `AssociationDictionary.swift` | 載入中英文聯想索引及管理本機排序 |
 | `SmartCandidateRanker.swift` | 記錄字碼候選選擇及提供智能預測 |
@@ -343,25 +343,31 @@ https://api.github.com/repos/rime/rime-cangjie/commits?path=cangjie5.extended.di
 
 ### 5.2 基礎與擴展碼表
 
-`CangjieDecoder.resourceNames` 定義載入次序：
+`CangjieDecoder.resourceName` 指向運行時碼表：
 
 ```swift
-[
-    "cangjie5.base.dict",
-    "cangjie5.extended.dict",
-]
+"hybrid-cangjie5.dict"
 ```
 
-`cangjie5.base.dict.yaml`：
+實際載入檔案：
 
-- 收錄一般及較常用的倉頡五代單字。
-- 先於擴展碼表載入。
-- 同碼候選通常具有較高優先次序。
+```text
+HybridIME/CangjieData/hybrid-cangjie5.dict.tsv
+```
 
-`cangjie5.extended.dict.yaml`：
+此檔由 `Scripts/build_hybrid_cangjie_dict.swift` 生成，來源包括：
 
-- 補充罕用字、異體字及 Unicode CJK 擴展區漢字。
-- 可能包含本機字型沒有正常字形的字元。
+- `cangjie5.base.dict.yaml`：一般及較常用的倉頡五代單字。
+- `cangjie5.extended.dict.yaml`：罕用字、異體字及 Unicode CJK 擴展區漢字。
+
+生成時先載入 base，再載入 extended，因此同碼候選通常保留 base 的優先次序。
+重複候選會被移除，並保留第一次出現的位置。
+
+`hybrid-cangjie5.dict.tsv` 格式：
+
+```text
+code	candidate...
+```
 
 解析器只接受：
 
@@ -369,66 +375,27 @@ https://api.github.com/repos/rime/rime-cangjie/commits?path=cangjie5.extended.di
 - 非空白倉頡碼
 - 完全由 ASCII 小寫字母組成的倉頡碼
 
-同一倉頡碼下的重複字會被移除，並保留第一次出現的位置。
+原始 Rime `.dict.yaml` 仍保留於專案內，作為重新生成合併碼表時的來源；輸入法運行時不再直接讀取它們。
 
-## 6. macOS 相容覆寫
+## 6. 本地改碼記錄
 
-Apple 沒有公開 macOS 內建倉頡碼表或解碼 API。因此 HybridIME 以 Rime 倉頡五代為基礎，再透過：
-
-```text
-HybridIME/CangjieData/macOS-overrides.tsv
-```
-
-記錄已確認的 macOS 差異。
-
-格式為以 Tab 分隔的欄位：
+Apple 沒有公開 macOS 內建倉頡碼表或解碼 API。因此已確認的 macOS 差異直接寫入：
 
 ```text
-operation	code	candidate...
+HybridIME/CangjieData/hybrid-cangjie5.dict.tsv
 ```
 
-### `add`
-
-把一個或多個候選移至指定字碼的最前方，並依欄位次序排列：
+曾經修改過的倉頡碼由以下檔案手動記錄：
 
 ```text
-add	hsp	怎
+HybridIME/CangjieData/cangjie-change-log.tsv
 ```
 
-若候選原本已存在，會先移除舊位置，避免重複。
-
-若要把上游字碼改為 macOS 字碼，可配合 `remove` 與 `add`：
+`cangjie-change-log.tsv` 只作記錄用途，輸入法運行時不會讀取。格式為：
 
 ```text
-remove	mwsl	面
-add	mwyl	面
-remove	tmlc	黃
-add	tmwc	黃
-remove	orbt	盒
-add	omrt	盒
-remove	orq	拿
-add	omrq	拿
+character	old_code	new_code
 ```
-
-### `remove`
-
-從指定字碼移除一個或多個候選：
-
-```text
-remove	osp	怎
-```
-
-### `replace`
-
-完全捨棄指定字碼的原有候選，改用所列的完整候選及次序：
-
-```text
-replace	abc	字	候	選
-```
-
-重複候選會自動移除，並保留第一次出現的位置。
-
-覆寫檔獨立於上游碼表，可避免更新 Rime 碼表時覆蓋 macOS 相容修正。
 
 ## 7. 缺字過濾
 
@@ -451,19 +418,24 @@ replace	abc	字	候	選
 1. 查看 `rime/rime-cangjie` 中兩個碼表的最新 commit。
 2. 閱讀上游授權及變更內容。
 3. 取代本地 `base` 及 `extended` 檔案。
-4. 不要覆蓋 `macOS-overrides.tsv`。
-5. 建置 HybridIME。
-6. 驗證常用倉頡碼、超過五碼的英文輸入及數字候選選擇。
-7. 驗證缺字候選不會顯示為方框問號。
-8. 驗證英文後預設半形標點、中文後預設全形標點，以及第二候選切換。
-9. 重新安裝、註冊及啟用輸入來源。
+4. 重新生成合併碼表：
 
-不建議直接修改上游 `.dict.yaml`：
+```sh
+swift Scripts/build_hybrid_cangjie_dict.swift \
+  HybridIME/CangjieData/cangjie5.base.dict.yaml \
+  HybridIME/CangjieData/cangjie5.extended.dict.yaml \
+  HybridIME/CangjieData/hybrid-cangjie5.dict.tsv
+```
 
-- 上游更新會覆蓋本地修改。
-- 難以識別哪些條目是 macOS 相容修正。
-- 候選次序及重複項目較難維護。
-- 第三方原始資料與本地行為規則會混在一起。
+5. 按 `cangjie-change-log.tsv` 重新套用本地改碼。
+6. 建置 HybridIME。
+7. 驗證常用倉頡碼、超過五碼的英文輸入及數字候選選擇。
+8. 驗證缺字候選不會顯示為方框問號。
+9. 驗證英文後預設半形標點、中文後預設全形標點，以及第二候選切換。
+10. 重新安裝、註冊及啟用輸入來源。
+
+日常已確認的 macOS 字碼修正可直接修改 `hybrid-cangjie5.dict.tsv`。
+不建議直接修改上游 `.dict.yaml`，因為重新下載 Rime 檔案時會覆蓋本地修改。
 
 ## 9. 中英雙向字典
 
@@ -615,7 +587,7 @@ xcodebuild \
 ## 12. 已知限制
 
 - 無法直接讀取或調用 Apple 的系統倉頡解碼器。
-- 與 macOS 倉頡的一致性取決於 `macOS-overrides.tsv` 已收錄的差異。
+- 與 macOS 倉頡的一致性取決於 `hybrid-cangjie5.dict.tsv` 已收錄的差異。
 - 候選視窗目前只顯示單頁最多十個候選，沒有翻頁功能。
 - 字形可用性取決於目前 macOS 版本及已安裝字體。
 - 目標應用程式若未提供正確插入點位置，候選視窗只能使用備用位置。

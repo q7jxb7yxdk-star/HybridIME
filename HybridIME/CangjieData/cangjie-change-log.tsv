@@ -1,0 +1,14 @@
+# HybridIME Cangjie code change log.
+# This file records confirmed macOS Cangjie differences applied to hybrid-cangjie5.dict.tsv.
+# It is documentation only; HybridIME does not load this file at runtime.
+# character	old_code	new_code
+怎	osp	hsp
+面	mwsl	mwyl
+黃	tmlc	tmwc
+作	oos	ohs
+盒	orbt	omrt
+拿	orq	omrq
+應	iogp	igp
+非	lmsy	lmyyy
+假	orse	orye
+樓	dllv	dlwv

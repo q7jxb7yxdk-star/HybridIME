@@ -251,12 +251,12 @@ final class CandidateWindowController {
             )
             result.append(
                 NSAttributedString(
-                    string: smartPredictionIndex == index
-                        ? "\(candidate) ◆"
-                        : candidate,
+                    string: candidate,
                     attributes: [
                         .font: NSFont.systemFont(ofSize: 17),
-                        .foregroundColor: translationIndices.contains(index)
+                        .foregroundColor: smartPredictionIndex == index
+                            ? NSColor.systemBlue
+                            : translationIndices.contains(index)
                             ? NSColor.secondaryLabelColor
                             : NSColor.labelColor,
                     ]

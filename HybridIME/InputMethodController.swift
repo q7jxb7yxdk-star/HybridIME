@@ -1152,7 +1152,7 @@ final class InputMethodController: IMKInputController {
         case "$":
             candidates = ["$", "¥", "£", "€", "₹", "₺", "＄"]
             chineseDefault = "$"
-        case "`", "-", "+", "=":
+        case "#", "`", "-", "+", "=":
             candidates = [String(character), String(fullWidth)]
             chineseDefault = String(character)
         case ".":

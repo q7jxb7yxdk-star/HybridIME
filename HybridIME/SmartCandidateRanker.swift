@@ -19,20 +19,34 @@ final class SmartCandidateRanker {
         let normalizedCode = code.lowercased()
         guard !normalizedCode.isEmpty, !candidate.isEmpty else { return }
 
-        defaults.set(
-            Date().timeIntervalSince1970,
-            forKey: key(
-                code: normalizedCode,
-                suffix: "recent.\(candidate)"
-            )
-        )
-
         var candidates = defaults.stringArray(
             forKey: key(
                 code: normalizedCode,
                 suffix: "candidates"
             )
         ) ?? []
+        let mostRecentTimestamp = candidates
+            .map {
+                defaults.double(
+                    forKey: key(
+                        code: normalizedCode,
+                        suffix: "recent.\($0)"
+                    )
+                )
+            }
+            .max() ?? 0
+        let timestamp = max(
+            Date().timeIntervalSince1970,
+            mostRecentTimestamp.nextUp
+        )
+        defaults.set(
+            timestamp,
+            forKey: key(
+                code: normalizedCode,
+                suffix: "recent.\(candidate)"
+            )
+        )
+
         if !candidates.contains(candidate) {
             candidates.append(candidate)
             defaults.set(

@@ -11,6 +11,7 @@ final class InputMethodController: IMKInputController {
 
     private enum CandidateAction {
         case commit(String)
+        case rawCommit(String)
         case dictionaryCommit(String)
         case translate(String, replacingPrefixUTF16Length: Int)
         case associate(AssociationDictionary.Suggestion)
@@ -18,6 +19,7 @@ final class InputMethodController: IMKInputController {
         var text: String {
             switch self {
             case .commit(let text),
+                 .rawCommit(let text),
                  .dictionaryCommit(let text),
                  .translate(let text, _):
                 text
@@ -270,6 +272,7 @@ final class InputMethodController: IMKInputController {
         {
             commitCandidate(at: smartPredictionIndex, to: sender)
         } else if isShiftSpace {
+            recordRawSmartSelection()
             commitWithoutAssociations(
                 buffer,
                 to: sender,
@@ -287,10 +290,14 @@ final class InputMethodController: IMKInputController {
     private var shouldCommitSmartPredictionOnSpace: Bool {
         guard smartPredictionIndex == 0 else { return false }
         guard currentCandidateActions.indices.contains(0) else { return false }
-        if case .commit(let text) = currentCandidateActions[0] {
+        switch currentCandidateActions[0] {
+        case .rawCommit:
+            return true
+        case .commit(let text):
             return text.allSatisfy(isChinese)
+        default:
+            return false
         }
-        return false
     }
 
     private var shouldCommitEnglishOnEscape: Bool {
@@ -358,30 +365,19 @@ final class InputMethodController: IMKInputController {
         isEnglishCompositionContext = englishTextBeforeComposition(
             in: sender as? IMKTextInput
         )
-        let prediction = isEnglishCompositionContext
-            ? nil
-            : smartCandidateRanker.prediction(
-                code: buffer,
-                availableCandidates: currentCandidateActions.compactMap {
-                    guard case .commit(let text) = $0, text.allSatisfy(isChinese) else {
-                        return nil
-                    }
-                    return text
+        let learnedChineseCandidates: [String] = isEnglishCompositionContext
+            ? []
+            : currentCandidateActions.compactMap {
+                guard case .commit(let text) = $0, text.allSatisfy(isChinese) else {
+                    return nil
                 }
-            )
-        if
-            let prediction,
-            let index = currentCandidateActions.firstIndex(
-                where: { $0.text == prediction.candidate }
-            )
-        {
-            let action = currentCandidateActions.remove(at: index)
-            currentCandidateActions.insert(action, at: 0)
-            currentCandidates = currentCandidateActions.map(\.text)
-            smartPredictionIndex = 0
-        } else {
-            smartPredictionIndex = nil
-        }
+                return text
+            }
+        let prediction = smartCandidateRanker.prediction(
+            code: buffer,
+            availableCandidates: learnedChineseCandidates + [buffer]
+        )
+        applySmartPrediction(prediction)
         updateComposition()
 
         if buffer.isEmpty {
@@ -399,6 +395,34 @@ final class InputMethodController: IMKInputController {
                 client: sender as? IMKTextInput
             )
         }
+    }
+
+    private func applySmartPrediction(_ prediction: SmartCandidateRanker.Prediction?) {
+        guard let prediction else {
+            smartPredictionIndex = nil
+            return
+        }
+
+        if prediction.candidate == buffer {
+            currentCandidateActions.removeAll { $0.text == buffer }
+            currentCandidateActions.insert(.rawCommit(buffer), at: 0)
+            if currentCandidateActions.count > 10 {
+                currentCandidateActions.removeLast(
+                    currentCandidateActions.count - 10
+                )
+            }
+        } else if let index = currentCandidateActions.firstIndex(
+            where: { $0.text == prediction.candidate }
+        ) {
+            let action = currentCandidateActions.remove(at: index)
+            currentCandidateActions.insert(action, at: 0)
+        } else {
+            smartPredictionIndex = nil
+            return
+        }
+
+        currentCandidates = currentCandidateActions.map(\.text)
+        smartPredictionIndex = 0
     }
 
     private func candidateActions(
@@ -618,6 +642,13 @@ final class InputMethodController: IMKInputController {
             } else {
                 commitWithoutAssociations(text, to: sender)
             }
+        case .rawCommit(let text):
+            recordRawSmartSelection()
+            if showingAssociations {
+                commit(text, to: sender)
+            } else {
+                commitWithoutAssociations(text, to: sender)
+            }
         case .dictionaryCommit(let text):
             if showingAssociations {
                 commit(text, to: sender)
@@ -648,6 +679,21 @@ final class InputMethodController: IMKInputController {
         smartCandidateRanker.record(
             code: buffer,
             candidate: candidate
+        )
+    }
+
+    private func recordRawSmartSelection() {
+        guard
+            !isSelectingPunctuation,
+            !isSelectingAssociation,
+            !buffer.isEmpty,
+            buffer.allSatisfy({ $0.isASCII && $0.isLetter })
+        else {
+            return
+        }
+        smartCandidateRanker.record(
+            code: buffer,
+            candidate: buffer
         )
     }
 

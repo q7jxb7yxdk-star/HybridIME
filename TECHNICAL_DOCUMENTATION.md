@@ -13,7 +13,7 @@ HybridIME 是以 Swift、AppKit 及 InputMethodKit 開發的 macOS 輸入法。
 | `CangjieDecoder.swift` | 載入 HybridIME 專用倉頡碼表及查詢候選 |
 | `BilingualDictionary.swift` | 載入 CC-CEDICT 中英雙向索引 |
 | `AssociationDictionary.swift` | 載入中英文聯想索引及管理本機排序 |
-| `SmartCandidateRanker.swift` | 記錄字碼候選選擇及提供智能預測 |
+| `SmartCandidateRanker.swift` | 記錄字碼的中文與原始英文候選選擇及提供智能預測 |
 | `CandidateWindowController.swift` | 建立及定位自訂候選視窗 |
 | `Info.plist` | 定義輸入法識別碼、語言、圖示及控制器類別 |
 
@@ -69,6 +69,7 @@ ASCII 英文字母會轉為小寫並加入 `buffer`。每次更新後：
 候選由 `CandidateAction` 表示：
 
 - `commit`：提交倉頡中文或一般候選。
+- `rawCommit`：提交由 `Shift + Space` 學習的原始英文。
 - `dictionaryCommit`：提交英文字典的中文翻譯，不參與倉頡智能學習。
 - `translate`：提交英文翻譯，並可替換游標前已組成的中文前綴。
 
@@ -81,8 +82,8 @@ ASCII 英文字母會轉為小寫並加入 `buffer`。每次更新後：
 
 | 按鍵 | 行為 |
 | --- | --- |
-| `Space` | 第一候選若是藍色中文智能預測則提交該候選；否則英文語境提交英文並附加空格，其他語境提交英文及空格 |
-| `Shift + Space` | 提交緩衝區內的英文，不附加空格 |
+| `Space` | 第一候選若是藍色中文或原始英文智能預測則提交該候選；否則英文語境提交英文並附加空格，其他語境提交英文及空格 |
+| `Shift + Space` | 提交緩衝區內的英文，不附加空格，並記錄為原始英文智能選擇 |
 | `Return` / 數字鍵盤 `Enter` | 提交第一個候選；沒有候選時提交英文 |
 | `1` 至 `9` | 提交第一至第九個候選；字元判斷失敗時會 fallback 至主鍵盤及數字鍵盤 keyCode |
 | `0` | 提交第十個候選；支援主鍵盤及數字鍵盤 keyCode fallback |
@@ -102,7 +103,8 @@ code units，並只檢查最近一個句號、問號、感嘆號或換行之後�
 含 ASCII 英文字母且不含中文字時，當前組字會標記為英文語境。
 
 英文語境中的 Space 直接提交原始英文，不套用中文智能預測，避免曾經誤選
-中文字後令 `you`、`Step` 這類英文輸入被自動取代。Return
+中文字後令 `you`、`Step` 這類英文輸入被自動取代；但完全相同大小寫且已學習的
+原始英文仍可作為藍色首選並由 Space 直接提交、不加空格。Return
 仍以當前候選為優先，只有完全沒有候選時才提交英文，避免英文前文令有效
 倉頡碼被誤判為英文。輸入 ASCII 標點時，`commitBeforePunctuation`
 會先檢查緩衝區第一個候選；若是純中文 `.commit` 候選，先提交該中文並令標點
@@ -118,19 +120,19 @@ code units，並只檢查最近一個句號、問號、感嘆號或換行之後�
 ### 智能候選學習
 
 `SmartCandidateRanker` 以正規化小寫字碼及候選文字為鍵，把每次實際選取
-的純中文字候選記錄到 `UserDefaults`。資料使用
+的純中文字 `.commit` 候選，以及 `Shift + Space` 或 raw 候選提交的原始英文記錄到 `UserDefaults`。資料使用
 `smartCandidate.v2.<code>.*` key namespace，保存最近選擇時間及該字碼的
 候選清單；舊版本的累計次數資料不再讀取或更新。
 
-同一字碼與同一中文字候選選取一次後即可成為預測，不使用百分比或前文
-情境；但 `isEnglishCompositionContext` 為 true 時不查詢排序器。查詢時只考慮
-目前仍存在的純中文 `.commit` 候選，以最近選擇時間決定最佳
-候選；若時間相同則以文字次序作為穩定比較。原始英文、`.dictionaryCommit` 中文翻譯
-與 `.translate` 英文翻譯不會交給排序器，也不會取得
-`smartPredictionIndex`。
+同一字碼與同一中文或原始英文候選選取一次後即可成為預測，不使用百分比或前文
+情境；以最近選擇時間決定最佳候選。原始英文保留大小寫，只會在當前 buffer
+完全相同時列為可用候選。`isEnglishCompositionContext` 為 true 時會排除純中文
+`.commit` 候選，但保留原始英文候選；`.dictionaryCommit` 中文翻譯與 `.translate`
+英文翻譯不會交給排序器，也不會取得 `smartPredictionIndex`。
 
 候選視窗會把預測候選顯示為藍色文字。若該候選已被移到第一位，Space 會直接
-提交該候選；`Shift + Space` 則始終強制提交英文。標點及聯想
+提交該候選；raw 英文預測不附加空格。`Shift + Space` 則始終強制提交英文並將其
+設為最新 raw 選擇。標點及聯想
 候選亦不會寫入這套智能候選記錄。
 
 ### 滑鼠事件透傳

@@ -4,6 +4,11 @@ import InputMethodKit
 @objc(HybridIMEInputController)
 @MainActor
 final class InputMethodController: IMKInputController {
+    private struct PendingPunctuationReplacement {
+        let text: String
+        let range: NSRange
+    }
+
     private enum CandidateAction {
         case commit(String)
         case dictionaryCommit(String)
@@ -35,6 +40,7 @@ final class InputMethodController: IMKInputController {
     private var smartPredictionIndex: Int?
     private var isEnglishCompositionContext = false
     private var isSelectingPunctuation = false
+    private var pendingPunctuationReplacement: PendingPunctuationReplacement?
     private var isSelectingAssociation = false
     private var associationContext = ""
     private var associationLanguage: AssociationDictionary.Language?
@@ -80,6 +86,7 @@ final class InputMethodController: IMKInputController {
         }
 
         guard event.type == .keyDown else {
+            dismissPunctuationSelection()
             return false
         }
 
@@ -87,6 +94,7 @@ final class InputMethodController: IMKInputController {
         if !modifiers.intersection([.command, .control, .option]).isEmpty {
             learnedChineseContext = ""
             dismissAssociation(clearContext: true)
+            dismissPunctuationSelection()
             return false
         }
 
@@ -99,6 +107,10 @@ final class InputMethodController: IMKInputController {
 
         switch event.keyCode {
         case 36, 76:
+            if isSelectingPunctuation {
+                dismissPunctuationSelection()
+                return false
+            }
             guard !buffer.isEmpty || isSelectingAssociation else {
                 return false
             }
@@ -109,6 +121,10 @@ final class InputMethodController: IMKInputController {
             }
             return true
         case 51:
+            if isSelectingPunctuation {
+                dismissPunctuationSelection()
+                return false
+            }
             if isSelectingAssociation {
                 dismissAssociation(clearContext: true)
                 return false
@@ -150,9 +166,10 @@ final class InputMethodController: IMKInputController {
 
         if
             let index = candidateIndex(for: event),
+            !isNewPunctuationInput(event),
             !shouldContinuePunctuationInput(event),
             !isInvalidPunctuationCandidateIndex(index),
-            !buffer.isEmpty || isSelectingAssociation
+            !buffer.isEmpty || isSelectingPunctuation || isSelectingAssociation
         {
             commitCandidate(at: index, to: sender)
             return true
@@ -178,7 +195,7 @@ final class InputMethodController: IMKInputController {
 
         if isSelectingPunctuation {
             suppressAssociationsUntilNextInput = false
-            commitCandidate(at: 0, to: sender)
+            dismissPunctuationSelection()
         }
 
         suppressAssociationsUntilNextInput = false
@@ -236,11 +253,12 @@ final class InputMethodController: IMKInputController {
             dismissAssociation(clearContext: true)
             return false
         }
-        guard !buffer.isEmpty else { return false }
         if isSelectingPunctuation {
-            suppressAssociationsUntilNextInput = false
-            commitCandidate(at: 0, to: sender)
-        } else if
+            dismissPunctuationSelection()
+            return false
+        }
+        guard !buffer.isEmpty else { return false }
+        if
             !isShiftSpace,
             shouldCommitSmartPredictionOnSpace
         {
@@ -319,6 +337,7 @@ final class InputMethodController: IMKInputController {
     private func refreshComposition(client sender: Any?) {
         isSelectingAssociation = false
         isSelectingPunctuation = false
+        pendingPunctuationReplacement = nil
         let dictionaryCandidates = bilingualDictionary?.chineseCandidates(
             for: buffer,
             limit: 10
@@ -528,6 +547,7 @@ final class InputMethodController: IMKInputController {
         smartPredictionIndex = nil
         isEnglishCompositionContext = false
         isSelectingPunctuation = false
+        pendingPunctuationReplacement = nil
         isSelectingAssociation = false
         associationContext = ""
         associationLanguage = nil
@@ -548,11 +568,7 @@ final class InputMethodController: IMKInputController {
         showingAssociations: Bool = true
     ) {
         if isSelectingPunctuation {
-            commitCandidate(
-                at: 0,
-                to: sender,
-                showingAssociations: showingAssociations
-            )
+            dismissPunctuationSelection()
         } else {
             if showingAssociations {
                 commitEnglish(to: sender)
@@ -585,6 +601,13 @@ final class InputMethodController: IMKInputController {
             } else {
                 commitWithoutAssociations(buffer, to: sender)
             }
+            return
+        }
+        if isSelectingPunctuation {
+            replacePendingPunctuation(
+                with: currentCandidateActions[index].text,
+                to: sender
+            )
             return
         }
         switch currentCandidateActions[index] {
@@ -758,6 +781,7 @@ final class InputMethodController: IMKInputController {
         smartPredictionIndex = nil
         isEnglishCompositionContext = false
         isSelectingPunctuation = false
+        pendingPunctuationReplacement = nil
         isSelectingAssociation = false
         updateComposition()
     }
@@ -891,10 +915,27 @@ final class InputMethodController: IMKInputController {
         )
         currentCandidateActions = currentCandidates.map(CandidateAction.commit)
         smartPredictionIndex = nil
-        buffer = currentCandidates[0]
+        buffer = ""
         isSelectingPunctuation = true
         isSelectingAssociation = false
-        updateComposition()
+        let selection = (client as? NSTextInputClient)?.selectedRange()
+        client?.insertText(
+            defaultCandidate,
+            replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
+        )
+        if let selection, selection.location != NSNotFound {
+            pendingPunctuationReplacement = PendingPunctuationReplacement(
+                text: defaultCandidate,
+                range: NSRange(
+                    location: selection.location,
+                    length: defaultCandidate.utf16.count
+                )
+            )
+        } else {
+            pendingPunctuationReplacement = nil
+        }
+        lastCommittedCharacter = defaultCandidate.last
+        learnCommittedText(defaultCandidate)
         CandidateWindowController.shared.showPunctuation(
             candidates: currentCandidates,
             displayCandidates: punctuationDisplayCandidates(
@@ -907,6 +948,46 @@ final class InputMethodController: IMKInputController {
             ),
             client: client
         )
+    }
+
+    private func replacePendingPunctuation(
+        with replacement: String,
+        to sender: Any?
+    ) {
+        defer { dismissPunctuationSelection() }
+        guard let pendingPunctuationReplacement else { return }
+        guard replacement != pendingPunctuationReplacement.text else { return }
+        guard let textClient = sender as? NSTextInputClient else { return }
+
+        let selection = textClient.selectedRange()
+        let replacementRange = pendingPunctuationReplacement.range
+        guard
+            selection.location == NSMaxRange(replacementRange),
+            selection.length == 0,
+            textClient.attributedSubstring(
+                forProposedRange: replacementRange,
+                actualRange: nil
+            )?.string == pendingPunctuationReplacement.text
+        else {
+            return
+        }
+
+        (sender as? IMKTextInput)?.insertText(
+            replacement,
+            replacementRange: replacementRange
+        )
+        lastCommittedCharacter = replacement.last
+        learnCommittedText(replacement)
+    }
+
+    private func dismissPunctuationSelection() {
+        guard isSelectingPunctuation else { return }
+        currentCandidates = []
+        currentCandidateActions = []
+        smartPredictionIndex = nil
+        isSelectingPunctuation = false
+        pendingPunctuationReplacement = nil
+        CandidateWindowController.shared.hide()
     }
 
     private func defaultPunctuationCandidate(
@@ -991,6 +1072,12 @@ final class InputMethodController: IMKInputController {
             return false
         }
         return character.isNumber
+    }
+
+    private func isNewPunctuationInput(_ event: NSEvent) -> Bool {
+        guard !isSelectingPunctuation else { return false }
+        guard let character = event.characters?.first else { return false }
+        return punctuationPair(for: character) != nil
     }
 
     private func isShiftModified(_ event: NSEvent) -> Bool {

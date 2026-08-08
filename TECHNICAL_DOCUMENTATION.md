@@ -119,12 +119,13 @@ code units，並只檢查最近一個句號、問號、感嘆號或換行之後�
 
 `SmartCandidateRanker` 以正規化小寫字碼及候選文字為鍵，把每次實際選取
 的純中文字候選記錄到 `UserDefaults`。資料使用
-`smartCandidate.v2.<code>.*` key namespace，分別保存候選累計次數、最近
-選擇時間及該字碼的候選清單。
+`smartCandidate.v2.<code>.*` key namespace，保存最近選擇時間及該字碼的
+候選清單；舊版本的累計次數資料不再讀取或更新。
 
 同一字碼與同一中文字候選選取一次後即可成為預測，不使用百分比或前文
-情境；但 `isEnglishCompositionContext` 為 true 時不查詢排序器。查詢時只考慮目前仍存在的純中文 `.commit` 候選，依累計次數、最近
-選擇時間及文字次序決定最佳候選。原始英文、`.dictionaryCommit` 中文翻譯
+情境；但 `isEnglishCompositionContext` 為 true 時不查詢排序器。查詢時只考慮
+目前仍存在的純中文 `.commit` 候選，以最近選擇時間決定最佳
+候選；若時間相同則以文字次序作為穩定比較。原始英文、`.dictionaryCommit` 中文翻譯
 與 `.translate` 英文翻譯不會交給排序器，也不會取得
 `smartPredictionIndex`。
 

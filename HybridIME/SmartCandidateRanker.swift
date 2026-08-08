@@ -4,13 +4,11 @@ import Foundation
 final class SmartCandidateRanker {
     struct Prediction {
         let candidate: String
-        let selectionCount: Int
     }
 
     static let shared = SmartCandidateRanker()
 
     private let defaults = UserDefaults.standard
-    private let minimumSelections = 1
 
     private init() {}
 
@@ -21,14 +19,6 @@ final class SmartCandidateRanker {
         let normalizedCode = code.lowercased()
         guard !normalizedCode.isEmpty, !candidate.isEmpty else { return }
 
-        let candidateKey = key(
-            code: normalizedCode,
-            suffix: "candidate.\(candidate)"
-        )
-        defaults.set(
-            defaults.integer(forKey: candidateKey) + 1,
-            forKey: candidateKey
-        )
         defaults.set(
             Date().timeIntervalSince1970,
             forKey: key(
@@ -72,12 +62,6 @@ final class SmartCandidateRanker {
             .map { candidate in
                 (
                     candidate,
-                    defaults.integer(
-                        forKey: key(
-                            code: normalizedCode,
-                            suffix: "candidate.\(candidate)"
-                        )
-                    ),
                     defaults.double(
                         forKey: key(
                             code: normalizedCode,
@@ -90,16 +74,10 @@ final class SmartCandidateRanker {
                 if $0.1 != $1.1 {
                     return $0.1 < $1.1
                 }
-                if $0.2 != $1.2 {
-                    return $0.2 < $1.2
-                }
                 return $0.0 > $1.0
             }
-        guard let best, best.1 >= minimumSelections else { return nil }
-        return Prediction(
-            candidate: best.0,
-            selectionCount: best.1
-        )
+        guard let best, best.1 > 0 else { return nil }
+        return Prediction(candidate: best.0)
     }
 
     private func key(

@@ -262,6 +262,13 @@ pass-through fallback，避免倉頡碼被誤記為英文語境。此狀態會�
 中文後：1 ，   2 ,
 ```
 
+`beginPunctuationSelection` 會透過 InputMethodKit 傳入的 `IMKTextInput` client
+讀取插入前的 `selectedRange()`，保存已輸出標點的文件範圍。選取其他候選時，
+`replacePendingPunctuation(with:to:)` 會使用同一個 `IMKTextInput` 驗證目前游標及
+原有文字，再以 `insertText(_:replacementRange:)` 原位替換。此流程不能假設
+sender 同時符合 `NSTextInputClient`，否則無法建立待替換範圍，`Shift + 數字`
+便只會關閉候選而不會更改已輸出的標點。
+
 標點候選狀態的按鍵行為：
 
 | 按鍵 | 行為 |

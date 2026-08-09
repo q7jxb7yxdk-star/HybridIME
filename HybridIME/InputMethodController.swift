@@ -964,7 +964,7 @@ final class InputMethodController: IMKInputController {
         buffer = ""
         isSelectingPunctuation = true
         isSelectingAssociation = false
-        let selection = (client as? NSTextInputClient)?.selectedRange()
+        let selection = client?.selectedRange()
         client?.insertText(
             defaultCandidate,
             replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
@@ -1003,22 +1003,22 @@ final class InputMethodController: IMKInputController {
         defer { dismissPunctuationSelection() }
         guard let pendingPunctuationReplacement else { return }
         guard replacement != pendingPunctuationReplacement.text else { return }
-        guard let textClient = sender as? NSTextInputClient else { return }
+        guard let inputClient = sender as? IMKTextInput else { return }
 
-        let selection = textClient.selectedRange()
+        let selection = inputClient.selectedRange()
         let replacementRange = pendingPunctuationReplacement.range
+        let existingText = inputClient.attributedSubstring(
+            from: replacementRange
+        )?.string
         guard
             selection.location == NSMaxRange(replacementRange),
             selection.length == 0,
-            textClient.attributedSubstring(
-                forProposedRange: replacementRange,
-                actualRange: nil
-            )?.string == pendingPunctuationReplacement.text
+            existingText == nil || existingText == pendingPunctuationReplacement.text
         else {
             return
         }
 
-        (sender as? IMKTextInput)?.insertText(
+        inputClient.insertText(
             replacement,
             replacementRange: replacementRange
         )

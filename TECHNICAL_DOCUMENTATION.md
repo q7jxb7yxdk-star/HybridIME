@@ -82,7 +82,7 @@ ASCII 英文字母會轉為小寫並加入 `buffer`。每次更新後：
 
 | 按鍵 | 行為 |
 | --- | --- |
-| `Space` | 第一候選若是藍色中文或原始英文智能預測則提交該候選；否則英文語境提交英文並附加空格，其他語境提交英文及空格 |
+| `Space` | 第一候選若是藍色中文或原始英文智能預測則提交該候選；否則提交原始英文並附加空格 |
 | `Shift + Space` | 提交緩衝區內的英文，不附加空格，並記錄為原始英文智能選擇 |
 | `Return` / 數字鍵盤 `Enter` | 提交第一個候選；沒有候選時提交英文 |
 | `1` 至 `9` | 提交第一至第九個候選；字元判斷失敗時會 fallback 至主鍵盤及數字鍵盤 keyCode |
@@ -96,17 +96,11 @@ ASCII 英文字母會轉為小寫並加入 `buffer`。每次更新後：
 避免 InputMethodKit 中斷 `⌘C`、`⌘V`、`⌘A`、`⌘Z` 等應用程式快捷鍵。
 Shift 不在此透傳集合內，因此仍可保留英文大小寫。
 
-### 英文語境與邊界提交
+### 智能首選與邊界提交
 
-`englishTextBeforeComposition(in:)` 讀取 marked range 前最多 64 個 UTF-16
-code units，並只檢查最近一個句號、問號、感嘆號或換行之後的片段。片段
-含 ASCII 英文字母且不含中文字時，當前組字會標記為英文語境。
-
-英文語境中的 Space 直接提交原始英文，不套用中文智能預測，避免曾經誤選
-中文字後令 `you`、`Step` 這類英文輸入被自動取代；但完全相同大小寫且已學習的
-原始英文仍可作為藍色首選並由 Space 直接提交、不加空格。Return
-仍以當前候選為優先，只有完全沒有候選時才提交英文，避免英文前文令有效
-倉頡碼被誤判為英文。輸入 ASCII 標點時，`commitBeforePunctuation`
+智能首選不讀取 marked range 前文，也不區分中文或英文語境。Space 會直接提交
+當前藍色智能首選；沒有智能首選時才提交原始英文並附加空格。Return 仍以當前
+候選為優先，只有完全沒有候選時才提交英文。輸入 ASCII 標點時，`commitBeforePunctuation`
 會先檢查緩衝區第一個候選；若是純中文 `.commit` 候選，先提交該中文並令標點
 預設全形，否則提交緩衝區英文並令標點預設半形。因此 `I love you!` 的
 `you` 不需要額外按 Space，而倉頡候選後接標點亦可直接得到中文標點。句首第一個
@@ -126,9 +120,9 @@ code units，並只檢查最近一個句號、問號、感嘆號或換行之後�
 
 同一字碼與同一中文或原始英文候選選取一次後即可成為預測，不使用百分比或前文
 情境；以最近選擇時間決定最佳候選。原始英文保留大小寫，只會在當前 buffer
-完全相同時列為可用候選。`isEnglishCompositionContext` 為 true 時會排除純中文
-`.commit` 候選，但保留原始英文候選；`.dictionaryCommit` 中文翻譯與 `.translate`
-英文翻譯不會交給排序器，也不會取得 `smartPredictionIndex`。
+完全相同時列為可用候選。純中文 `.commit` 候選不會因游標前文而被排除；
+`.dictionaryCommit` 中文翻譯與 `.translate` 英文翻譯不會交給排序器，也不會取得
+`smartPredictionIndex`。
 
 候選視窗會把預測候選顯示為藍色文字。若該候選已被移到第一位，Space 會直接
 提交該候選；raw 英文預測不附加空格。`Shift + Space` 則始終強制提交英文並將其
@@ -241,8 +235,8 @@ HybridIME 自己提交文字時，`setNextPunctuationContext(from:)` 會設定�
 數字提交會令下一個標點偏半形；`beginPunctuationSelection` 讀取後立即清除，
 避免舊語境影響之後的聽寫輸入。
 
-若目標應用程式不支援讀取游標前文字，標點預設偏向中文，以改善聽寫中文後
-目標 app 不回傳文字內容的情況。直接鍵入數字時，HybridIME 會在 pass-through 前透過
+若目標應用程式不支援讀取游標前文字，標點預設使用半形；文件開頭沒有前文時
+亦使用半形。直接鍵入數字時，HybridIME 會在 pass-through 前透過
 `punctuationUsesFullWidthForPassthroughInput(_:)` 設定
 `lastPassthroughPunctuationUsesFullWidth = false`，讓下一個標點即使讀不到
 目標文字框內容仍使用半形；字母輸入會進入 HybridIME buffer，不使用這個

@@ -40,7 +40,6 @@ final class InputMethodController: IMKInputController {
     private var currentCandidates: [String] = []
     private var currentCandidateActions: [CandidateAction] = []
     private var smartPredictionIndex: Int?
-    private var isEnglishCompositionContext = false
     private var isSelectingPunctuation = false
     private var pendingPunctuationReplacement: PendingPunctuationReplacement?
     private var isSelectingAssociation = false
@@ -51,14 +50,10 @@ final class InputMethodController: IMKInputController {
     private var lastPassthroughPunctuationUsesFullWidth: Bool?
     private var learnedChineseContext = ""
     private var suppressAssociationsUntilNextInput = false
-    private var workspaceDeactivationObserver: NSObjectProtocol?
+    private var hasRegisteredLifecycleObservers = false
 
     deinit {
-        if let workspaceDeactivationObserver {
-            NSWorkspace.shared.notificationCenter.removeObserver(
-                workspaceDeactivationObserver
-            )
-        }
+        NSWorkspace.shared.notificationCenter.removeObserver(self)
     }
 
     override func recognizedEvents(_ sender: Any!) -> Int {
@@ -267,7 +262,6 @@ final class InputMethodController: IMKInputController {
             commitCandidate(at: 0, to: sender)
         } else if
             !isShiftSpace,
-            !isEnglishCompositionContext,
             let smartPredictionIndex
         {
             commitCandidate(at: smartPredictionIndex, to: sender)
@@ -362,17 +356,12 @@ final class InputMethodController: IMKInputController {
             limit: 10
         )
         currentCandidates = currentCandidateActions.map(\.text)
-        isEnglishCompositionContext = englishTextBeforeComposition(
-            in: sender as? IMKTextInput
-        )
-        let learnedChineseCandidates: [String] = isEnglishCompositionContext
-            ? []
-            : currentCandidateActions.compactMap {
-                guard case .commit(let text) = $0, text.allSatisfy(isChinese) else {
-                    return nil
-                }
-                return text
+        let learnedChineseCandidates: [String] = currentCandidateActions.compactMap {
+            guard case .commit(let text) = $0, text.allSatisfy(isChinese) else {
+                return nil
             }
+            return text
+        }
         let prediction = smartCandidateRanker.prediction(
             code: buffer,
             availableCandidates: learnedChineseCandidates + [buffer]
@@ -546,17 +535,22 @@ final class InputMethodController: IMKInputController {
     }
 
     private func registerLifecycleObserversIfNeeded() {
-        guard workspaceDeactivationObserver == nil else { return }
-        workspaceDeactivationObserver = NSWorkspace.shared.notificationCenter
-            .addObserver(
-                forName: NSWorkspace.didDeactivateApplicationNotification,
-                object: nil,
-                queue: .main
-            ) { [weak self] _ in
-                MainActor.assumeIsolated {
-                    self?.releaseCompositionForExternalSessionChange()
-                }
-            }
+        guard !hasRegisteredLifecycleObservers else { return }
+        NSWorkspace.shared.notificationCenter.addObserver(
+            self,
+            selector: #selector(workspaceDidDeactivateApplication(_:)),
+            name: NSWorkspace.didDeactivateApplicationNotification,
+            object: nil
+        )
+        hasRegisteredLifecycleObservers = true
+    }
+
+    @objc nonisolated private func workspaceDidDeactivateApplication(
+        _ notification: Notification
+    ) {
+        Task { @MainActor [weak self] in
+            self?.releaseCompositionForExternalSessionChange()
+        }
     }
 
     private func releaseCompositionForExternalSessionChange() {
@@ -569,7 +563,6 @@ final class InputMethodController: IMKInputController {
         currentCandidates = []
         currentCandidateActions = []
         smartPredictionIndex = nil
-        isEnglishCompositionContext = false
         isSelectingPunctuation = false
         pendingPunctuationReplacement = nil
         isSelectingAssociation = false
@@ -825,7 +818,6 @@ final class InputMethodController: IMKInputController {
         currentCandidates = []
         currentCandidateActions = []
         smartPredictionIndex = nil
-        isEnglishCompositionContext = false
         isSelectingPunctuation = false
         pendingPunctuationReplacement = nil
         isSelectingAssociation = false
@@ -948,7 +940,7 @@ final class InputMethodController: IMKInputController {
             ?? punctuationUsesFullWidthBeforeCursor(in: client)
             ?? nextPunctuationUsesFullWidth
             ?? lastPassthroughPunctuationUsesFullWidth
-            ?? true
+            ?? false
         nextPunctuationUsesFullWidth = nil
         lastPassthroughPunctuationUsesFullWidth = nil
         let defaultCandidate = defaultPunctuationCandidate(
@@ -1201,45 +1193,6 @@ final class InputMethodController: IMKInputController {
             }
         }
         return nil
-    }
-
-    private func englishTextBeforeComposition(
-        in client: IMKTextInput?
-    ) -> Bool {
-        guard let textClient = client as? NSTextInputClient else {
-            return lastCommittedCharacter.map {
-                $0.isASCII && ($0.isLetter || $0.isNumber)
-            } ?? false
-        }
-
-        let markedRange = textClient.markedRange()
-        let selection = textClient.selectedRange()
-        let location = markedRange.location != NSNotFound
-            ? markedRange.location
-            : selection.location
-        guard
-            location != NSNotFound,
-            location > 0,
-            let text = textClient.attributedSubstring(
-                forProposedRange: NSRange(
-                    location: max(0, location - 64),
-                    length: min(64, location)
-                ),
-                actualRange: nil
-            )?.string
-        else {
-            return false
-        }
-
-        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty else { return false }
-        let sentenceStart = trimmed.lastIndex {
-            ".!?。！？\n".contains($0)
-        }.map { trimmed.index(after: $0) } ?? trimmed.startIndex
-        let fragment = trimmed[sentenceStart...]
-        let latinLetters = fragment.filter { $0.isASCII && $0.isLetter }.count
-        let chineseCharacters = fragment.filter(isChinese).count
-        return latinLetters > 0 && chineseCharacters == 0
     }
 
     private func isChinese(_ character: Character) -> Bool {

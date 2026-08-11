@@ -119,7 +119,7 @@ final class CandidateWindowController {
         rootsLabel.isHidden = true
         if let shiftKeyCandidates {
             candidatesLabel.attributedStringValue = shiftKeyCandidateText(
-                shiftKeyCandidates
+                displayCandidates ?? shiftKeyCandidates
             )
         } else {
             candidatesLabel.attributedStringValue = candidateText(

@@ -1080,7 +1080,8 @@ final class InputMethodController: IMKInputController {
         )
     ) -> [String]? {
         let labeledHalfWidthPunctuation: Set<String> = [
-            "'", "\"", "`", ";", "\\", "?", "(", ")", ":", "!",
+            "`", "~", "!", "%", "^", "&", "(", ")", "-", "+", "\\",
+            "|", ";", ":", "'", "\"", "/", "?", "@", "#",
         ]
         guard labeledHalfWidthPunctuation.contains(punctuation.halfWidth) else {
             return nil
@@ -1234,7 +1235,7 @@ final class InputMethodController: IMKInputController {
         case "$":
             candidates = ["$", "¥", "£", "€", "₹", "₺", "＄"]
             chineseDefault = "$"
-        case "\"", "'", "#", "`", "-", "+", "=", "&":
+        case "#", "=":
             candidates = [String(character), String(fullWidth)]
             chineseDefault = String(character)
         case ".":
@@ -1248,7 +1249,7 @@ final class InputMethodController: IMKInputController {
             chineseDefault = "*"
         case "/":
             candidates = ["/", "／", "÷"]
-            chineseDefault = "/"
+            chineseDefault = nil
         case "<":
             candidates = ["<", "＜", "←"]
             chineseDefault = "<"

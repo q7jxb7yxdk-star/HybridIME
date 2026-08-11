@@ -260,11 +260,6 @@ final class InputMethodController: IMKInputController {
             shouldCommitSmartPredictionOnSpace
         {
             commitCandidate(at: 0, to: sender)
-        } else if
-            !isShiftSpace,
-            let smartPredictionIndex
-        {
-            commitCandidate(at: smartPredictionIndex, to: sender)
         } else if isShiftSpace {
             recordRawSmartSelection()
             commitWithoutAssociations(
@@ -285,8 +280,6 @@ final class InputMethodController: IMKInputController {
         guard smartPredictionIndex == 0 else { return false }
         guard currentCandidateActions.indices.contains(0) else { return false }
         switch currentCandidateActions[0] {
-        case .rawCommit:
-            return true
         case .commit(let text):
             return text.allSatisfy(isChinese)
         default:

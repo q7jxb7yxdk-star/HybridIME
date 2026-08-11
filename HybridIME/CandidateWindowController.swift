@@ -107,7 +107,6 @@ final class CandidateWindowController {
     func showPunctuation(
         candidates: [String],
         displayCandidates: [String]? = nil,
-        shiftKeyCandidates: [String]? = nil,
         client: IMKTextInput?
     ) {
         guard !candidates.isEmpty else {
@@ -117,15 +116,9 @@ final class CandidateWindowController {
 
         codeLabel.isHidden = true
         rootsLabel.isHidden = true
-        if let shiftKeyCandidates {
-            candidatesLabel.attributedStringValue = shiftKeyCandidateText(
-                displayCandidates ?? shiftKeyCandidates
-            )
-        } else {
-            candidatesLabel.attributedStringValue = candidateText(
-                displayCandidates ?? candidates
-            )
-        }
+        candidatesLabel.attributedStringValue = candidateText(
+            displayCandidates ?? candidates
+        )
         candidatesLabel.isHidden = false
 
         updatePanel(client: client)
@@ -179,49 +172,6 @@ final class CandidateWindowController {
             "y": "卜", "z": "重",
         ]
         return String(code.lowercased().compactMap { roots[$0] })
-    }
-
-    private func shiftKeyCandidateText(_ candidates: [String]) -> NSAttributedString {
-        let result = NSMutableAttributedString()
-        let keyAttributes: [NSAttributedString.Key: Any] = [
-            .font: NSFont.monospacedDigitSystemFont(
-                ofSize: 10,
-                weight: .medium
-            ),
-            .foregroundColor: NSColor.secondaryLabelColor,
-        ]
-        let candidateAttributes: [NSAttributedString.Key: Any] = [
-            .font: NSFont.systemFont(ofSize: 17),
-            .foregroundColor: NSColor.labelColor,
-        ]
-
-        result.append(
-            NSAttributedString(
-                string: "Shift：",
-                attributes: keyAttributes
-            )
-        )
-
-        for (index, candidate) in candidates.enumerated() {
-            if index > 0 {
-                result.append(NSAttributedString(string: "  "))
-            }
-            let key = index == 9 ? "0" : String(index + 1)
-            result.append(
-                NSAttributedString(
-                    string: "\(key) ",
-                    attributes: keyAttributes
-                )
-            )
-            result.append(
-                NSAttributedString(
-                    string: candidate,
-                    attributes: candidateAttributes
-                )
-            )
-        }
-
-        return result
     }
 
     private func candidateText(

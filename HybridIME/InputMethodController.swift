@@ -164,7 +164,6 @@ final class InputMethodController: IMKInputController {
         if
             let index = candidateIndex(for: event),
             !isNewPunctuationInput(event),
-            !shouldContinuePunctuationInput(event),
             !isInvalidPunctuationCandidateIndex(index),
             !buffer.isEmpty || isSelectingPunctuation || isSelectingAssociation
         {
@@ -973,10 +972,6 @@ final class InputMethodController: IMKInputController {
                 for: currentCandidates,
                 punctuation: punctuation
             ),
-            shiftKeyCandidates: shiftKeyCandidates(
-                for: currentCandidates,
-                punctuation: punctuation
-            ),
             client: client
         )
     }
@@ -1051,18 +1046,6 @@ final class InputMethodController: IMKInputController {
         return true
     }
 
-    private func shiftKeyCandidates(
-        for candidates: [String],
-        punctuation: (
-            halfWidth: String,
-            fullWidth: String,
-            candidates: [String],
-            chineseDefault: String?
-        )
-    ) -> [String]? {
-        return candidates
-    }
-
     private func punctuationDisplayCandidates(
         for candidates: [String],
         punctuation: (
@@ -1093,17 +1076,6 @@ final class InputMethodController: IMKInputController {
 
     private func isInvalidPunctuationCandidateIndex(_ index: Int) -> Bool {
         isSelectingPunctuation && !currentCandidateActions.indices.contains(index)
-    }
-
-    private func shouldContinuePunctuationInput(_ event: NSEvent) -> Bool {
-        guard isSelectingPunctuation else {
-            return false
-        }
-        guard !isShiftModified(event) else { return false }
-        guard let character = event.charactersIgnoringModifiers?.first else {
-            return false
-        }
-        return character.isNumber
     }
 
     private func isNewPunctuationInput(_ event: NSEvent) -> Bool {
@@ -1274,7 +1246,7 @@ final class InputMethodController: IMKInputController {
     }
 
     private func candidateIndex(for event: NSEvent) -> Int? {
-        if isSelectingPunctuation && !isShiftModified(event) {
+        if isSelectingPunctuation && isShiftModified(event) {
             return nil
         }
 

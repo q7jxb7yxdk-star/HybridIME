@@ -597,6 +597,22 @@ xcodebuild \
 
 若曾修改 bundle identifier、input source ID 或 input mode ID，即使 `lsregister`、`killall TextInputMenuAgent`、`killall TextInputSwitcher` 及 `killall imklaunchagent` 已執行，System Settings 仍可能看不到輸入法。實測需要重新開機後，macOS 才會刷新 Text Input / LaunchServices cache 並列出「中英混合」。
 
+重新開機後亦可能出現輸入來源已選中、HybridIME process 存在，但按鍵完全
+沒有反應的狀態。若 unified log 顯示 `unrecognized
+'InputMethodConnectionName' value` 或 `NO Endpoint`，表示 InputMethodKit 未能
+取得輸入法 XPC endpoint。先強制註冊正式安裝位置，再重啟輸入法及選單代理：
+
+```sh
+/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister \
+  -f "$HOME/Library/Input Methods/HybridIME.app"
+killall HybridIME
+killall TextInputMenuAgent
+open "$HOME/Library/Input Methods/HybridIME.app"
+```
+
+修復後應在 log 看到 `Received setIMKXPCEndpoint` 及 `Activate Server`。僅確認
+HybridIME process 正在執行並不足以證明輸入事件連線正常。
+
 建置需要可用的 Apple Development 憑證。這不代表必須加入付費 Apple Developer Program；免費 Apple ID 亦可由 Xcode 建立個人開發憑證，但憑證及簽署限制可能不同。
 
 ## 12. 已知限制

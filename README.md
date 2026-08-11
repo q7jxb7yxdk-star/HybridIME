@@ -269,6 +269,17 @@ HybridIME 啟動時不會自行註冊或啟用輸入來源。安裝或更新後�
 HybridIME 直接建立 `NSApplication` 及 `IMKServer`，不建立一般 App 視窗。
 重新開機後首次選擇「中英混合」時，輸入法只會在背景啟動。
 
+若重新開機後已選擇「中英混合」但按鍵完全沒有反應，可強制刷新
+LaunchServices 註冊及 InputMethodKit 連線：
+
+```sh
+/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister \
+  -f "$HOME/Library/Input Methods/HybridIME.app"
+killall HybridIME
+killall TextInputMenuAgent
+open "$HOME/Library/Input Methods/HybridIME.app"
+```
+
 開發期間若要停止 HybridIME，應先切換至其他輸入法，再執行：
 
 ```sh

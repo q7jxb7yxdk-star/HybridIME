@@ -223,8 +223,8 @@ $ → $  ¥  £  €  ₹  ₺  ＄
 buffer 判斷標點語境：第一個候選若是純中文 `.commit` 候選則強制全形，
 否則強制半形。buffer 為空時，`punctuationUsesFullWidthBeforeCursor(in:)`
 會透過
-`NSTextInputClient.selectedRange()` 及
-`attributedSubstring(forProposedRange:actualRange:)` 讀取游標前最多 64 個
+`IMKTextInput.selectedRange()` 及
+`attributedSubstring(from:)` 讀取游標前最多 64 個
 UTF-16 單位，並由後往前尋找最近的有效語境字元。空白及換行會略過；
 中文字會令標點預設全形，ASCII 英文字母及數字會令標點預設半形，遇到
 句末或標點分隔符則停止掃描。因此聽寫或貼上文字後再輸入標點亦可跟隨

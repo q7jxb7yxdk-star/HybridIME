@@ -1139,23 +1139,20 @@ final class InputMethodController: IMKInputController {
     private func punctuationUsesFullWidthBeforeCursor(
         in client: IMKTextInput?
     ) -> Bool? {
-        guard let textClient = client as? NSTextInputClient else {
-            return nil
-        }
+        guard let client else { return nil }
 
-        let selection = textClient.selectedRange()
+        let selection = client.selectedRange()
         guard selection.location != NSNotFound, selection.location > 0 else {
             return nil
         }
 
         let contextLength = min(64, selection.location)
         if
-            let text = textClient.attributedSubstring(
-                forProposedRange: NSRange(
+            let text = client.attributedSubstring(
+                from: NSRange(
                     location: selection.location - contextLength,
                     length: contextLength
-                ),
-                actualRange: nil
+                )
             )?.string,
             let character = punctuationContextCharacter(in: text)
         {
@@ -1163,12 +1160,11 @@ final class InputMethodController: IMKInputController {
         }
 
         guard
-            let substring = textClient.attributedSubstring(
-                forProposedRange: NSRange(
+            let substring = client.attributedSubstring(
+                from: NSRange(
                     location: selection.location - 1,
                     length: 1
-                ),
-                actualRange: nil
+                )
             )?.string,
             let character = substring.last
         else {

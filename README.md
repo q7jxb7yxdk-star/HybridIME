@@ -217,7 +217,7 @@ HybridIME 會在本機記錄每組輸入碼實際選擇的中文字候選，以�
 
 ## 系統需求
 
-- macOS 26.5 或以上
+- macOS 26.0 或以上
 - Xcode 26.3 或以上
 - Apple Development 開發憑證
 

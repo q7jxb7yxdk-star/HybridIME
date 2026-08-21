@@ -176,6 +176,14 @@ final class InputMethodController: IMKInputController {
             let character = event.characters?.first,
             let punctuation = punctuationPair(for: character)
         {
+            if buffer.isEmpty {
+                guard
+                    let textClient = sender as? IMKTextInput,
+                    textClient.selectedRange().location != NSNotFound
+                else {
+                    return false
+                }
+            }
             let forceFullWidth = punctuationFullWidthPreferenceForCurrentComposition()
             learnedChineseContext = ""
             dismissAssociation(clearContext: true)

@@ -566,10 +566,13 @@ final class KeyboardViewController: UIInputViewController {
         primaryLabel.textColor = .label
         primaryLabel.textAlignment = .center
 
+        let usesLooserLabelSpacing = ["@", "#", "$", "&", "(", ")", "'", "\"", "/"]
+            .contains(key.primary)
+        let labelEdgeInset: CGFloat = usesLooserLabelSpacing ? 0 : 2
         let labels = UIStackView(arrangedSubviews: [alternateLabel, primaryLabel])
         labels.axis = .vertical
         labels.alignment = .center
-        labels.spacing = -5
+        labels.spacing = usesLooserLabelSpacing ? 0 : -5
         labels.isUserInteractionEnabled = false
         labels.translatesAutoresizingMaskIntoConstraints = false
         labels.tag = WideSymbolViewTag.labels
@@ -577,8 +580,14 @@ final class KeyboardViewController: UIInputViewController {
         NSLayoutConstraint.activate([
             labels.centerXAnchor.constraint(equalTo: button.centerXAnchor),
             labels.centerYAnchor.constraint(equalTo: button.centerYAnchor),
-            labels.topAnchor.constraint(greaterThanOrEqualTo: button.topAnchor, constant: 2),
-            labels.bottomAnchor.constraint(lessThanOrEqualTo: button.bottomAnchor, constant: -2),
+            labels.topAnchor.constraint(
+                greaterThanOrEqualTo: button.topAnchor,
+                constant: labelEdgeInset
+            ),
+            labels.bottomAnchor.constraint(
+                lessThanOrEqualTo: button.bottomAnchor,
+                constant: -labelEdgeInset
+            ),
         ])
 
         installAlternateFlick(

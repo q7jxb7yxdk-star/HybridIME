@@ -113,6 +113,31 @@ final class KeyboardViewController: UIInputViewController,
         case control
     }
 
+    private struct PendingPunctuationSelection {
+        let insertedText: String
+        let definition: PunctuationDefinition
+    }
+
+    private enum CandidateAction {
+        case cangjie(String)
+        case raw(String)
+        case dictionary(String)
+        case translation(String, replacingPrefixCharacterCount: Int)
+        case association(KeyboardAssociationDictionary.Suggestion)
+
+        var text: String {
+            switch self {
+            case .cangjie(let text),
+                 .raw(let text),
+                 .dictionary(let text),
+                 .translation(let text, _):
+                text
+            case .association(let suggestion):
+                suggestion.text
+            }
+        }
+    }
+
     private final class EmojiCell: UICollectionViewCell {
         let label = UILabel()
 
@@ -137,12 +162,17 @@ final class KeyboardViewController: UIInputViewController,
     }
 
     private let decoder = CangjieDecoder()
+    private let offlineLexicon = OfflineLexicon()
+    private lazy var associationDictionary = KeyboardAssociationDictionary(
+        lexicon: offlineLexicon
+    )
     private let candidateScrollView = UIScrollView()
     private let candidateStackView = UIStackView()
     private let compositionLabel = UILabel()
     private let candidateArea = UIStackView()
     private let keyboardStackView = UIStackView()
     private let rootStack = UIStackView()
+    private let cursorTrackpadOverlay = UIView()
 
     private lazy var emojiCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -165,16 +195,28 @@ final class KeyboardViewController: UIInputViewController,
     private var keyboardHeightConstraint: NSLayoutConstraint?
     private var buffer = ""
     private var currentCandidates: [String] = []
+    private var currentCandidateActions: [CandidateAction] = []
     private var learnedCandidate: String?
+    private var pendingPunctuationSelection: PendingPunctuationSelection?
+    private var isSelectingAssociation = false
+    private var associationContext = ""
+    private var associationLanguage: KeyboardAssociationDictionary.Language?
+    private var learnedChineseContext = ""
     private var currentPage = KeyboardPage.letters
     private var selectedEmojiCategory = EmojiCategory.frequentlyUsed
     private var emojiCategoryButtons: [EmojiCategory: UIButton] = [:]
     private var shiftState = ShiftState.lowercased
     private var lastShiftTapTime: TimeInterval = 0
-    private var cursorGestureStartX: CGFloat = 0
-    private var cursorGestureStep = 0
+    private var cursorGestureStartPoint = CGPoint.zero
+    private var cursorHorizontalGestureStep = 0
+    private var cursorVerticalGestureStep = 0
+    private var cursorPreferredColumn = 0
     // 游標每移動一個字元所需的水平滑動距離（pt）；數值越小越靈敏。
     private let cursorMovementThreshold: CGFloat = 5
+    // 每觸發一次上一行或下一行移動所需的垂直滑動距離（pt）；數值越小越靈敏。
+    private let cursorVerticalMovementThreshold: CGFloat = 5
+    // 找不到實際換行時，每次垂直移動所估算的字元數。數值越小則移動較短。
+    private let cursorEstimatedCharactersPerLine = 10
     private let cursorFeedbackGenerator = UISelectionFeedbackGenerator()
 
     private let letterRows: [[String]] = [
@@ -252,6 +294,12 @@ final class KeyboardViewController: UIInputViewController,
         rootStack.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(rootStack)
 
+        cursorTrackpadOverlay.backgroundColor = keyboardBackgroundColor
+        cursorTrackpadOverlay.isUserInteractionEnabled = false
+        cursorTrackpadOverlay.isHidden = true
+        cursorTrackpadOverlay.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(cursorTrackpadOverlay)
+
         let heightConstraint = view.heightAnchor.constraint(equalToConstant: 260)
         heightConstraint.priority = .defaultHigh
         keyboardHeightConstraint = heightConstraint
@@ -261,6 +309,10 @@ final class KeyboardViewController: UIInputViewController,
             rootStack.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -3),
             rootStack.topAnchor.constraint(equalTo: view.topAnchor, constant: 5),
             rootStack.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -5),
+            cursorTrackpadOverlay.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            cursorTrackpadOverlay.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            cursorTrackpadOverlay.topAnchor.constraint(equalTo: view.topAnchor),
+            cursorTrackpadOverlay.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             heightConstraint,
         ])
     }
@@ -789,6 +841,12 @@ final class KeyboardViewController: UIInputViewController,
     }
 
     private func enterLetter(_ key: String) {
+        if pendingPunctuationSelection != nil {
+            resetCompositionState()
+        }
+        if isSelectingAssociation {
+            dismissAssociation(clearContext: false)
+        }
         let text = shiftState == .lowercased ? key : key.uppercased()
         textDocumentProxy.insertText(text)
         buffer.append(text)
@@ -801,9 +859,57 @@ final class KeyboardViewController: UIInputViewController,
     }
 
     private func enterSymbol(_ symbol: String) {
+        if let punctuation = PunctuationStrategy.definition(for: symbol) {
+            beginPunctuationSelection(punctuation)
+            return
+        }
         resetCompositionState()
         textDocumentProxy.insertText(symbol)
         refreshComposition()
+    }
+
+    private func beginPunctuationSelection(_ punctuation: PunctuationDefinition) {
+        let forceFullWidth = punctuationFullWidthPreferenceForCurrentComposition()
+
+        if !buffer.isEmpty,
+           forceFullWidth == true,
+           let learnedCandidate
+        {
+            _ = replaceTypedCode(with: learnedCandidate)
+        } else {
+            resetCompositionState()
+        }
+
+        let useFullWidth = forceFullWidth
+            ?? PunctuationStrategy.usesFullWidth(
+                before: textDocumentProxy.documentContextBeforeInput
+            )
+            ?? false
+        let defaultCandidate = PunctuationStrategy.defaultCandidate(
+            for: punctuation,
+            useFullWidth: useFullWidth
+        )
+
+        resetCompositionState()
+        currentCandidates = PunctuationStrategy.orderedCandidates(
+            for: punctuation,
+            defaultCandidate: defaultCandidate
+        )
+        textDocumentProxy.insertText(defaultCandidate)
+        pendingPunctuationSelection = PendingPunctuationSelection(
+            insertedText: defaultCandidate,
+            definition: punctuation
+        )
+        rebuildCandidateButtons()
+    }
+
+    private func punctuationFullWidthPreferenceForCurrentComposition() -> Bool? {
+        guard !buffer.isEmpty else { return nil }
+        guard let learnedCandidate,
+              learnedCandidate != buffer,
+              PunctuationStrategy.isChinese(learnedCandidate)
+        else { return false }
+        return true
     }
 
     private func deleteBackward() {
@@ -835,15 +941,36 @@ final class KeyboardViewController: UIInputViewController,
             refreshComposition()
             return
         }
+
+        if isSelectingAssociation {
+            if case .association(let suggestion) = currentCandidateActions.first,
+               suggestion.isMostRecentSelection
+            {
+                commitAssociation(suggestion)
+            } else {
+                resetCompositionState()
+                textDocumentProxy.insertText(" ")
+                refreshComposition()
+            }
+            return
+        }
+
         if learnedCandidate == buffer, !buffer.isEmpty {
-            resetCompositionState()
+            let typedCode = buffer
             textDocumentProxy.insertText(" ")
-            refreshComposition()
+            finishCommittedText(typedCode)
             return
         }
         if let learnedCandidate,
-           replaceTypedCode(with: learnedCandidate)
+           replaceTypedCode(with: learnedCandidate, showingAssociations: true)
         {
+            return
+        }
+
+        let typedCode = buffer
+        if !typedCode.isEmpty {
+            textDocumentProxy.insertText(" ")
+            finishCommittedText(typedCode)
             return
         }
         resetCompositionState()
@@ -857,30 +984,128 @@ final class KeyboardViewController: UIInputViewController,
 
         switch gesture.state {
         case .began:
-            cursorGestureStartX = gesture.location(in: view).x
-            cursorGestureStep = 0
+            cursorGestureStartPoint = gesture.location(in: view)
+            cursorHorizontalGestureStep = 0
+            cursorVerticalGestureStep = 0
+            cursorPreferredColumn = currentCursorColumn
             resetCompositionState()
             refreshComposition()
+            setCursorTrackpadMode(active: true)
             updateSpaceButtonTitle("移動游標", accessibilityLabel: "移動游標")
             cursorFeedbackGenerator.prepare()
         case .changed:
-            let distance = gesture.location(in: view).x - cursorGestureStartX
-            let step = Int(distance / cursorMovementThreshold)
-            let offset = step - cursorGestureStep
-            guard offset != 0 else { return }
-            textDocumentProxy.adjustTextPosition(byCharacterOffset: offset)
-            cursorGestureStep = step
-            cursorFeedbackGenerator.selectionChanged()
-            cursorFeedbackGenerator.prepare()
+            let location = gesture.location(in: view)
+            let horizontalDistance = location.x - cursorGestureStartPoint.x
+            let verticalDistance = location.y - cursorGestureStartPoint.y
+
+            var didMove = false
+            let horizontalStep = Int(horizontalDistance / cursorMovementThreshold)
+            let horizontalOffset = horizontalStep - cursorHorizontalGestureStep
+            if horizontalOffset != 0 {
+                textDocumentProxy.adjustTextPosition(
+                    byCharacterOffset: horizontalOffset
+                )
+                cursorHorizontalGestureStep = horizontalStep
+                cursorPreferredColumn = currentCursorColumn
+                didMove = true
+            }
+
+            let verticalStep = Int(verticalDistance / cursorVerticalMovementThreshold)
+            let lineOffset = verticalStep - cursorVerticalGestureStep
+            if lineOffset != 0 {
+                if moveCursorByLogicalLines(lineOffset) {
+                    didMove = true
+                }
+                cursorVerticalGestureStep = verticalStep
+            }
+
+            if didMove {
+                cursorFeedbackGenerator.selectionChanged()
+                cursorFeedbackGenerator.prepare()
+            }
         case .ended, .cancelled, .failed:
-            cursorGestureStartX = 0
-            cursorGestureStep = 0
+            cursorGestureStartPoint = .zero
+            cursorHorizontalGestureStep = 0
+            cursorVerticalGestureStep = 0
+            cursorPreferredColumn = 0
+            setCursorTrackpadMode(active: false)
             updateSpaceButtonTitle("space", accessibilityLabel: "空格")
         default:
             break
         }
 
         spaceButton.isHighlighted = gesture.state == .began || gesture.state == .changed
+    }
+
+    private func setCursorTrackpadMode(active: Bool) {
+        cursorTrackpadOverlay.isHidden = !active
+        cursorTrackpadOverlay.alpha = active ? 0.94 : 0
+        if active {
+            view.bringSubviewToFront(cursorTrackpadOverlay)
+        }
+    }
+
+    private var currentCursorColumn: Int {
+        let beforeCursor = textDocumentProxy.documentContextBeforeInput ?? ""
+        guard let newline = beforeCursor.lastIndex(of: "\n") else {
+            return beforeCursor.count
+        }
+        return beforeCursor[beforeCursor.index(after: newline)...].count
+    }
+
+    private func moveCursorByLogicalLines(_ lineOffset: Int) -> Bool {
+        let direction = lineOffset > 0 ? 1 : -1
+        var didMove = false
+        for _ in 0..<abs(lineOffset) {
+            let movedToLogicalLine = direction > 0
+                ? moveCursorToNextLogicalLine()
+                : moveCursorToPreviousLogicalLine()
+            let moved = movedToLogicalLine || moveCursorByEstimatedLine(direction)
+            guard moved else { break }
+            didMove = true
+        }
+        return didMove
+    }
+
+    private func moveCursorByEstimatedLine(_ direction: Int) -> Bool {
+        textDocumentProxy.adjustTextPosition(
+            byCharacterOffset: direction * cursorEstimatedCharactersPerLine
+        )
+        return true
+    }
+
+    private func moveCursorToPreviousLogicalLine() -> Bool {
+        guard let beforeCursor = textDocumentProxy.documentContextBeforeInput,
+              let newline = beforeCursor.lastIndex(of: "\n")
+        else { return false }
+
+        let currentLineStart = beforeCursor.index(after: newline)
+        let currentColumn = beforeCursor[currentLineStart...].count
+        let previousText = beforeCursor[..<newline]
+        let previousLineStart = previousText.lastIndex(of: "\n").map {
+            previousText.index(after: $0)
+        } ?? previousText.startIndex
+        let previousLineLength = previousText[previousLineStart...].count
+        let targetColumn = min(cursorPreferredColumn, previousLineLength)
+        let offset = -(currentColumn + 1 + previousLineLength - targetColumn)
+        textDocumentProxy.adjustTextPosition(byCharacterOffset: offset)
+        return true
+    }
+
+    private func moveCursorToNextLogicalLine() -> Bool {
+        guard let afterCursor = textDocumentProxy.documentContextAfterInput,
+              let newline = afterCursor.firstIndex(of: "\n")
+        else { return false }
+
+        let currentLineRemainder = afterCursor[..<newline].count
+        let nextLineStart = afterCursor.index(after: newline)
+        let remainingText = afterCursor[nextLineStart...]
+        let nextLineEnd = remainingText.firstIndex(of: "\n") ?? remainingText.endIndex
+        let nextLineLength = remainingText[..<nextLineEnd].count
+        let targetColumn = min(cursorPreferredColumn, nextLineLength)
+        let offset = currentLineRemainder + 1 + targetColumn
+        textDocumentProxy.adjustTextPosition(byCharacterOffset: offset)
+        return true
     }
 
     private func updateSpaceButtonTitle(
@@ -900,27 +1125,60 @@ final class KeyboardViewController: UIInputViewController,
     }
 
     private func selectCandidate(_ candidate: String) {
-        let typedCode = buffer
-        if !typedCode.isEmpty {
+        if pendingPunctuationSelection != nil {
+            selectPunctuationCandidate(candidate)
+            return
+        }
+
+        guard let index = currentCandidates.firstIndex(of: candidate),
+              currentCandidateActions.indices.contains(index)
+        else { return }
+
+        switch currentCandidateActions[index] {
+        case .cangjie(let text):
             SmartCandidateRanker.shared.record(
-                code: typedCode,
-                candidate: candidate
+                code: buffer,
+                candidate: text
             )
+            _ = replaceTypedCode(with: text, showingAssociations: true)
+        case .raw(let text):
+            finishCommittedText(text)
+        case .dictionary(let text):
+            _ = replaceTypedCode(with: text, showingAssociations: true)
+        case .translation(let text, let prefixCharacterCount):
+            commitTranslation(
+                text,
+                replacingPrefixCharacterCount: prefixCharacterCount
+            )
+        case .association(let suggestion):
+            commitAssociation(suggestion)
         }
-        if candidate == typedCode {
-            resetCompositionState()
-            refreshComposition()
-            return
-        }
-        if replaceTypedCode(with: candidate) {
-            return
-        }
-        resetCompositionState()
-        textDocumentProxy.insertText(candidate)
-        refreshComposition()
     }
 
-    private func replaceTypedCode(with replacement: String) -> Bool {
+    private func selectPunctuationCandidate(_ candidate: String) {
+        guard let pendingPunctuationSelection,
+              currentCandidates.contains(candidate)
+        else { return }
+
+        defer {
+            resetCompositionState()
+            refreshComposition()
+        }
+        guard candidate != pendingPunctuationSelection.insertedText else { return }
+        guard textDocumentProxy.documentContextBeforeInput?.hasSuffix(
+            pendingPunctuationSelection.insertedText
+        ) == true else { return }
+
+        for _ in pendingPunctuationSelection.insertedText {
+            textDocumentProxy.deleteBackward()
+        }
+        textDocumentProxy.insertText(candidate)
+    }
+
+    private func replaceTypedCode(
+        with replacement: String,
+        showingAssociations: Bool = false
+    ) -> Bool {
         guard !buffer.isEmpty,
               textDocumentProxy.documentContextBeforeInput?.hasSuffix(buffer) == true
         else { return false }
@@ -928,35 +1186,294 @@ final class KeyboardViewController: UIInputViewController,
         for _ in buffer {
             textDocumentProxy.deleteBackward()
         }
-        resetCompositionState()
         textDocumentProxy.insertText(replacement)
-        refreshComposition()
+        if showingAssociations {
+            finishCommittedText(replacement)
+        } else {
+            resetCompositionState()
+            refreshComposition()
+        }
         return true
     }
 
     private func resetCompositionState() {
         buffer = ""
         currentCandidates = []
+        currentCandidateActions = []
         learnedCandidate = nil
+        pendingPunctuationSelection = nil
+        isSelectingAssociation = false
+        associationContext = ""
+        associationLanguage = nil
+        learnedChineseContext = ""
     }
 
     private func refreshComposition() {
-        var candidates = buffer.count <= 5
+        let cangjieCandidates = buffer.count <= 5
             ? decoder.candidates(for: buffer, limit: 10)
             : []
+        let dictionaryCandidates = offlineLexicon.chineseCandidates(
+            for: buffer,
+            limit: 10
+        )
+        var actions = candidateActions(
+            dictionaryCandidates: dictionaryCandidates,
+            cangjieCandidates: cangjieCandidates,
+            limit: 10
+        )
         let prediction = SmartCandidateRanker.shared.prediction(
             code: buffer,
-            availableCandidates: buffer.isEmpty ? candidates : candidates + [buffer]
+            availableCandidates: buffer.isEmpty
+                ? cangjieCandidates
+                : cangjieCandidates + [buffer]
         )
         learnedCandidate = prediction?.candidate
         if let learnedCandidate {
-            candidates.removeAll { $0 == learnedCandidate }
-            candidates.insert(learnedCandidate, at: 0)
+            if learnedCandidate == buffer {
+                actions.removeAll { $0.text == buffer }
+                actions.insert(.raw(buffer), at: 0)
+            } else if let index = actions.firstIndex(where: { action in
+                if case .cangjie(let text) = action {
+                    return text == learnedCandidate
+                }
+                return false
+            }) {
+                let action = actions.remove(at: index)
+                actions.insert(action, at: 0)
+            } else {
+                self.learnedCandidate = nil
+            }
         }
-        currentCandidates = candidates
+        currentCandidateActions = actions
+        currentCandidates = actions.map(\.text)
+        isSelectingAssociation = false
         let roots = cangjieRoots(for: buffer)
         compositionLabel.text = buffer.isEmpty ? "" : "\(roots)  ·  \(buffer)"
         rebuildCandidateButtons()
+    }
+
+    private func candidateActions(
+        dictionaryCandidates: [String],
+        cangjieCandidates: [String],
+        limit: Int
+    ) -> [CandidateAction] {
+        var result: [CandidateAction] = []
+        var seen: Set<String> = []
+
+        func append(_ action: CandidateAction) {
+            guard result.count < limit, seen.insert(action.text).inserted else {
+                return
+            }
+            result.append(action)
+        }
+
+        let precedingChinese = chineseTextBeforeComposition()
+        for candidate in cangjieCandidates where result.count < limit {
+            append(.cangjie(candidate))
+            let lookup = longestTranslationLookup(
+                precedingChinese: precedingChinese,
+                candidate: candidate
+            )
+            for translation in lookup.translations.prefix(2) {
+                append(
+                    .translation(
+                        translation,
+                        replacingPrefixCharacterCount: lookup.prefix.count
+                    )
+                )
+            }
+        }
+        for candidate in dictionaryCandidates {
+            append(.dictionary(candidate))
+        }
+        return result
+    }
+
+    private func longestTranslationLookup(
+        precedingChinese: String,
+        candidate: String
+    ) -> (prefix: String, translations: [String]) {
+        let characters = Array(precedingChinese)
+        for length in stride(from: characters.count, through: 0, by: -1) {
+            let prefix = String(characters.suffix(length))
+            let translations = offlineLexicon.englishCandidates(
+                for: prefix + candidate,
+                limit: 2
+            )
+            if !translations.isEmpty {
+                return (prefix, translations)
+            }
+        }
+        return ("", [])
+    }
+
+    private func chineseTextBeforeComposition() -> String {
+        guard !buffer.isEmpty,
+              let text = textDocumentProxy.documentContextBeforeInput,
+              text.hasSuffix(buffer)
+        else { return "" }
+
+        let end = text.index(text.endIndex, offsetBy: -buffer.count)
+        let preceding = text[..<end]
+        let trailingChinese = String(
+            preceding.reversed()
+                .prefix {
+                    PunctuationStrategy.isChinese(String($0))
+                }
+                .reversed()
+        )
+        return String(trailingChinese.suffix(16))
+    }
+
+    private func commitTranslation(
+        _ text: String,
+        replacingPrefixCharacterCount prefixCharacterCount: Int
+    ) {
+        let prefix = String(chineseTextBeforeComposition().suffix(prefixCharacterCount))
+        let expectedSuffix = prefix + buffer
+        guard !buffer.isEmpty,
+              textDocumentProxy.documentContextBeforeInput?.hasSuffix(expectedSuffix) == true
+        else { return }
+
+        for _ in expectedSuffix {
+            textDocumentProxy.deleteBackward()
+        }
+        textDocumentProxy.insertText(text)
+        finishCommittedText(text, forcedLanguage: .english)
+    }
+
+    private func commitAssociation(
+        _ suggestion: KeyboardAssociationDictionary.Suggestion
+    ) {
+        associationDictionary.recordSelection(suggestion)
+        let insertedText = suggestion.language == .english
+            ? suggestion.text + " "
+            : suggestion.text
+        textDocumentProxy.insertText(insertedText)
+        learnCommittedText(suggestion.text)
+
+        let context = suggestion.language == .chinese
+            ? associationContext + suggestion.text
+            : suggestion.text
+        clearActiveComposition()
+        showAssociations(context: context, language: suggestion.language)
+    }
+
+    private func finishCommittedText(
+        _ text: String,
+        forcedLanguage: KeyboardAssociationDictionary.Language? = nil
+    ) {
+        let cleanText = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !cleanText.isEmpty else {
+            resetCompositionState()
+            refreshComposition()
+            return
+        }
+
+        let language = forcedLanguage ?? associationLanguage(for: cleanText)
+        let previousContext = associationContext
+        let previousLanguage = associationLanguage
+        learnCommittedText(cleanText)
+        clearActiveComposition()
+
+        guard let language else {
+            associationContext = ""
+            associationLanguage = nil
+            rebuildCandidateButtons()
+            return
+        }
+        let context = language == .chinese && previousLanguage == language
+            && !previousContext.isEmpty
+            ? previousContext + cleanText
+            : cleanText
+        showAssociations(context: context, language: language)
+    }
+
+    private func showAssociations(
+        context: String,
+        language: KeyboardAssociationDictionary.Language
+    ) {
+        let suggestions = associationDictionary.suggestions(
+            for: context,
+            language: language,
+            limit: 10
+        )
+        guard !suggestions.isEmpty else {
+            dismissAssociation(clearContext: true)
+            compositionLabel.text = ""
+            rebuildCandidateButtons()
+            return
+        }
+
+        associationContext = context
+        associationLanguage = language
+        currentCandidateActions = suggestions.map(CandidateAction.association)
+        currentCandidates = suggestions.map(\.text)
+        learnedCandidate = suggestions.first(where: \.isMostRecentSelection)?.text
+        isSelectingAssociation = true
+        compositionLabel.text = ""
+        rebuildCandidateButtons()
+    }
+
+    private func dismissAssociation(clearContext: Bool) {
+        if isSelectingAssociation {
+            clearActiveComposition()
+        }
+        if clearContext {
+            associationContext = ""
+            associationLanguage = nil
+        }
+    }
+
+    private func clearActiveComposition() {
+        buffer = ""
+        currentCandidates = []
+        currentCandidateActions = []
+        learnedCandidate = nil
+        pendingPunctuationSelection = nil
+        isSelectingAssociation = false
+    }
+
+    private func associationLanguage(
+        for text: String
+    ) -> KeyboardAssociationDictionary.Language? {
+        guard !text.isEmpty else { return nil }
+        if text.allSatisfy({
+            PunctuationStrategy.isChinese(String($0))
+        }) {
+            return .chinese
+        }
+        if text.allSatisfy({
+            $0.isASCII && ($0.isLetter || $0 == "'" || $0.isWhitespace)
+        }) {
+            return .english
+        }
+        return nil
+    }
+
+    private func learnCommittedText(_ text: String) {
+        guard !text.isEmpty, text.allSatisfy({
+            PunctuationStrategy.isChinese(String($0))
+        }) else {
+            learnedChineseContext = ""
+            return
+        }
+
+        for character in text {
+            let continuation = String(character)
+            if !learnedChineseContext.isEmpty {
+                associationDictionary.recordChineseSequence(
+                    context: learnedChineseContext,
+                    continuation: continuation
+                )
+            }
+            learnedChineseContext.append(character)
+            if learnedChineseContext.count > 8 {
+                learnedChineseContext.removeFirst(
+                    learnedChineseContext.count - 8
+                )
+            }
+        }
     }
 
     private func rebuildCandidateButtons() {
@@ -971,19 +1488,33 @@ final class KeyboardViewController: UIInputViewController,
 
         guard !currentCandidates.isEmpty else {
             let placeholder = UILabel()
-            placeholder.text = buffer.isEmpty ? "倉頡候選" : "沒有中文候選"
+            placeholder.text = buffer.isEmpty ? "倉頡／字典候選" : "沒有候選"
             placeholder.textColor = .secondaryLabel
             placeholder.font = .systemFont(ofSize: 16)
             candidateStackView.addArrangedSubview(placeholder)
             return
         }
 
-        for candidate in currentCandidates {
+        for (index, candidate) in currentCandidates.enumerated() {
             var configuration = UIButton.Configuration.plain()
-            configuration.title = candidate
-            configuration.baseForegroundColor = candidate == learnedCandidate
+            if let pendingPunctuationSelection {
+                configuration.title = PunctuationStrategy.displayTitle(
+                    for: candidate,
+                    punctuation: pendingPunctuationSelection.definition
+                )
+            } else {
+                configuration.title = candidate
+            }
+            let isTranslation = currentCandidateActions.indices.contains(index) && {
+                if case .translation = currentCandidateActions[index] {
+                    return true
+                }
+                return false
+            }()
+            configuration.baseForegroundColor = pendingPunctuationSelection == nil
+                && candidate == learnedCandidate
                 ? .systemBlue
-                : .label
+                : isTranslation ? .secondaryLabel : .label
             configuration.contentInsets = NSDirectionalEdgeInsets(
                 top: 5,
                 leading: 10,

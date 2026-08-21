@@ -1,0 +1,20 @@
+HybridIME bilingual dictionary data
+
+The generated cedict-index.tsv file is derived from CC-CEDICT, a community
+maintained Chinese-English dictionary published by MDBG.
+
+Source:
+https://www.mdbg.net/chinese/dictionary?page=cc-cedict
+https://cc-cedict.org/wiki/
+
+Source data version used for the current generated index:
+CC-CEDICT version 1, subversion 0
+Date: 2026-07-28T06:50:20Z
+Entries: 124725
+
+License:
+Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)
+https://creativecommons.org/licenses/by-sa/4.0/
+
+The source definitions are normalized and indexed in both directions for use
+by HybridIME. This derived index remains subject to CC BY-SA 4.0.

@@ -1,0 +1,8 @@
+Rime Essay is licensed under the GNU Lesser General Public License,
+version 3.0 (LGPL-3.0).
+
+Source:
+https://github.com/rime/rime-essay
+
+License:
+https://www.gnu.org/licenses/lgpl-3.0.html

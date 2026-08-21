@@ -19,22 +19,14 @@ struct ContentView: View {
                     instruction(
                         number: 3,
                         title: "輸入倉頡碼",
-                        detail: "點按英文字母後，從鍵盤上方的候選列直接選取中文字。Space 提交英文，Return 優先提交第一個中文候選。"
+                        detail: "點按英文字母後，從鍵盤上方的候選列直接選取中文字。已學習的智能候選會以藍色顯示，普通 Space 提交智能首選。"
+                    )
+                    instruction(
+                        number: 4,
+                        title: "輸出英文字",
+                        detail: "Shift-Space：輸出英文字，不輸出對應倉頡字。"
                     )
 
-                    Label(
-                        "此 POC 完全離線，不需要開啟「允許完整取用」。",
-                        systemImage: "lock.shield"
-                    )
-                    .font(.callout)
-                    .foregroundStyle(.secondary)
-                    .padding()
-                    .background(.quaternary, in: RoundedRectangle(cornerRadius: 12))
-
-                    Text("概念驗證版本")
-                        .font(.caption)
-                        .foregroundStyle(.tertiary)
-                        .frame(maxWidth: .infinity, alignment: .center)
                 }
                 .padding(24)
             }
@@ -49,7 +41,7 @@ struct ContentView: View {
                 .foregroundStyle(.tint)
             Text("中英混合倉頡鍵盤")
                 .font(.title2.bold())
-            Text("這個版本用來驗證 HybridIME 的基本倉頡輸入能否在 iOS Custom Keyboard Extension 運作。")
+            Text("HybridIME 是支援智能候選、英文直接輸入及 Emoji 的 iOS 倉頡鍵盤。")
                 .foregroundStyle(.secondary)
         }
     }

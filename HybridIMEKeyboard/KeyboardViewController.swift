@@ -142,6 +142,7 @@ final class KeyboardViewController: UIInputViewController,
     private let compositionLabel = UILabel()
     private let candidateArea = UIStackView()
     private let keyboardStackView = UIStackView()
+    private let rootStack = UIStackView()
 
     private lazy var emojiCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -160,14 +161,21 @@ final class KeyboardViewController: UIInputViewController,
     }()
 
     private var returnButton: UIButton?
+    private weak var spaceButton: UIButton?
     private var keyboardHeightConstraint: NSLayoutConstraint?
     private var buffer = ""
     private var currentCandidates: [String] = []
+    private var learnedCandidate: String?
     private var currentPage = KeyboardPage.letters
     private var selectedEmojiCategory = EmojiCategory.frequentlyUsed
     private var emojiCategoryButtons: [EmojiCategory: UIButton] = [:]
     private var shiftState = ShiftState.lowercased
     private var lastShiftTapTime: TimeInterval = 0
+    private var cursorGestureStartX: CGFloat = 0
+    private var cursorGestureStep = 0
+    // 游標每移動一個字元所需的水平滑動距離（pt）；數值越小越靈敏。
+    private let cursorMovementThreshold: CGFloat = 5
+    private let cursorFeedbackGenerator = UISelectionFeedbackGenerator()
 
     private let letterRows: [[String]] = [
         ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p"],
@@ -237,7 +245,8 @@ final class KeyboardViewController: UIInputViewController,
         keyboardStackView.axis = .vertical
         keyboardStackView.spacing = 7
 
-        let rootStack = UIStackView(arrangedSubviews: [candidateArea, keyboardStackView])
+        rootStack.addArrangedSubview(candidateArea)
+        rootStack.addArrangedSubview(keyboardStackView)
         rootStack.axis = .vertical
         rootStack.spacing = 7
         rootStack.translatesAutoresizingMaskIntoConstraints = false
@@ -264,6 +273,9 @@ final class KeyboardViewController: UIInputViewController,
 
         candidateArea.isHidden = currentPage == .emoji
         keyboardHeightConstraint?.constant = currentPage == .emoji ? 282 : 260
+        compositionLabel.isHidden = currentPage == .letters
+        keyboardStackView.spacing = currentPage == .letters ? 5 : 7
+        rootStack.spacing = currentPage == .letters ? 5 : 7
 
         switch currentPage {
         case .letters:
@@ -318,7 +330,9 @@ final class KeyboardViewController: UIInputViewController,
             let displayedKey = usesShift && shiftState != .lowercased
                 ? key.uppercased()
                 : key
-            let button = makeKey(title: displayedKey, role: .character)
+            let button = usesShift
+                ? makeLetterKey(letter: key, displayedLetter: displayedKey)
+                : makeKey(title: displayedKey, role: .character)
             button.addAction(
                 UIAction { [weak self] _ in
                     if usesShift {
@@ -344,7 +358,8 @@ final class KeyboardViewController: UIInputViewController,
         let shiftButton = makeIconKey(
             systemName: shiftSymbolName,
             accessibilityLabel: "Shift",
-            role: .control
+            role: .control,
+            height: 50
         )
         shiftButton.addAction(
             UIAction { [weak self] _ in self?.toggleShift() },
@@ -356,7 +371,7 @@ final class KeyboardViewController: UIInputViewController,
         var letterButtons: [UIButton] = []
         for key in letterRows[2] {
             let displayedKey = shiftState == .lowercased ? key : key.uppercased()
-            let button = makeKey(title: displayedKey, role: .character)
+            let button = makeLetterKey(letter: key, displayedLetter: displayedKey)
             button.addAction(
                 UIAction { [weak self] _ in self?.enterLetter(key) },
                 for: .touchUpInside
@@ -366,7 +381,7 @@ final class KeyboardViewController: UIInputViewController,
         }
         equalizeWidths(letterButtons)
 
-        let deleteButton = makeDeleteButton()
+        let deleteButton = makeDeleteButton(height: 50)
         deleteButton.widthAnchor.constraint(equalToConstant: 44).isActive = true
         row.addArrangedSubview(deleteButton)
         return wrap(row, horizontalInset: 0)
@@ -526,8 +541,17 @@ final class KeyboardViewController: UIInputViewController,
             UIAction { [weak self] _ in self?.commitSpace() },
             for: .touchUpInside
         )
+        let cursorGesture = UILongPressGestureRecognizer(
+            target: self,
+            action: #selector(handleSpaceCursorGesture(_:))
+        )
+        cursorGesture.minimumPressDuration = 0.35
+        cursorGesture.allowableMovement = 24
+        cursorGesture.cancelsTouchesInView = true
+        spaceButton.addGestureRecognizer(cursorGesture)
         spaceButton.widthAnchor.constraint(greaterThanOrEqualToConstant: 105).isActive = true
         row.addArrangedSubview(spaceButton)
+        self.spaceButton = spaceButton
 
         let returnButton = makeKey(
             title: returnKeyTitle,
@@ -545,11 +569,12 @@ final class KeyboardViewController: UIInputViewController,
         return wrap(row, horizontalInset: 0)
     }
 
-    private func makeDeleteButton() -> UIButton {
+    private func makeDeleteButton(height: CGFloat = 42) -> UIButton {
         let button = makeIconKey(
             systemName: "delete.left",
             accessibilityLabel: "刪除",
-            role: .control
+            role: .control,
+            height: height
         )
         button.addAction(
             UIAction { [weak self] _ in self?.deleteBackward() },
@@ -561,7 +586,8 @@ final class KeyboardViewController: UIInputViewController,
     private func makeKey(
         title: String,
         role: KeyRole,
-        fontSize: CGFloat = 21
+        fontSize: CGFloat = 21,
+        height: CGFloat = 42
     ) -> UIButton {
         var configuration = UIButton.Configuration.plain()
         configuration.title = title
@@ -579,14 +605,61 @@ final class KeyboardViewController: UIInputViewController,
         return configuredButton(
             configuration: configuration,
             normalColor: keyColor(for: role),
-            accessibilityLabel: title
+            accessibilityLabel: title,
+            height: height
         )
+    }
+
+    private func makeLetterKey(
+        letter: String,
+        displayedLetter: String
+    ) -> UIButton {
+        var configuration = UIButton.Configuration.plain()
+        configuration.contentInsets = .zero
+        configuration.background.backgroundColor = characterKeyColor
+        configuration.background.cornerRadius = 5
+
+        let root = cangjieRoots(for: letter)
+        let button = configuredButton(
+            configuration: configuration,
+            normalColor: characterKeyColor,
+            accessibilityLabel: "\(displayedLetter)，倉頡字根\(root)",
+            height: 50
+        )
+
+        let rootLabel = UILabel()
+        rootLabel.text = root
+        rootLabel.font = .systemFont(ofSize: 21, weight: .regular)
+        rootLabel.textColor = .label
+        rootLabel.textAlignment = .center
+
+        let letterLabel = UILabel()
+        letterLabel.text = displayedLetter
+        letterLabel.font = .systemFont(ofSize: 21, weight: .regular)
+        letterLabel.textColor = .secondaryLabel
+        letterLabel.textAlignment = .center
+
+        let labels = UIStackView(arrangedSubviews: [rootLabel, letterLabel])
+        labels.axis = .vertical
+        labels.alignment = .center
+        labels.spacing = -6
+        labels.isUserInteractionEnabled = false
+        labels.translatesAutoresizingMaskIntoConstraints = false
+        button.addSubview(labels)
+        NSLayoutConstraint.activate([
+            labels.centerXAnchor.constraint(equalTo: button.centerXAnchor),
+            labels.centerYAnchor.constraint(equalTo: button.centerYAnchor),
+            labels.topAnchor.constraint(greaterThanOrEqualTo: button.topAnchor, constant: 2),
+            labels.bottomAnchor.constraint(lessThanOrEqualTo: button.bottomAnchor, constant: -2),
+        ])
+        return button
     }
 
     private func makeIconKey(
         systemName: String,
         accessibilityLabel: String,
-        role: KeyRole
+        role: KeyRole,
+        height: CGFloat = 42
     ) -> UIButton {
         var configuration = UIButton.Configuration.plain()
         configuration.image = UIImage(systemName: systemName)
@@ -600,14 +673,16 @@ final class KeyboardViewController: UIInputViewController,
         return configuredButton(
             configuration: configuration,
             normalColor: keyColor(for: role),
-            accessibilityLabel: accessibilityLabel
+            accessibilityLabel: accessibilityLabel,
+            height: height
         )
     }
 
     private func configuredButton(
         configuration: UIButton.Configuration,
         normalColor: UIColor,
-        accessibilityLabel: String
+        accessibilityLabel: String,
+        height: CGFloat
     ) -> UIButton {
         let button = UIButton(configuration: configuration)
         button.accessibilityLabel = accessibilityLabel
@@ -615,7 +690,7 @@ final class KeyboardViewController: UIInputViewController,
         button.layer.shadowOpacity = 0.22
         button.layer.shadowRadius = 0.5
         button.layer.shadowOffset = CGSize(width: 0, height: 1)
-        button.heightAnchor.constraint(equalToConstant: 42).isActive = true
+        button.heightAnchor.constraint(equalToConstant: height).isActive = true
         button.configurationUpdateHandler = { button in
             guard var configuration = button.configuration else { return }
             configuration.background.backgroundColor = button.isHighlighted
@@ -650,6 +725,9 @@ final class KeyboardViewController: UIInputViewController,
     }
 
     private func switchPage(to page: KeyboardPage) {
+        if page != currentPage {
+            resetCompositionState()
+        }
         currentPage = page
         if page != .letters {
             shiftState = .lowercased
@@ -712,8 +790,8 @@ final class KeyboardViewController: UIInputViewController,
 
     private func enterLetter(_ key: String) {
         let text = shiftState == .lowercased ? key : key.uppercased()
+        textDocumentProxy.insertText(text)
         buffer.append(text)
-        updateMarkedText()
         refreshComposition()
 
         if shiftState == .uppercased {
@@ -723,70 +801,159 @@ final class KeyboardViewController: UIInputViewController,
     }
 
     private func enterSymbol(_ symbol: String) {
-        if !buffer.isEmpty {
-            commit(buffer)
-        }
+        resetCompositionState()
         textDocumentProxy.insertText(symbol)
+        refreshComposition()
     }
 
     private func deleteBackward() {
-        guard !buffer.isEmpty else {
-            textDocumentProxy.deleteBackward()
-            return
-        }
-
-        buffer.removeLast()
-        if buffer.isEmpty {
-            textDocumentProxy.setMarkedText(
-                "",
-                selectedRange: NSRange(location: 0, length: 0)
-            )
-            textDocumentProxy.unmarkText()
+        if !buffer.isEmpty,
+           textDocumentProxy.documentContextBeforeInput?.hasSuffix(buffer) == true
+        {
+            buffer.removeLast()
         } else {
-            updateMarkedText()
+            resetCompositionState()
         }
+        textDocumentProxy.deleteBackward()
         refreshComposition()
     }
 
     private func commitSpace() {
-        guard !buffer.isEmpty else {
-            textDocumentProxy.insertText(" ")
+        if shiftState != .lowercased {
+            let typedCode = buffer
+            if !typedCode.isEmpty {
+                SmartCandidateRanker.shared.replaceLearning(
+                    code: typedCode,
+                    candidate: typedCode
+                )
+            }
+            resetCompositionState()
+            if shiftState == .uppercased {
+                shiftState = .lowercased
+                rebuildKeyboard()
+            }
+            refreshComposition()
             return
         }
-        commit(buffer + " ")
-    }
-
-    private func commitReturn() {
-        if let firstCandidate = currentCandidates.first {
-            commit(firstCandidate)
-        } else if !buffer.isEmpty {
-            commit(buffer)
-        } else {
-            textDocumentProxy.insertText("\n")
+        if learnedCandidate == buffer, !buffer.isEmpty {
+            resetCompositionState()
+            textDocumentProxy.insertText(" ")
+            refreshComposition()
+            return
         }
-    }
-
-    private func commit(_ text: String) {
-        textDocumentProxy.setMarkedText(
-            text,
-            selectedRange: NSRange(location: text.utf16.count, length: 0)
-        )
-        textDocumentProxy.unmarkText()
-        buffer = ""
+        if let learnedCandidate,
+           replaceTypedCode(with: learnedCandidate)
+        {
+            return
+        }
+        resetCompositionState()
+        textDocumentProxy.insertText(" ")
         refreshComposition()
     }
 
-    private func updateMarkedText() {
-        textDocumentProxy.setMarkedText(
-            buffer,
-            selectedRange: NSRange(location: buffer.utf16.count, length: 0)
-        )
+    @objc
+    private func handleSpaceCursorGesture(_ gesture: UILongPressGestureRecognizer) {
+        guard let spaceButton = gesture.view as? UIButton else { return }
+
+        switch gesture.state {
+        case .began:
+            cursorGestureStartX = gesture.location(in: view).x
+            cursorGestureStep = 0
+            resetCompositionState()
+            refreshComposition()
+            updateSpaceButtonTitle("移動游標", accessibilityLabel: "移動游標")
+            cursorFeedbackGenerator.prepare()
+        case .changed:
+            let distance = gesture.location(in: view).x - cursorGestureStartX
+            let step = Int(distance / cursorMovementThreshold)
+            let offset = step - cursorGestureStep
+            guard offset != 0 else { return }
+            textDocumentProxy.adjustTextPosition(byCharacterOffset: offset)
+            cursorGestureStep = step
+            cursorFeedbackGenerator.selectionChanged()
+            cursorFeedbackGenerator.prepare()
+        case .ended, .cancelled, .failed:
+            cursorGestureStartX = 0
+            cursorGestureStep = 0
+            updateSpaceButtonTitle("space", accessibilityLabel: "空格")
+        default:
+            break
+        }
+
+        spaceButton.isHighlighted = gesture.state == .began || gesture.state == .changed
+    }
+
+    private func updateSpaceButtonTitle(
+        _ title: String,
+        accessibilityLabel: String
+    ) {
+        guard let spaceButton, var configuration = spaceButton.configuration else { return }
+        configuration.title = title
+        spaceButton.configuration = configuration
+        spaceButton.accessibilityLabel = accessibilityLabel
+    }
+
+    private func commitReturn() {
+        resetCompositionState()
+        textDocumentProxy.insertText("\n")
+        refreshComposition()
+    }
+
+    private func selectCandidate(_ candidate: String) {
+        let typedCode = buffer
+        if !typedCode.isEmpty {
+            SmartCandidateRanker.shared.record(
+                code: typedCode,
+                candidate: candidate
+            )
+        }
+        if candidate == typedCode {
+            resetCompositionState()
+            refreshComposition()
+            return
+        }
+        if replaceTypedCode(with: candidate) {
+            return
+        }
+        resetCompositionState()
+        textDocumentProxy.insertText(candidate)
+        refreshComposition()
+    }
+
+    private func replaceTypedCode(with replacement: String) -> Bool {
+        guard !buffer.isEmpty,
+              textDocumentProxy.documentContextBeforeInput?.hasSuffix(buffer) == true
+        else { return false }
+
+        for _ in buffer {
+            textDocumentProxy.deleteBackward()
+        }
+        resetCompositionState()
+        textDocumentProxy.insertText(replacement)
+        refreshComposition()
+        return true
+    }
+
+    private func resetCompositionState() {
+        buffer = ""
+        currentCandidates = []
+        learnedCandidate = nil
     }
 
     private func refreshComposition() {
-        currentCandidates = buffer.count <= 5
+        var candidates = buffer.count <= 5
             ? decoder.candidates(for: buffer, limit: 10)
             : []
+        let prediction = SmartCandidateRanker.shared.prediction(
+            code: buffer,
+            availableCandidates: buffer.isEmpty ? candidates : candidates + [buffer]
+        )
+        learnedCandidate = prediction?.candidate
+        if let learnedCandidate {
+            candidates.removeAll { $0 == learnedCandidate }
+            candidates.insert(learnedCandidate, at: 0)
+        }
+        currentCandidates = candidates
         let roots = cangjieRoots(for: buffer)
         compositionLabel.text = buffer.isEmpty ? "" : "\(roots)  ·  \(buffer)"
         rebuildCandidateButtons()
@@ -811,10 +978,12 @@ final class KeyboardViewController: UIInputViewController,
             return
         }
 
-        for (index, candidate) in currentCandidates.enumerated() {
+        for candidate in currentCandidates {
             var configuration = UIButton.Configuration.plain()
-            configuration.title = "\(index + 1)  \(candidate)"
-            configuration.baseForegroundColor = .label
+            configuration.title = candidate
+            configuration.baseForegroundColor = candidate == learnedCandidate
+                ? .systemBlue
+                : .label
             configuration.contentInsets = NSDirectionalEdgeInsets(
                 top: 5,
                 leading: 10,
@@ -832,7 +1001,7 @@ final class KeyboardViewController: UIInputViewController,
 
             let button = UIButton(configuration: configuration)
             button.addAction(
-                UIAction { [weak self] _ in self?.commit(candidate) },
+                UIAction { [weak self] _ in self?.selectCandidate(candidate) },
                 for: .touchUpInside
             )
             candidateStackView.addArrangedSubview(button)

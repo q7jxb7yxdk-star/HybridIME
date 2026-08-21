@@ -29,6 +29,11 @@ final class KeyboardViewController: UIInputViewController {
         let alternate: String
     }
 
+    private enum WideSymbolViewTag {
+        static let labels = 7_001
+        static let alternatePreview = 7_002
+    }
+
     private struct PendingPunctuationSelection {
         let insertedText: String
         let definition: PunctuationDefinition
@@ -567,6 +572,7 @@ final class KeyboardViewController: UIInputViewController {
         labels.spacing = -5
         labels.isUserInteractionEnabled = false
         labels.translatesAutoresizingMaskIntoConstraints = false
+        labels.tag = WideSymbolViewTag.labels
         button.addSubview(labels)
         NSLayoutConstraint.activate([
             labels.centerXAnchor.constraint(equalTo: button.centerXAnchor),
@@ -575,20 +581,74 @@ final class KeyboardViewController: UIInputViewController {
             labels.bottomAnchor.constraint(lessThanOrEqualTo: button.bottomAnchor, constant: -2),
         ])
 
-        let alternateSwipe = UISwipeGestureRecognizer(
-            target: self,
-            action: #selector(handleWideSymbolAlternateSwipe(_:))
+        installAlternateFlick(
+            on: button,
+            alternate: key.alternate
         )
-        alternateSwipe.direction = .down
-        alternateSwipe.name = key.alternate
-        button.addGestureRecognizer(alternateSwipe)
         return button
     }
 
+    private func installAlternateFlick(
+        on button: UIButton,
+        alternate: String
+    ) {
+        let previewLabel = UILabel()
+        previewLabel.text = alternate
+        previewLabel.font = .systemFont(ofSize: 21, weight: .regular)
+        previewLabel.textColor = .label
+        previewLabel.textAlignment = .center
+        previewLabel.isHidden = true
+        previewLabel.isUserInteractionEnabled = false
+        previewLabel.translatesAutoresizingMaskIntoConstraints = false
+        previewLabel.tag = WideSymbolViewTag.alternatePreview
+        button.addSubview(previewLabel)
+        NSLayoutConstraint.activate([
+            previewLabel.centerXAnchor.constraint(equalTo: button.centerXAnchor),
+            previewLabel.centerYAnchor.constraint(equalTo: button.centerYAnchor),
+        ])
+
+        let alternatePan = UIPanGestureRecognizer(
+            target: self,
+            action: #selector(handleWideSymbolAlternatePan(_:))
+        )
+        alternatePan.maximumNumberOfTouches = 1
+        alternatePan.cancelsTouchesInView = true
+        alternatePan.name = alternate
+        button.addGestureRecognizer(alternatePan)
+    }
+
     @objc
-    private func handleWideSymbolAlternateSwipe(_ gesture: UISwipeGestureRecognizer) {
-        guard gesture.state == .ended, let alternate = gesture.name else { return }
-        enterSymbol(alternate)
+    private func handleWideSymbolAlternatePan(_ gesture: UIPanGestureRecognizer) {
+        guard let button = gesture.view as? UIButton,
+              let alternate = gesture.name
+        else { return }
+
+        let translation = gesture.translation(in: button)
+        let selectsAlternate = translation.y >= 12
+            && abs(translation.y) > abs(translation.x)
+
+        switch gesture.state {
+        case .began, .changed:
+            setAlternateFlickPreview(selectsAlternate, on: button)
+        case .ended:
+            setAlternateFlickPreview(false, on: button)
+            if selectsAlternate {
+                enterSymbol(alternate)
+            }
+        case .cancelled, .failed:
+            setAlternateFlickPreview(false, on: button)
+        default:
+            break
+        }
+    }
+
+    private func setAlternateFlickPreview(
+        _ isActive: Bool,
+        on button: UIButton
+    ) {
+        button.viewWithTag(WideSymbolViewTag.labels)?.isHidden = isActive
+        button.viewWithTag(WideSymbolViewTag.alternatePreview)?.isHidden = !isActive
+        button.isHighlighted = isActive
     }
 
     private func makeWidePunctuationButton(
@@ -622,7 +682,7 @@ final class KeyboardViewController: UIInputViewController {
         let button = configuredButton(
             configuration: configuration,
             normalColor: characterKeyColor,
-            accessibilityLabel: "\(key)，Shift 輸入\(alternateKey)",
+            accessibilityLabel: "\(key)，向下滑動或 Shift 輸入\(alternateKey)",
             height: 42
         )
         button.addAction(
@@ -648,6 +708,7 @@ final class KeyboardViewController: UIInputViewController {
         labels.spacing = -5
         labels.isUserInteractionEnabled = false
         labels.translatesAutoresizingMaskIntoConstraints = false
+        labels.tag = WideSymbolViewTag.labels
         button.addSubview(labels)
         NSLayoutConstraint.activate([
             labels.centerXAnchor.constraint(equalTo: button.centerXAnchor),
@@ -655,6 +716,11 @@ final class KeyboardViewController: UIInputViewController {
             labels.topAnchor.constraint(greaterThanOrEqualTo: button.topAnchor, constant: 2),
             labels.bottomAnchor.constraint(lessThanOrEqualTo: button.bottomAnchor, constant: -2),
         ])
+
+        installAlternateFlick(
+            on: button,
+            alternate: alternateKey
+        )
         return button
     }
 

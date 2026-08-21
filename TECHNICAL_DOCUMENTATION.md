@@ -180,6 +180,12 @@ All table and column names passed into SQL helpers are internal constants. User-
 
 The iOS controller reads `needsInputModeSwitchKey` when loaded and as text／layout state changes. When true, it builds a Globe button targeted at `handleInputModeList(from:with:)` for all touch events; this lets iOS handle both advancing and the long-press list of enabled keyboards. The Emoji catalog, search placeholder and Emoji page are not part of the current keyboard UI.
 
+### iOS layout modes and alternate symbols
+
+`KeyboardViewController` selects `wideIPad` after layout when the device is an iPad, the horizontal size class is regular and the keyboard view is at least 700 points wide; otherwise it uses `compact`. The initial pre-layout choice accepts any non-compact iPad horizontal size class, then `viewWillLayoutSubviews()` reconciles it against the final width. Wide mode uses a 353-point keyboard height, equal row distribution and fixed 11-slot rows; compact mode uses 260 points. Wide letter rows place Delete on the first row, Return on the second, and Shift on both ends of the third row with comma and period punctuation controls.
+
+Wide number mode presents stacked primary／alternate pairs: `@／¥`, `#／€`, `$／£`, `&／_`, `*／^`, `(／[`, `)／]`, `'／{`, `"／}`, `%／§`, `-／|`, `+／~`, `=／…`, `/／\\`, `;／<`, `:／>`, `,／!` and `.／?`. A one-touch pan selects the alternate only when downward translation reaches 12 points and is greater than horizontal translation. While selected, the stacked labels are hidden, a centered alternate preview is shown and the key is highlighted; ending commits the alternate, while cancellation restores the normal labels. Primary keys `@`, `#`, `$`, `&`, `(`, `)`, `'`, `"` and `/` use zero stack spacing and edge inset; the remaining pairs use -5-point stack spacing and 2-point edge insets. The wide letter punctuation controls also expose `!` and `?` as downward-flick alternates for comma and period.
+
 ## 6. Data Models and State Management
 
 Important transient state includes buffer text, candidate action arrays, selected association context, punctuation replacement metadata and most-recent prediction. Both controllers confine UI state to the main actor／platform main thread.
@@ -260,6 +266,8 @@ No unofficial runtime endpoint is called. External URLs in notices identify data
 | `HybridIMEKeyboard` | keyboard extension | `com.sunny.inputmethod.hybridime.ios.keyboard` | iOS 26.0 | 1.2.0 (build 20260821) |
 
 All targets set Swift language version 5.0. The project has no `.xcconfig`, `.swift-version`, `.xcode-version`, CI matrix or package lockfile. Metadata records Xcode 26.5／26.6 creation or upgrade, but that is not a formal minimum-Xcode declaration.
+
+Both iOS products target device families `1,2` (iPhone and iPad) and use the iPhoneOS SDK. The `HybridIMEiOS` host explicitly limits `SUPPORTED_PLATFORMS` to `iphoneos iphonesimulator` and disables Mac Catalyst, Designed for iPhone／iPad on Mac, and Designed for iPhone／iPad on visionOS. These four platform restrictions are host-target settings; the keyboard extension does not repeat them in its target build settings.
 
 ### macOS Info.plist and entitlements
 
@@ -363,6 +371,8 @@ This section records commands actually executed during the documentation task th
 - The unsigned generic iOS Simulator Debug build passed for `HybridIMEiOS` and its `HybridIMEKeyboard` dependency. Both products report version 1.2.0; the embedded extension contains the Cangjie TSV, notices and schema-version-1 SQLite with `integrity_check=ok`.
 - `git diff --check`, plist／entitlement lint and Markdown code-fence checks passed after the documentation edits.
 
+For the 2026-08-22 documentation refresh at HEAD `56fcaa7`, an unsigned generic iOS Simulator Debug build again passed for `HybridIMEiOS` and `HybridIMEKeyboard`, compiling both arm64 and x86_64 slices. This is compile／bundle validation only; no Simulator keyboard activation or gesture interaction was performed.
+
 ### Externally unverified
 
 - Installed macOS InputMethodKit registration, endpoint and real text entry.
@@ -381,6 +391,7 @@ This section records commands actually executed during the documentation task th
 - macOS resource preload has no readiness state, progress UI or retry.
 - iOS replacement depends on host context and immediate insert/delete behavior rather than marked-text composition.
 - iOS conditionally builds its Globe key from `needsInputModeSwitchKey` and delegates switching／long-press selection to `handleInputModeList(from:with:)`; device behavior across widths, orientations and enabled-keyboard combinations remains unverified.
+- iPad wide-layout switching at the 700-point boundary, its 11-slot geometry, stacked symbol labels and the 12-point alternate-flick preview／commit interaction remain visually and behaviorally unverified in Simulator and on device.
 - iOS vertical cursor fallback estimates ten characters per line and cannot know visual wrapping.
 - No settings UI clears learning data; record cardinality has no global bound or pruning policy.
 - SQLite execution errors are mostly silent and there are no migrations beyond initial schema creation.

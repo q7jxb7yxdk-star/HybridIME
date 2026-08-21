@@ -6,11 +6,64 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		9655A7F73037E00D0045C799 /* HybridIMEKeyboard.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 9655A7F03037E00D0045C799 /* HybridIMEKeyboard.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		9655A7F53037E00D0045C799 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 96BFC1772FDBF84200364389 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 9655A7EF3037E00D0045C799;
+			remoteInfo = HybridIMEKeyboard;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		9655A7FC3037E00D0045C799 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				9655A7F73037E00D0045C799 /* HybridIMEKeyboard.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		9655A7E13037DFDA0045C799 /* HybridIMEiOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HybridIMEiOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		9655A7F03037E00D0045C799 /* HybridIMEKeyboard.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = HybridIMEKeyboard.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		96BFC17F2FDBF84200364389 /* HybridIME.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HybridIME.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		9655A7F83037E00D0045C799 /* Exceptions for "HybridIMEKeyboard" folder in "HybridIMEKeyboard" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 9655A7EF3037E00D0045C799 /* HybridIMEKeyboard */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		9655A7E23037DFDA0045C799 /* HybridIMEiOS */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = HybridIMEiOS;
+			sourceTree = "<group>";
+		};
+		9655A7F13037E00D0045C799 /* HybridIMEKeyboard */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				9655A7F83037E00D0045C799 /* Exceptions for "HybridIMEKeyboard" folder in "HybridIMEKeyboard" target */,
+			);
+			path = HybridIMEKeyboard;
+			sourceTree = "<group>";
+		};
 		96BFC1812FDBF84200364389 /* HybridIME */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = HybridIME;
@@ -19,6 +72,20 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		9655A7DE3037DFDA0045C799 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9655A7ED3037E00D0045C799 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		96BFC17C2FDBF84200364389 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -33,6 +100,8 @@
 			isa = PBXGroup;
 			children = (
 				96BFC1812FDBF84200364389 /* HybridIME */,
+				9655A7E23037DFDA0045C799 /* HybridIMEiOS */,
+				9655A7F13037E00D0045C799 /* HybridIMEKeyboard */,
 				96BFC1802FDBF84200364389 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -41,6 +110,8 @@
 			isa = PBXGroup;
 			children = (
 				96BFC17F2FDBF84200364389 /* HybridIME.app */,
+				9655A7E13037DFDA0045C799 /* HybridIMEiOS.app */,
+				9655A7F03037E00D0045C799 /* HybridIMEKeyboard.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -48,6 +119,52 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		9655A7E03037DFDA0045C799 /* HybridIMEiOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9655A7EB3037DFDB0045C799 /* Build configuration list for PBXNativeTarget "HybridIMEiOS" */;
+			buildPhases = (
+				9655A7DD3037DFDA0045C799 /* Sources */,
+				9655A7DE3037DFDA0045C799 /* Frameworks */,
+				9655A7DF3037DFDA0045C799 /* Resources */,
+				9655A7FC3037E00D0045C799 /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				9655A7F63037E00D0045C799 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				9655A7E23037DFDA0045C799 /* HybridIMEiOS */,
+			);
+			name = HybridIMEiOS;
+			packageProductDependencies = (
+			);
+			productName = HybridIMEiOS;
+			productReference = 9655A7E13037DFDA0045C799 /* HybridIMEiOS.app */;
+			productType = "com.apple.product-type.application";
+		};
+		9655A7EF3037E00D0045C799 /* HybridIMEKeyboard */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9655A7F93037E00D0045C799 /* Build configuration list for PBXNativeTarget "HybridIMEKeyboard" */;
+			buildPhases = (
+				9655A7EC3037E00D0045C799 /* Sources */,
+				9655A7ED3037E00D0045C799 /* Frameworks */,
+				9655A7EE3037E00D0045C799 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				9655A7F13037E00D0045C799 /* HybridIMEKeyboard */,
+			);
+			name = HybridIMEKeyboard;
+			packageProductDependencies = (
+			);
+			productName = HybridIMEKeyboard;
+			productReference = 9655A7F03037E00D0045C799 /* HybridIMEKeyboard.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		96BFC17E2FDBF84200364389 /* HybridIME */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 96BFC18A2FDBF84300364389 /* Build configuration list for PBXNativeTarget "HybridIME" */;
@@ -77,9 +194,15 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 2650;
+				LastSwiftUpdateCheck = 2660;
 				LastUpgradeCheck = 2660;
 				TargetAttributes = {
+					9655A7E03037DFDA0045C799 = {
+						CreatedOnToolsVersion = 26.6;
+					};
+					9655A7EF3037E00D0045C799 = {
+						CreatedOnToolsVersion = 26.6;
+					};
 					96BFC17E2FDBF84200364389 = {
 						CreatedOnToolsVersion = 26.5;
 					};
@@ -101,11 +224,27 @@
 			projectRoot = "";
 			targets = (
 				96BFC17E2FDBF84200364389 /* HybridIME */,
+				9655A7E03037DFDA0045C799 /* HybridIMEiOS */,
+				9655A7EF3037E00D0045C799 /* HybridIMEKeyboard */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		9655A7DF3037DFDA0045C799 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9655A7EE3037E00D0045C799 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		96BFC17D2FDBF84200364389 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -116,6 +255,20 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		9655A7DD3037DFDA0045C799 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9655A7EC3037E00D0045C799 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		96BFC17B2FDBF84200364389 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -125,7 +278,149 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		9655A7F63037E00D0045C799 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 9655A7EF3037E00D0045C799 /* HybridIMEKeyboard */;
+			targetProxy = 9655A7F53037E00D0045C799 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		9655A7E93037DFDB0045C799 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 20260821;
+				DEVELOPMENT_TEAM = WX793X49GJ;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "中英混合輸入法";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.1.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.sunny.inputmethod.hybridime.ios;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		9655A7EA3037DFDB0045C799 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 20260821;
+				DEVELOPMENT_TEAM = WX793X49GJ;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "中英混合輸入法";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.1.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.sunny.inputmethod.hybridime.ios;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		9655A7FA3037E00D0045C799 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 20260821;
+				DEVELOPMENT_TEAM = WX793X49GJ;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = HybridIMEKeyboard/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = HybridIMEKeyboard;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.1.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.sunny.inputmethod.hybridime.ios.keyboard;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		9655A7FB3037E00D0045C799 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 20260821;
+				DEVELOPMENT_TEAM = WX793X49GJ;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = HybridIMEKeyboard/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = HybridIMEKeyboard;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.1.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.sunny.inputmethod.hybridime.ios.keyboard;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 		96BFC1882FDBF84300364389 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -328,6 +623,24 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		9655A7EB3037DFDB0045C799 /* Build configuration list for PBXNativeTarget "HybridIMEiOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9655A7E93037DFDB0045C799 /* Debug */,
+				9655A7EA3037DFDB0045C799 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		9655A7F93037E00D0045C799 /* Build configuration list for PBXNativeTarget "HybridIMEKeyboard" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9655A7FA3037E00D0045C799 /* Debug */,
+				9655A7FB3037E00D0045C799 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		96BFC17A2FDBF84200364389 /* Build configuration list for PBXProject "HybridIME" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

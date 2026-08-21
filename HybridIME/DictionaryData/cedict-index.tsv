@@ -273,6 +273,7 @@ e	a detailed list	明細表
 e	a devastating criticism	誅心之論
 e	a developable surface	可展曲面
 e	a diagonal	對角線
+e	a diamond	金剛鑽
 e	a different matter	別論
 e	a digest	選錄
 e	a digital scan	數碼掃描
@@ -552,7 +553,6 @@ e	a law	律條
 e	a law unto oneself	獨斷專行	獨斷獨行
 e	a laxative	通便劑
 e	a lazybones	懶貓
-e	a leading light	當世之冠	當世冠
 e	a leak	漏洩
 e	a leap forward	躍進
 e	a learned person	腹笥便便
@@ -710,7 +710,6 @@ e	a mute	啞子	啞巴
 e	a nap	覺
 e	a narrow bed	臥榻
 e	a narrow escape	天幸
-e	a narrow gap	少間
 e	a narrow slit window	弦月窗
 e	a narrow street	夾道
 e	a nation's power	國力
@@ -722,6 +721,7 @@ e	a network computer game	聯機遊戲
 e	a new shift	瓜代
 e	a new year begins	一元復始
 e	a news service	通訊社
+e	a news tip	報料
 e	a night march	夜行軍
 e	a noble steed	驁
 e	a nobody	小人物	小卒	平庸之輩	無名小卒
@@ -816,6 +816,7 @@ e	a polypus	瘜
 e	a popular wave	熱捧
 e	a portable lamp	提燈
 e	a possession	所有物
+e	a post on x	推文
 e	a posteriori	後天
 e	a pot of porridge	一鍋粥
 e	a potpourri	雜集
@@ -990,7 +991,7 @@ e	a shore	橕
 e	a short moment	拈指	食頃
 e	a short person	矮個兒
 e	a short time	一時半晌	一時半會	一時半霎	一陣子	片時
-e	a short while	少刻	少間	歇	頃
+e	a short while	少刻	歇	頃
 e	a short while ago	頃者
 e	a short-barreled mortar	虎蹲砲
 e	a short-term loan	通融
@@ -1013,7 +1014,6 @@ e	a sketch	草圖
 e	a skill	一手
 e	a slandering toady	讒佞	讒諂
 e	a sleep	覺
-e	a sleeping compartment	臥房
 e	a sleeve valve	筒閥
 e	a slice	片
 e	a sliced ball	斜射球
@@ -1470,6 +1470,7 @@ e	absolute temperature	絕對溫度
 e	absolute value	絕對值
 e	absolute zero	絕對零度
 e	absolutely	十分	斷	斷然	根本	渾然	百分之百	絕	絕然
+e	absolutely amazing	絕絕子
 e	absolutely continuous	絕對連續
 e	absolutely empty	空空蕩蕩
 e	absolutely necessary	必不可少
@@ -1477,7 +1478,7 @@ e	absolutely not	絕非
 e	absolutely quiet	悄然無聲
 e	absolutely reliant on	端賴
 e	absolutely safe	萬全
-e	absolutely still	文風不動	紋風不動
+e	absolutely still	紋風不動
 e	absolutely true	千真萬確
 e	absolutely unrestrained	肆無忌憚
 e	absolutism	專制主義
@@ -1549,12 +1550,12 @@ e	abyssal rock	深成岩
 e	abyssinian	阿比西尼亞人
 e	acacia	金合歡
 e	acacia gum	阿拉伯膠
-e	academia	學界	學術界	教育界
+e	academia	學界	教育界
 e	academia sinica	中研院
 e	academic	學術
 e	academic advisor	導師
 e	academic atmosphere	學風
-e	academic circles	學界	學術界	教育界
+e	academic circles	學界	教育界
 e	academic degree	學位
 e	academic degree honoris causa	名譽學位
 e	academic discipline	學科	學門
@@ -1567,7 +1568,7 @@ e	academic success	學業有成
 e	academic title	學銜	授銜
 e	academic world	學界	教育界
 e	academic year	學年
-e	academician	學會院士	院士
+e	academician	學會院士
 e	academism	學院派
 e	academy	學園	專科院校	研究院	院校
 e	academy of classical learning	書院
@@ -1744,7 +1745,7 @@ e	accuse	參劾	彈	彈糾	指控	控	控訴	攻	攻擊	歸咎	舉發
 e	accuse and criticize	彈斥
 e	accuse falsely	誣	誣告	誣賴
 e	accuse the victim	反污
-e	accuse unjustly	攀誣	讕言	讕調
+e	accuse unjustly	攀誣	讕言
 e	accuse wrongly	冤枉
 e	accustomed to	忕	慣	狃	習以為常
 e	ace	么點
@@ -1794,7 +1795,6 @@ e	acid rain	酸雨
 e	acid reflux	反酸
 e	acid salt	酸式鹽
 e	acid-resistant	耐酸
-e	acidamide	酰胺
 e	acidity	酸性
 e	acipenser micadoi	鱣
 e	acipenser sturio	鱘
@@ -1839,6 +1839,7 @@ e	acrimony	刻薄
 e	acrobat	雜技演員
 e	acrobatic display	解
 e	acrobatics	雜戲	雜技
+e	acromion	肩峰
 e	acronym	縮略語	縮語	首字母縮寫
 e	acropolis	衛城	雅典衛城
 e	across	對過	橫
@@ -1872,7 +1873,6 @@ e	act brilliantly	演活
 e	act condescending	神氣活現
 e	act contrary to	佷
 e	act cool	扮酷
-e	act coquettishly	撒嬌
 e	act cute	裝可愛	裝萌	賣萌
 e	act discourteously	失禮
 e	act dumb	耍賴
@@ -2044,6 +2044,7 @@ e	added-value	附加值
 e	addendum	後附	續增	補遺	追加
 e	adder	黃頷蛇
 e	adderall	阿得拉	阿得拉爾
+e	addict	癮君子
 e	addicted to	溺
 e	addicted to liquor	酖
 e	addiction	成癮	痼癖	癮	癮頭
@@ -2100,6 +2101,7 @@ e	adherent of religion	宗教徒
 e	adherent to a religion	教民
 e	adhesion	沾黏	粘連	黏著力
 e	adhesive bandage	橡皮膏
+e	adhesive breast covering	胸貼
 e	adhesive capsulitis	五十肩	肩周炎
 e	adhesive force	黏著力	黏附力
 e	adhesive plaster	膠布
@@ -3035,7 +3037,7 @@ e	allotropy	同素異形體
 e	allotted exhibit area	展位
 e	allotted share	份兒
 e	allotted time	期限
-e	allow	任	任令	任憑	任由	任聽	任隨	允	允許	准	准許
+e	allow	任	任令	任憑	任由	任聽	任隨	允	准	准許	容
 e	allow for	備抵	酌量
 e	allow no explanation	不由分說
 e	allow to fly	放飛
@@ -3733,7 +3735,6 @@ e	and yet	又
 e	andaman islands	安達曼島	安達曼群島
 e	andaman sea	安達曼海
 e	andante	行板
-e	andaz	安達仕
 e	andes mountains	安地斯	安第斯山脈
 e	andesite	安山岩
 e	andingmen neighborhood of beijing	安定門
@@ -4039,7 +4040,7 @@ e	anti-cancer	抗癌
 e	anti-cheating	防弊
 e	anti-chinese	反華	排華
 e	anti-christ	反基督
-e	anti-communist	反共	白	白色
+e	anti-communist	反共	白色
 e	anti-contraband	反走私
 e	anti-corrosion	防腐
 e	anti-corruption	反腐	反貪	反貪腐
@@ -4427,6 +4428,7 @@ e	aquatic motion	水上運動
 e	aquatic plants	水草
 e	aquatic product	水產
 e	aquatic products	水產品
+e	aqueduct	渡槽
 e	aqueous	水性
 e	aqueous humor	眼房水
 e	aqueous solution	水相
@@ -4533,7 +4535,6 @@ e	ardisia villosa	矮腳羅傘
 e	ardor	熱忱
 e	arduous	吃重	浩繁	繁重	艱苦	艱辛	辛苦
 e	arduous and unrewarding undertaking	苦差
-e	arduous effort	苦戰
 e	arduous task	苦事
 e	arduousness	艱巨性
 e	are	公畝
@@ -4711,6 +4712,7 @@ e	arrange	侖	備下	列	安排	布下	打兌	扦	接洽	措	措置
 e	arrange a deal	說合
 e	arrange an interview	約見
 e	arrange for	安置	安頓
+e	arrange in advance	預定
 e	arrange in order	排列	排序	排放	排班	編列
 e	arrange in pairs	搭	搭配
 e	arrange matters	操辦
@@ -5525,6 +5527,7 @@ e	audi	奧迪
 e	audibility threshold	聽閾
 e	audience	會眾	聽眾	觀客	閱聽人
 e	audience hall	聽事
+e	audience seating area	觀眾席
 e	audio	語音	音頻
 e	audio and video	音像
 e	audio channel	聲道
@@ -5602,6 +5605,7 @@ e	austrian school	奧派
 e	austronesian	南島
 e	autarky	自給自足
 e	authentic	作準	地地道道	地道	正兒八板	正宗	真確	真跡	確有其事	確鑿	道地
+e	authentic piece	真品
 e	authentic taste	原味
 e	authentic tradition	真傳
 e	authenticate	認明	認證	驗證
@@ -5706,6 +5710,7 @@ e	auxiliary word	語助詞
 e	auxin	生長素
 e	avail oneself of	乘	趁	趕
 e	available	可選	資用	齊備
+e	available for purchase	在售
 e	available item	現貨
 e	avalanche	走山	雪崩
 e	avant-garde	先鋒派	前衛	另類
@@ -5799,7 +5804,7 @@ e	awe-inspiring manner	威儀
 e	awe-inspiring presence	威風凜凜
 e	awe-inspiringly	赫然
 e	awed	肅然
-e	awesome	倍兒棒	勁爆	屌爆	帥呆了	板扎	棒棒噠	正點	波瀾老成	炫	炫酷
+e	awesome	倍兒棒	勁爆	屌爆	帥呆了	板扎	棒棒噠	正點	波瀾老成	炫酷	牛
 e	awestruck and fearful	夔夔
 e	awful	可怕	陰間
 e	awful weather	鬼天氣
@@ -5842,7 +5847,7 @@ e	azerbaijan	亞塞拜然	阿塞拜疆
 e	azetidine	吖丁啶
 e	azimuth	方位	方位角
 e	azithromycin	阿奇黴素
-e	azoic dyes	冰染染料
+e	azoic dye	冰染染料
 e	azole	唑
 e	azoospermia	無精症
 e	azor	亞所
@@ -6327,6 +6332,7 @@ e	bankruptcy	破產
 e	banks	班克斯
 e	banksy	班克斯	班克西
 e	banned book	禁書
+e	banned movie	禁片
 e	banner	大旗	幡	徽幟	斾	旌	旌旗	旐	旗	旗子	旗幅
 e	banner advertisement	廣告條幅	條幅廣告
 e	banner registration	旗籍
@@ -6397,7 +6403,6 @@ e	bare hill	屼
 e	bare one shoulder	偏袒
 e	bare one's arms	攘臂
 e	bare one's chest	光膀子	打赤膊
-e	bare one's fangs	齜牙咧嘴
 e	bare one's teeth	齜牙
 e	bare pillow	枕心
 e	bare rock	裸岩
@@ -6482,7 +6487,6 @@ e	barter	以物易物	物物交換
 e	barth or barthes	巴特
 e	bartholomew	巴爾多祿茂
 e	baruch	巴錄
-e	barycenter	質心
 e	baryon	重子
 e	bas-relief	淺浮雕
 e	basa	巴沙魚
@@ -6789,6 +6793,7 @@ e	be awake	醒
 e	be aware	憬然	知	覺察
 e	be away from	離
 e	be awfully	不可開交
+e	be backed by	背靠
 e	be baffled	一頭霧水	奇怪
 e	be balding	歇頂
 e	be baptized	受浸	領洗
@@ -6981,11 +6986,9 @@ e	be enchanted by	迷戀
 e	be engaged in	務
 e	be engrossed	沉迷
 e	be enraged	著惱
-e	be enthralled	入神
 e	be entirely different	涇渭分明
 e	be entitled	有資格
 e	be entitled to	有權
-e	be entranced	入神
 e	be entrenched	固守
 e	be entrusted	受託
 e	be entrusted with	託
@@ -7413,7 +7416,7 @@ e	be steeped in	沾濕
 e	be stifling	燻蒸
 e	be still angry	餘怒未息
 e	be stingy	摳腳
-e	be stranded	擱淺	流落
+e	be stranded	流落
 e	be stringed together	貫
 e	be strong in	健
 e	be struck by	中
@@ -7926,7 +7929,7 @@ e	beggar	丐	乞丐	乞人	乞兒	化子	叫花子	花子
 e	beggars' union	丐幫
 e	beggarticks	鬼針	鬼針草
 e	begging for magnanimity	請求寬恕
-e	begin	俶	入手	始	昉	興辦	謖	開場	開始	開學	開演
+e	begin	俶	入手	始	昉	興辦	謖	開場	開學	開演
 e	begin a lecture	開講
 e	begin abruptly	大作
 e	begin an exam	開考
@@ -7938,7 +7941,7 @@ e	begin to shine	朏
 e	begin to stir	蠢蠢欲動
 e	begin work	開工
 e	beginner	小學生	菜鳥
-e	beginning	伊始	朔	權輿	發軔	起頭	開始	開端	開頭	開首
+e	beginning	伊始	朔	權輿	發軔	起頭	開端	開頭	開首
 e	beginning and end	起訖
 e	beginning of a decade	年代初
 e	beginning of a year	開年
@@ -8224,6 +8227,7 @@ e	best friends	死黨
 e	best man	儐	男儐相
 e	best of its kind	尖子
 e	best of the bunch	精選
+e	best of three	三局兩勝
 e	best pal	麻吉
 e	best part	戲眼
 e	best policy	上上之策	善策
@@ -8234,7 +8238,6 @@ e	best-seller	搶手貨	暢銷書
 e	best-selling book	暢銷書
 e	bestial	獸
 e	bestiality	獸交	獸姦	獸行
-e	bestie	閨蜜
 e	bestir oneself	振作
 e	bestow	恩賜	打發	欽賜	貺	賚	賞	賦予	錫
 e	bestow a reward	賞賜
@@ -8252,7 +8255,7 @@ e	beta-lactamase	內酰胺酶
 e	betel	茇	萎葉	蒟
 e	bethlehem	伯利恆
 e	betoken	預示
-e	betray	叛	叛變	叛賣	叛離	背叛	貳	賣	辜負	逆	露
+e	betray	叛	叛變	叛賣	叛離	背叛	貳	賣	逆	露
 e	betray one's country	賣國
 e	betray one's party	叛黨
 e	betray oneself	顯形
@@ -8460,7 +8463,6 @@ e	billiards table	台球桌
 e	billion	兆	秭
 e	billionaire	億萬富翁	富翁
 e	billow	大浪
-e	billowing smoke	烏煙瘴氣
 e	billows	波瀾	浪濤	湧浪
 e	billy goat	羝
 e	bimaculated lark	二斑百靈
@@ -8557,7 +8559,7 @@ e	bipinnate leaf	羽狀複葉
 e	biplane	雙翼飛機
 e	bipod	兩腳架	雙腳架
 e	bipolar	二元	雙極
-e	bipolar disorder	躁鬱症
+e	bipolar disorder	躁鬱症	雙相障礙
 e	birch	樺	樺木	樺樹
 e	birch-leaved pear	棠梨
 e	birchleaf pear	杜
@@ -8606,10 +8608,9 @@ e	birth permit	准生證
 e	birth rate	出生率	生育率
 e	birthday	壽	壽誕	壽辰	母難日	生日	生辰	破殼日	華誕	誕	誕辰
 e	birthday banquet	壽筵
-e	birthday boy	小壽星
 e	birthday cake	壽糕
 e	birthday card	生日卡	生日賀卡
-e	birthday girl	小壽星
+e	birthday gift	生日禮物
 e	birthday noodles	壽麵
 e	birthday of reigning emperor	聖誕
 e	birthday peach bun	壽桃包
@@ -8673,7 +8674,6 @@ e	bitter orange	枳殼
 e	bitter quarrel	仇隙
 e	bitter remarks	冷話
 e	bitter smile	慘笑
-e	bitter struggle	苦戰
 e	bitter sweet	苦甘
 e	bitter taste	苦味
 e	bitter taste in wine	醰
@@ -8742,6 +8742,7 @@ e	black hawk	黑鷹
 e	black henbane	莨菪
 e	black hole	黑洞
 e	black horse	騏	驔	驪
+e	black humor	黑色幽默
 e	black jade	㺵	玖
 e	black kite	黑鳶
 e	black lark	黑百靈
@@ -8776,6 +8777,7 @@ e	black swan event	黑天鵝事件
 e	black tea	紅茶
 e	black tern	黑浮鷗
 e	black tortoise	玄武
+e	black truffle	黑松露
 e	black woodpecker	黑啄木鳥
 e	black-backed dwarf kingfisher	三趾翠鳥
 e	black-backed forktail	黑背燕尾
@@ -8879,7 +8881,7 @@ e	bland	寡淡
 e	blanford's rosefinch	赤朱雀
 e	blanford's snowfinch	棕背雪雀
 e	blang ethnic group	布朗	布朗族
-e	blank	坯	坯件	愣	無表情	白	空格
+e	blank	坯	坯件	愣	無表情	空格
 e	blank check	空白支票
 e	blank exam paper	白卷
 e	blank slate	白板
@@ -8999,8 +9001,8 @@ e	blockhead	傻叉	傻大個	檮	笨瓜	蠢貨
 e	blocking	閉塞
 e	bloemfontein	布隆方丹
 e	blog	博	網絡日記	網誌	部落格
-e	blog article	博文
 e	blog drama	博客話劇
+e	blog post	博文
 e	blog writer	博客寫手
 e	blogger	博主	博客寫手	部落客
 e	blogosphere	博客圈
@@ -9055,7 +9057,6 @@ e	blood vengeance	血親復仇
 e	blood vessels	血脈
 e	blood vessels swell wide	血脈僨張
 e	blood-curdling screech	慘叫
-e	blood-soaked	浴血
 e	bloodbath	血流成河
 e	bloodline	血氣	血緣
 e	bloodshed	血刃
@@ -9221,7 +9222,7 @@ e	boarding formalities	登機手續
 e	boarding gate	登機入口	登機橋	登機門	閘口
 e	boarding pass	登機牌	登機證
 e	boarding school	寄宿學校
-e	boast	伐	侃	侘	吹	吹擂	吹牛皮	哃	嗙	大言	炫
+e	boast	伐	侃	侘	吹	吹擂	吹牛皮	哃	嗙	大言	瞎吹
 e	boast and flatter	吹吹拍拍
 e	boast loudly	咋呼
 e	boast one's merits	逞能
@@ -9271,7 +9272,7 @@ e	body and soul	形神
 e	body armor and helmet	盔甲
 e	body bag	屍體袋
 e	body cavity	體腔
-e	body double	替身	裸替	飯替
+e	body double	裸替	飯替
 e	body fat	體脂
 e	body hair	體毛
 e	body language	肢體語言
@@ -9612,7 +9613,7 @@ e	bosom buddies	莫逆之交
 e	bosom friend	良知
 e	boson	玻色子
 e	bosphorus	博斯普魯斯	波斯普魯斯	波斯普魯斯海峽
-e	boss	一把手	上司	大拿	大頭目	東家	老大	老總	老闆	頭	頭子
+e	boss	一把手	上司	大拿	大頭目	東家	老大	老總	頭	頭子	頭家
 e	boss people around	發號施令
 e	boss's son	小開	少東	少東家
 e	boss's wife	老闆娘
@@ -9871,8 +9872,8 @@ e	brake pedal	制動踏板
 e	bramble	樹莓	藟
 e	brambles	荊棘
 e	brambling	燕雀
-e	bran	䅵	米糠	麩	麩皮
-e	branch	丫	分店	分所	分支	分會	分枝	分部	專科	支	支公司
+e	bran	䅵	麩	麩皮
+e	branch	丫	分店	分所	分支	分會	分枝	分號	分部	專科	支
 e	branch and leaf	枝葉
 e	branch line	支線
 e	branch of a school	分校
@@ -10011,7 +10012,7 @@ e	break with	破
 e	break with sb	絕交
 e	break-even point	收支平衡點
 e	breakbone fever	骨痛熱症
-e	breakdown	分列	崩壞	摰	故障	細數
+e	breakdown	分列	崩壞	摰	故障
 e	breaker	浪
 e	breakfast	早飯	早餐	早點	饔
 e	breaking	破缺
@@ -10075,7 +10076,7 @@ e	breeding	孵	孵化	育種	選育
 e	breeding egg	種蛋
 e	breeding ground	溫床
 e	breeding like flies	層出不窮
-e	breeding season	發情期	配種季節
+e	breeding season	發情期
 e	breeding stock	種畜
 e	breeze	和風	微風	輕風
 e	bremen	不來梅	不萊梅
@@ -10588,7 +10589,6 @@ e	buffeted	挨揍
 e	buffoon	丑角	活寶
 e	buffoonery	插科打諢
 e	buffy laughingthrush	棕噪鶥
-e	bufo vulgaris	蜍
 e	bug	故障	竊聽器	蟲子
 e	bugatti	布加迪
 e	buggery	男風
@@ -10828,7 +10828,6 @@ e	bus station	公共汽車站	汽車站
 e	bus stop	停站	停車站	公共汽車站	巴士站	汽車站	車站
 e	bus transport	汽運
 e	bush	布什	灌木	矮樹
-e	bush fire	野火
 e	bushel	蒲式耳
 e	bushman	布須曼人
 e	bushy and weedy	榛蕪
@@ -10856,7 +10855,6 @@ e	business newspaper	商報
 e	business opportunity	商機
 e	business plan	商業計劃
 e	business profit	利市
-e	business proprietor	老闆
 e	business school	商學院	商科院校
 e	business sense	生意經
 e	business studies	商學	商科
@@ -10901,7 +10899,7 @@ e	butler	男管家
 e	butt	夆	屁股	牴	腚	臀部	觝
 e	butt against	踤
 e	butt cheek	屁股蛋
-e	butt crack	股溝
+e	butt crack	溝子	股溝
 e	butt end of spear	鐏
 e	butt in	打橫炮	插口	插嘴	湊熱鬧
 e	butt of a gun	槍托	槍把兒
@@ -11139,6 +11137,7 @@ e	calcined gypsum	煅石膏	熟石膏
 e	calcite	方解石
 e	calcitonin	降血鈣素
 e	calcium	鈣	鈣質
+e	calcium carbide	電石
 e	calcium carbonate	碳酸鈣
 e	calcium chloride	氯化鈣
 e	calcium cyanamide	氰氨化鈣
@@ -11232,6 +11231,7 @@ e	calligraphic community	書壇
 e	calligraphic style	字體	書風
 e	calligraphy	書法
 e	calligraphy and painting	字畫
+e	calligraphy exhibition	書展
 e	calligraphy society	書會
 e	calling	使命
 e	calling card	話卡
@@ -11258,7 +11258,7 @@ e	calque	借譯	借譯詞
 e	caltex	加德士
 e	caltrop	鐵菱	鐵蒺藜
 e	caltrop or puncture vine	茨
-e	calumny	屠毒筆墨	讒言	讕言	讕調
+e	calumny	屠毒筆墨	讒言	讕言
 e	calvin	卡爾文
 e	calvin klein ck	卡爾文克萊因
 e	calyx of a flower	萼
@@ -11732,7 +11732,7 @@ e	cardiac atrium	心房
 e	cardiac pain	心痛
 e	cardiac stimulant	強心劑
 e	cardiff	加的夫
-e	cardigan	開襟衫
+e	cardigan	開衫	開襟衫
 e	cardinal	樞機	樞機主教
 e	cardinal number	基數
 e	cardinal numeral	基數詞
@@ -12315,8 +12315,9 @@ e	center forward	中前衛
 e	center of a lake	湖心
 e	center of circle	圓心
 e	center of force	力心
-e	center of gravity	質心	重心
+e	center of gravity	重心
 e	center of historic interest	聖地
+e	center of mass	質心
 e	center of projection	投影中心
 e	center of target	靶心
 e	center of the sky	天心
@@ -12349,7 +12350,7 @@ e	central china	華中
 e	central city district	市中區
 e	central committee	中央委員會
 e	central conservatory of music	中央音樂學院
-e	central core	心材	重心
+e	central core	心材
 e	central daily news	中央日報
 e	central dashboard	中控面板
 e	central district	中區	中心區
@@ -12389,6 +12390,7 @@ e	centriole	中心粒
 e	centripetal force	向心力
 e	centrist	中立派
 e	centrist faction	中立派
+e	centroid	重心
 e	centrum	善存
 e	century	世紀
 e	ceo	總經理
@@ -12496,7 +12498,7 @@ e	chain of ossicles	聽骨鏈
 e	chain reaction	偶聯反應	連鎖反應	鏈式反應
 e	chain saw	鏈鋸
 e	chain sinnet	雛菊花環
-e	chain smoker	煙鬼	癮君子	老煙槍	老煙鬼
+e	chain smoker	煙鬼	老煙槍	老煙鬼
 e	chain store	連銷店	連鎖商店	連鎖店
 e	chains	枷銷	鎖鏈
 e	chair	坐椅	幻椅式	椅	椅子	講座
@@ -12523,7 +12525,7 @@ e	challenge	叫板	將軍	搦
 e	challenge the law	以身試法
 e	challenge to battle	搦戰
 e	challenger	挑戰者
-e	challenging	克難	困難	戛戛	艱難	高難
+e	challenging	克難	困難	戛戛	高難
 e	chalone	抑素
 e	cham ethnic group	占族
 e	chamaeleon	堰蜓座
@@ -12636,7 +12638,6 @@ e	changing	變化多端
 e	changing circumstances	變局
 e	changjiang river	萬里長江
 e	changning district in shanghai	長寧
-e	channa argus	烏鱧
 e	channa asiatica	月鱧
 e	channa maculata	斑鱧
 e	channel	信道	導入	槽	河槽	溝渠	管道	經	調撥	通路	通道
@@ -12958,6 +12959,7 @@ e	chest and hypochondrium	胸脅
 e	chest distress	胸悶
 e	chest expander	拉力器	擴胸器
 e	chest fluoroscopy	胸透
+e	chest hair	胸毛
 e	chest measurement	胸圍
 e	chest of drawers	五斗櫃
 e	chest pain	胸悶
@@ -13227,7 +13229,7 @@ e	chinese academy of science	中國科學院
 e	chinese alligator	揚子鱷	豬婆龍	鮀	鼉龍
 e	chinese alpine rush	蓑草
 e	chinese and western medicine	中西醫
-e	chinese anise	八角茴香	大料	大茴香	莽草
+e	chinese anise	八角茴香	大茴香	莽草
 e	chinese artichoke	草石蠶
 e	chinese ash	梣	梣樹
 e	chinese babax	矛紋草鶥
@@ -14019,7 +14021,6 @@ e	claypot	石頭火鍋
 e	clayton or crichton	克萊頓
 e	clean	乾淨	完璧之身	察察	打掃	扢	擦洗	淨	清滌	清潔	清真
 e	clean and honest	純潔
-e	clean and honest government	廉政
 e	clean and jerk	挺舉
 e	clean and spotless	潔淨無瑕
 e	clean and white	琅
@@ -14086,7 +14087,6 @@ e	clear-cut	輪廓鮮明
 e	clear-cut personality	鮮明個性
 e	clear-headed	清醒	頭腦清楚
 e	clear-minded	僬僬	靈醒
-e	clear-sighted	瞭
 e	clearance	間隙
 e	clearance sale	清倉大甩賣
 e	clearing bank	清算行
@@ -14243,7 +14243,7 @@ e	close at	報收
 e	close at hand	緊
 e	close contact	密切接觸者	密接
 e	close down	倒閉	停業	封閉	查封	歇業
-e	close female friend	紅顏知己	閨蜜
+e	close female friend	紅顏知己
 e	close firmly	關緊
 e	close for business	收市
 e	close friend	友好	好友	密友	摯友	相好	近人	麻吉
@@ -14255,7 +14255,7 @@ e	close lightly	抿
 e	close love	昵愛
 e	close male friend	藍顏知己
 e	close neighbor	緊鄰	近鄰
-e	close one's eyes	交睫	合眼	瞑目
+e	close one's eyes	交睫	合眼	瞑目	閉眼
 e	close planting	密植
 e	close range	近距離
 e	close relative	睦親	近親
@@ -14406,7 +14406,7 @@ e	co-production	聯產
 e	co-renting	合租
 e	co-worker	合作者
 e	coacervation	凝聚
-e	coach	主帥	執教	大客車	大巴	客車	技術指導	指導員	輔導員
+e	coach	主帥	執教	大客車	大巴	客車	技術指導	指導員
 e	coachman	車夫
 e	coagulant	凝固劑	混凝劑
 e	coagulate	凝結	凝聚	血凝
@@ -14615,7 +14615,7 @@ e	cohomology	上同調
 e	cohort	群組	隊列
 e	cohort leader	級長
 e	coiffure	髮式
-e	coil	卷繞	挽	盤	盤繞	盤纏	線圈	線圈般	繞	繞組	纏
+e	coil	卷繞	挽	盤	盤繞	盤纏	線圈	繞	繞組	纏	蜷局
 e	coil around	纏結
 e	coil in still	盤管
 e	coiled	盤曲	蜷曲
@@ -14648,7 +14648,7 @@ e	colchicine	秋水仙素	秋水仙鹼
 e	cold	冰	冷	冷淡	凓	凔	凜	寒	寒冷	惏	感冒
 e	cold air	冷氣	寒氣
 e	cold air current	寒流
-e	cold air mass	冷空氣
+e	cold air mass	冷氣團	冷空氣
 e	cold and cheerless	冷冷清清	冷清清
 e	cold and desolate	冷寂	淒寒
 e	cold and dismal	淒淒
@@ -15062,7 +15062,6 @@ e	commemorate	弔古	緬懷
 e	commemoration day	念日
 e	commemorative banknote	紀念鈔
 e	commemorative coin	紀念幣
-e	commemorative museum	紀念館
 e	commemorative postage stamp	紀念郵票
 e	commence	開打
 e	commence trading	開盤
@@ -15154,10 +15153,10 @@ e	common crane	灰鶴
 e	common cuckoo	大杜鵑
 e	common denominator	公分母
 e	common difference	公差
-e	common divisor	公因式	公約數
+e	common divisor	公因式
 e	common emerald dove	綠翅金鳩
 e	common eurasian falcon	茶隼
-e	common factor	公因子	公因式	公約數
+e	common factor	公因子	公因式
 e	common failing	通病
 e	common feeling	同感
 e	common flameback	金背三趾啄木鳥
@@ -15253,7 +15252,7 @@ e	commonly referred to as	俗稱
 e	commonly seen	常見	習見
 e	commonly used chinese character	常用字
 e	commonly used phrase	慣用語
-e	commonplace	凡	凡俗	到處可見	平凡	平庸	陳詞濫調
+e	commonplace	凡	凡俗	平凡	平庸	陳詞濫調
 e	commonplace in military operations	兵家常事
 e	commonplace thing	筐篋中物
 e	commonwealth	聯邦
@@ -15775,7 +15774,7 @@ e	confer a title	封爵
 e	confer an award	頒獎
 e	confer on	畀	頒給
 e	confer posthumously	追贈
-e	conference	座談會	會晤	會議	談判
+e	conference	座談會	會議	談判
 e	conference hall	會議廳
 e	conference of activist representatives	積代會
 e	conference room	會議室
@@ -16159,6 +16158,7 @@ e	contend strongly	力爭
 e	contending for supreme beauty	爭妍鬥艷
 e	content	含蘊	含量	嗛	媅	樂意	涵意	涵義	滿足
 e	content and at ease	恬愉
+e	content creator	博主
 e	content management system	內容管理系統
 e	content with one's lot	安分
 e	content with one's situation	知足
@@ -16172,7 +16172,7 @@ e	contest	博弈	對決	徵選	比拚	比拼	爭奪	角逐	較量
 e	contest a lawsuit	諍訟
 e	contest first place	爭先
 e	contestant	選手
-e	context	上下文	前後文	場合	語境
+e	context	上下文	前後文	語境
 e	context menu	上下文菜單
 e	contiguous	連片
 e	continent	大洲	洲
@@ -16180,6 +16180,7 @@ e	continent of europe	歐洲大陸
 e	continental	大陸性
 e	continental climate	大陸性氣候
 e	continental drift	大陸漂移
+e	continental europe	歐陸
 e	continental plates	大陸塊
 e	continental shelf	大陸架	陸架
 e	continental slope	大陸坡	陸坡
@@ -16190,13 +16191,14 @@ e	continually	不息
 e	continually plunder	裒斂無厭
 e	continuation	嗣徽	續篇	續編
 e	continuation of a book	續書
-e	continue	下去	延續	承	持續	接續	接著	紹	繼	繼嗣	續
+e	continue	下去	延續	承	接續	接著	紹	繼	繼嗣	續
 e	continue blundering	一錯再錯
 e	continue in office	連任
 e	continue to exist	存續
 e	continue to fall	續跌
 e	continue to use	沿用
 e	continue upholding	堅執
+e	continued fraction	連分數
 e	continued rain	霖
 e	continued tradition	傳承
 e	continuing	嗣
@@ -16408,11 +16410,10 @@ e	cooking wine	料酒
 e	cooking-stove	爨
 e	cookout	野炊
 e	cookware	炊具
-e	cool	俊	冷卻	涼	涼涼	清涼	炫	炫酷	給力	趨冷	酷
+e	cool	俊	冷卻	涼	涼涼	清涼	炫酷	給力	趨冷	酷	酷斃
 e	cool and refreshing	涼爽
 e	cool autumn breeze	秋風送爽
-e	cool breeze	清風
-e	cool breeze of autumn	颸
+e	cool breeze	清風	颸
 e	cool color	冷色
 e	cool eye	冷眼
 e	cool fresh air	爽氣
@@ -16519,9 +16520,8 @@ e	core course	通識課程
 e	core curriculum	基礎課	通識課程
 e	core diameter	纖芯直徑
 e	core network	主幹網絡	主幹網路
-e	core of the earth	地核
 e	corgi	柯基
-e	coriander	胡芫	芫荽	荽	香荽	香菜
+e	coriander	芫荽	荽	香荽	香菜
 e	coriander leaf	芫荽葉
 e	coriandrum sativum	香菜
 e	corinthians	格林多
@@ -16783,7 +16783,7 @@ e	count votes	開票	點票
 e	countable	可數
 e	countable noun	可數名詞
 e	countable set	可數集
-e	countdown	倒計時	細數
+e	countdown	倒計時
 e	countenance	嘴臉	容	眉眼	長相	顏	顏色
 e	counter	劃圓防守	反制	後跟	抗衡	計數器	計數管	防制	防堵
 e	counter accusations	抗辯
@@ -17224,7 +17224,7 @@ e	crib mobile	床鈴
 e	crib sheet	小抄
 e	crick	扭傷
 e	cricket	促織	木球	板球	蛌	蛐蛐	蛩	蟋蟀
-e	crime	愆尤	犯	罪	罪孽	罪惡	罪行	警匪	辜
+e	crime	愆尤	犯	罪	罪孽	罪惡	罪行	警匪
 e	crime against humanity	反人道罪	反人道罪行
 e	crime against public order	公共安全罪
 e	crime and punishment	罪刑
@@ -17358,7 +17358,8 @@ e	croquettes	炸丸子
 e	cross	交叉	十字架	叉	周遊	橫	橫斷	橫渡	橫穿	橫越	渡
 e	cross a barrier	過關
 e	cross a border	出界	越境	越界
-e	cross a river	渡河	濟	過河
+e	cross a river	渡江	渡河	濟	過河
+e	cross a sea	渡海
 e	cross bar	栒
 e	cross country running	越野跑
 e	cross entropy	交叉熵
@@ -17499,6 +17500,7 @@ e	crumbling fate	頹運
 e	crumbs	屑
 e	crumple	弄皺	挼	捼
 e	crumpled	皺巴巴
+e	crumpled paper ball	紙團
 e	crunch	吱嘎	嘎吱	扎扎	捲腹	緊縮
 e	crunchy	脆	酥
 e	crupper	紂	鞧
@@ -17534,6 +17536,7 @@ e	cry of hen pheasant	鷕
 e	cry of rage	嚗
 e	cry out	出聲	叫喚	喊叫
 e	cry piteously for food	嗷嗷待哺
+e	cry profusely	飆淚
 e	crybaby	愛哭鬼
 e	crying over spilt milk	替古人擔憂
 e	crying sound	唉唉
@@ -17730,7 +17733,7 @@ e	current political situation	時局
 e	current politics	時政
 e	current price	時價
 e	current reigning emperor	聖躬
-e	current situation	時勢	現勢	現實情況	現況	現狀	近況
+e	current situation	時勢	現勢	現實情況	現況	現狀
 e	current state	現實情況
 e	current trend	時勢
 e	current year	本年度
@@ -18206,7 +18209,7 @@ e	dashing of waves	湱
 e	data	數據	材料	資料
 e	data bus	數據總線
 e	data cable	數據線
-e	data center	數據中心
+e	data center	數據中心	資料中心
 e	data communication	數據通信
 e	data compression	數據壓縮
 e	data entry system	輸入系統
@@ -18693,6 +18696,7 @@ e	deeply rooted	積弊
 e	deeply touching	感人肺腑	感人至深
 e	deeply troubled	甚感詫異
 e	deeply worried	焦灼
+e	deeply worried or troubled	寢食難安
 e	deepwater port	深水港
 e	deer	鹿
 e	deer horn	鹿角
@@ -18739,7 +18743,6 @@ e	defenses against floods	抗澇
 e	defensive	防禦性	防衛
 e	defensive art	防禦術
 e	defensive city	衛城
-e	defensive gate	防門
 e	defensive line or perimeter	防線
 e	defensive midfielder	後腰
 e	defensive platform over gate	闍
@@ -19309,7 +19312,7 @@ e	despise	下視	不齒	侮蔑	傲	僇	厭薄	小視	小覷	恨惡	看不起
 e	despite	任憑	儘管	歸	饒
 e	despondent	侘	傯	失神	懊喪
 e	despot	暴君	豪強	霸王
-e	despotic rule	暴政	霸王之道	霸道
+e	despotic rule	暴政	霸道
 e	despotism	專制主義
 e	dessert	甜品	甜食	甜點	點心
 e	destabilize	動搖
@@ -19539,7 +19542,7 @@ e	diameter	中徑	徑	徑跡	直徑
 e	diameter of hole	孔徑
 e	diameter of the moon	月徑
 e	diametrical	對立
-e	diamond	金剛	金剛石	鑽	鑽石
+e	diamond	金剛	金剛石	金剛鑽	鑽	鑽石
 e	diamond ring	鑽戒
 e	dian hong tea	滇紅
 e	diana	戴安娜	黛安娜
@@ -19672,7 +19675,7 @@ e	differing interpretations	歧見
 e	differing only slightly	未達一間
 e	differing opinion	二話	異義
 e	differing slightly	稍異
-e	difficult	不易	克難	困難	彆扭	戛戛	撓頭	艱	艱苦	艱辛	艱難
+e	difficult	不易	克難	困難	彆扭	戛戛	撓頭	艱	艱苦	艱辛	蹇
 e	difficult and dangerous	艱險
 e	difficult birth	難產
 e	difficult for some reason	礙難
@@ -19968,7 +19971,6 @@ e	disambiguation	消歧義
 e	disappear	失蹤	杳	泯滅	溶沒	絕	逃遁	隱去	隱沒	隱滅
 e	disappear from view	隱遁
 e	disappear without trace	不翼而飛
-e	disappoint	辜負
 e	disappointed	喪	壈	失望	悵悵然	惆	惘	惝	敗興	頹然
 e	disappointed and frustrated	悵然
 e	disappointed and unhappy	忽忽不樂
@@ -20096,6 +20098,7 @@ e	discussions	會談
 e	disdain	唾棄	鄙棄	鄙視
 e	disdainful look	白眼
 e	disease	疧	病	病患	病症	症	症候	痾	瘥	瘵
+e	disease attributed to miasma	瘴癘
 e	disease caused by anxiety	痗
 e	disease of the blood	血液病
 e	disease rate	發病率
@@ -20809,7 +20812,7 @@ e	door handle	門把
 e	door hinge	門鉸
 e	door knob	門把
 e	door knocker	銅環	門環
-e	door latch	扂	扂楔	門釦
+e	door latch	扂	門釦
 e	door lock	門鎖
 e	door number	門號
 e	door of a room	房門
@@ -21002,7 +21005,7 @@ e	dowsing	尋水術
 e	dox	起底	開盒
 e	doyle	多伊爾
 e	doze	假寐	小睡	盹	瞌睡
-e	doze off	度估	度姑	打盹	打瞌睡	督龜	肚孤
+e	doze off	度估	度姑	打盹	督龜	肚孤
 e	dozen	一打	打
 e	dozen or more	十數
 e	dpp	民主進步黨	民進黨
@@ -21080,7 +21083,6 @@ e	drama	劇情	戲
 e	drama queen	戲精
 e	dramatic	劇	戲劇性
 e	dramatic increase	劇增
-e	dramatic series	連續劇
 e	dramatically modify	爆改
 e	dramatist	戲劇家	編劇
 e	dramatize historical events	演義
@@ -21095,6 +21097,7 @@ e	dravidian	達羅毗荼
 e	draw	不分勝負	作出	劃	吸住	吸取	和局	平局	平手	引	打成平手
 e	draw a circle	圈圈	畫圓
 e	draw a distinction	區分
+e	draw a gun	拔槍
 e	draw a lesson	吸取教訓
 e	draw a line	劃線
 e	draw a parallel	比擬	比附
@@ -21377,7 +21380,6 @@ e	drowsy or slow-moving cat	懶貓
 e	drowsy-eyed	惺忪	餳
 e	drudgery	苦差
 e	drug	藥	藥劑	藥品	藥物
-e	drug addict	癮君子
 e	drug addiction	吸毒成癮	毒癮
 e	drug detector dog	緝毒犬
 e	drug enforcement	緝毒
@@ -21546,7 +21548,7 @@ e	duodenum	十二指腸
 e	dupe	大頭	忽悠	愚弄	欺哄	欺瞞	欺矇	耍得團團轉	耍花槍
 e	dupe one's sovereign	欺君罔上
 e	dupe sb	矇騙
-e	duplex	躍層
+e	duplex	躍層	雙工
 e	duplicate	抄件	複	複製	重疊	重複
 e	duplicate a document	複印
 e	duplication	重複法
@@ -21621,7 +21623,6 @@ e	dye	上色	擩	染	染料	染色	顏料
 e	dye black	涅
 e	dye cloth	染布
 e	dye factory	染廠
-e	dye one's hair	染髮
 e	dye paper	潢
 e	dye-works	染廠
 e	dyeing and weaving	染織
@@ -21786,9 +21787,11 @@ e	earth science	地球科學
 e	earth spirit	地祇
 e	earth up	培土
 e	earth's axis	地軸
-e	earth's core	地心
+e	earth's core	地核
 e	earth's crust	地殼
+e	earth's gravitational pull	地心吸力
 e	earth's gravity	地心引力
+e	earth's interior	地心
 e	earth's magnetic field	地球磁場	地磁場
 e	earth's orbit	地球軌道
 e	earth-shaking	撼天動地
@@ -22227,7 +22230,6 @@ e	eighth note	八分音符
 e	eighty	八十
 e	eighty percent	八成
 e	eindhoven	埃因霍溫
-e	einstein's theory of gravity	廣義相對論
 e	einsteinium	鎄	鑀
 e	eisenach	埃森納赫
 e	either	任一
@@ -22271,7 +22273,7 @@ e	elderly buddhist nun	師太
 e	elderly female relative	母
 e	elderly gentleman	老太爺
 e	elderly lady	嬤嬤	老太太
-e	elderly man	翁
+e	elderly man	翁	老爺爺
 e	elderly mother	老母
 e	elderly person	艾老
 e	elders	父老
@@ -22367,11 +22369,13 @@ e	electrical discharge	放電
 e	electrical energy	電能
 e	electrical engineering	電學	電工	電氣工程
 e	electrical heating	電熱
+e	electrical impedance	阻抗
 e	electrical insulation	絕緣體
 e	electrical lead	導線	引線
 e	electrical leakage	跑電
 e	electrical machinery	電機
 e	electrical power	電力
+e	electrical resistance	電阻
 e	electrical signal	電信號
 e	electrical work	電工
 e	electrically charged particles	帶電粒子
@@ -22389,6 +22393,7 @@ e	electrochemistry	電化學
 e	electrocute	電死
 e	electrocution	電刑
 e	electrode	電極
+e	electrodynamics	電動力學
 e	electroencephalogram	腦電圖	自發電位
 e	electrolux	伊萊克斯
 e	electrolysis	電解
@@ -22397,7 +22402,6 @@ e	electrolyte solution	電解液
 e	electrolytic	電解
 e	electrolytic capacitor	電解電容
 e	electromagnet	電磁鐵
-e	electromagnetic	電磁
 e	electromagnetic compatibility	電磁兼容性
 e	electromagnetic fields	電磁場
 e	electromagnetic force	電磁力	電磁相互作用
@@ -22409,7 +22413,7 @@ e	electromagnetic oscillation	電磁振蕩
 e	electromagnetic pulse	電磁脈衝
 e	electromagnetic theory	電磁理論
 e	electromagnetic wave	電磁波
-e	electromagnetism	電磁學	電磁理論
+e	electromagnetism	電磁	電磁學	電磁理論
 e	electromechanical	機電
 e	electromotive force	電動勢
 e	electromyogram	肌電圖
@@ -22632,7 +22636,6 @@ e	emerge prominently	湧現
 e	emerge suddenly	崛起
 e	emergence	崛起
 e	emergency	急難	應急	搶險	突發事件	緊急	緊急事件
-e	emergency aid committee	救災救濟司
 e	emergency braking	急剎車
 e	emergency desk	急救站
 e	emergency evacuation	緊急疏散
@@ -22748,7 +22751,7 @@ e	empress's physical condition	鳳體
 e	empress's throne	后座
 e	emptied	磬竭
 e	emptiness	空性	空虛	虛
-e	empty	倒空	匱	唐	寥	散場	清空	清零	無物	癟	白
+e	empty	倒空	匱	唐	寥	散場	清空	清零	無物	癟	空
 e	empty and quiet	空闃
 e	empty and silent	空寂
 e	empty and trite	陳腐
@@ -22844,14 +22847,14 @@ e	encumbrance	撈什子
 e	encyclopedia	事典	百科事典	百科全書	辭書
 e	encyclopedic	百科
 e	encyclopedic dictionary	百科詞典
-e	end	下場	了局	儩	劇終	告終	央	委	完畢	尾子	尾期
+e	end	下場	了局	儩	劇終	央	委	完畢	尾子	尾期	尾梢
 e	end a lockdown	解封
 e	end a relationship	斷交
 e	end abstinence	開戒
 e	end disastrously	吃大虧
 e	end face	端面
 e	end here	到此為止
-e	end in failure	吹
+e	end in failure	以失敗告終	吹
 e	end line	端線
 e	end of a banquet	散席
 e	end of a show	散戲
@@ -23213,7 +23216,7 @@ e	entry visa	入境簽證
 e	entry-level	陽春型
 e	entwine	虆
 e	entwined	盤曲
-e	enumerate	列舉	枚舉	歷數	細數	羅列	舉
+e	enumerate	列舉	枚舉	歷數	羅列	舉
 e	enumerate exactly	數清
 e	enumerate in detail	悉數
 e	enumerate sb's shortcomings	數落
@@ -23302,6 +23305,7 @@ e	epizootic	獸疫
 e	epoch	世	年頭	時代	紀元
 e	epoch-marking	劃時代
 e	eponymous	以人名命名
+e	eponymous daoist classic	莊子
 e	epoxy resin	環氧樹脂
 e	eprom	可擦除可編程只讀存儲器
 e	epsilon	伊普西隆	艾普西隆
@@ -23463,7 +23467,7 @@ e	escort sb	保駕
 e	escort the emperor	保駕
 e	escort vessel	護航艦	護衛艇
 e	eskimo	愛斯基摩
-e	esophageal cancer	食道癌
+e	esophageal cancer	食管癌	食道癌
 e	esoteric buddhism	密教
 e	esotropia	內斜視
 e	especially	尤其是	尤指	尤為	特
@@ -24258,7 +24262,7 @@ e	expertise	兩手
 e	expiration date	保質期
 e	expire	到期	屆滿	期滿	滿期	絕氣	過期
 e	expiry date	失效日期
-e	explain	分訴	分說	剖辯	啟發	申	白	白事	破解	索解	解
+e	explain	分訴	分說	剖辯	啟發	申	白事	破解	索解	解	解釋
 e	explain a sutra	談經
 e	explain clearly	悉數	辯明	闡明
 e	explain in detail	詳解
@@ -24482,6 +24486,7 @@ e	extrapolation	外推法	外插
 e	extras	雜費
 e	extrasensory perception	特異功能
 e	extraterrestrial	外星
+e	extraterrestrial civilization	地外文明
 e	extraterritorial	域外
 e	extravagance	鋪張	錦衣玉食
 e	extravagance and waste	鋪張浪費
@@ -24558,7 +24563,6 @@ e	extremely ugly	奇醜	奇醜無比
 e	extremely urgent	急如星火	火急
 e	extremely vast	漫無邊際
 e	extremely wealthy	富可敵國	腰纏萬貫
-e	extremely worried and troubled	寢食難安
 e	extremism	極端主義
 e	extremist	極端分子	激進
 e	extremity	尾
@@ -24831,6 +24835,7 @@ e	fall back	倒退	回落	回跌
 e	fall behind	名落孫山	掉隊	落後	落敗
 e	fall below	跌破
 e	fall dead	倒斃	踣
+e	fall directly on	直射
 e	fall down	偃	掉落	摔倒	撲倒	跌跤	隕落	顛踣
 e	fall dramatically	跳水
 e	fall due	到期	滿期
@@ -24842,7 +24847,7 @@ e	fall forwards	顛
 e	fall foul of	蒙難
 e	fall from grace	墮落
 e	fall gently	飄落
-e	fall guy	替死鬼	替身
+e	fall guy	替死鬼
 e	fall harvest	秋收
 e	fall headlong	倒栽蔥
 e	fall heavily	瓢潑而下
@@ -24917,6 +24922,7 @@ e	false positive	假陽性	偽陽性
 e	false proposition	偽命題
 e	false report	假報告
 e	false reputation	虛名
+e	false rhetoric	讕調
 e	false roof	偽頂
 e	false step	一念之差
 e	false teeth	假牙
@@ -25121,7 +25127,6 @@ e	farm	垌	田	田間	畈	種田	農場	農莊	飼養場
 e	farm animals	芻豢
 e	farm chemical	農藥
 e	farm crop	莊稼
-e	farm fire	野火
 e	farm hand	莊客
 e	farm house	農房
 e	farm implements	農具
@@ -25233,8 +25238,7 @@ e	father's elder brother's wife	大媽
 e	father's father	祖父
 e	father's father's brother	伯叔祖父
 e	father's father's brother's wife	伯叔祖母
-e	father's father's father	曾祖父	老爺爺
-e	father's father's mother	曾祖母	老奶奶
+e	father's father's mother	老奶奶
 e	father's father's sister	祖姑母
 e	father's friends	父執
 e	father's married sister	姑媽
@@ -25402,7 +25406,6 @@ e	feel deeply	深感	痛感
 e	feel deeply concerned	殊深軫念
 e	feel deeply hurt	傷心
 e	feel dejected	憋悶
-e	feel despondent	惆悵若失
 e	feel discouraged	洩勁
 e	feel disgusted	不是滋味	作嘔
 e	feel disheartened	喪氣
@@ -25415,7 +25418,7 @@ e	feel for sth	探摸
 e	feel for the ball	球感
 e	feel gratified	窩心
 e	feel great	爽歪歪
-e	feel guilty	負疚
+e	feel guilty	負疚	負罪
 e	feel happy	開心
 e	feel hatred	懷恨
 e	feel helpless	無助感
@@ -25513,9 +25516,8 @@ e	fell trees	伐木	楂	槎
 e	fellah	費拉
 e	fellatio	口淫
 e	fellmonger	皮革商
-e	fellow	伙計	小子	漢子	院士
+e	fellow	伙計	小子	漢子
 e	fellow citizen	同胞
-e	fellow countryman	鄉親
 e	fellow countrymen	國人
 e	fellow enthusiasts	同好
 e	fellow of academy	學會院士
@@ -25557,6 +25559,7 @@ e	female flight attendant	女乘務員	空姐
 e	female gang leader	大姐大	大姐頭
 e	female general	女將
 e	female genital mutilation	女性割禮
+e	female ghost	女鬼
 e	female gossip	長舌婦
 e	female hemp plant	種麻	苴麻
 e	female hero	英雌
@@ -25565,7 +25568,7 @@ e	female horse	騇
 e	female husky	母哈
 e	female immortal	仙姑
 e	female infertility	不孕症
-e	female matchmaker	媒婆
+e	female matchmaker	媒人婆	媒婆
 e	female name	媞
 e	female of a species	雌體
 e	female of domestic animals	牸
@@ -25644,7 +25647,7 @@ e	fermentogen	酶原
 e	fermi	費米
 e	fermion	費米子
 e	fermium	鐨
-e	ferocious	兇惡	兇狂	兇猛	凶惡	悍	殺氣騰騰	猖	猛
+e	ferocious	兇狂	兇猛	悍	殺氣騰騰	猖	猛
 e	ferocious appearance	兇相
 e	ferocious beast	猛獸
 e	ferocious beasts	狼蟲虎豹
@@ -25799,9 +25802,9 @@ e	fields divided by dikes	畾
 e	fields medal	菲爾茲獎
 e	fiend	兇煞	惡煞	惡神	惡魔	煞	煞神
 e	fiend in human form	混世魔王
-e	fiendish	兇惡	凶惡	窮凶極惡
+e	fiendish	窮凶極惡
 e	fiendishly cunning masterplan	錦囊妙計
-e	fierce	兇惡	兇殘	兇狂	兇猛	凌厲	凶	凶巴巴	厲害	威烈	悍
+e	fierce	兇殘	兇狂	兇猛	凌厲	凶	凶巴巴	厲害	威烈	悍	惡
 e	fierce and ambitious character	雄長
 e	fierce and combative party	鷹派
 e	fierce and malicious	凶狠
@@ -26068,7 +26071,7 @@ e	find it too much	不迭
 e	find one's niche	適得其所	靠山吃山，靠水吃水
 e	find oneself at	處在
 e	find oneself in	身處
-e	find out	了解	尋出	得知	探知	查出	查清	獲悉	瞭解
+e	find out	尋出	得知	探知	查出	查清	獲悉
 e	find out about	窺知
 e	find relief in	聊以自慰
 e	find some consolation	聊以自慰
@@ -26138,6 +26141,7 @@ e	fine work	工整	精品
 e	fine woven grass mat	簟
 e	fine woven silk fabric	紡
 e	fine-grained	細粒
+e	fine-sounding but empty words	漂亮話
 e	fine-toothed comb	笓	篦
 e	finely chopped firewood	蒸
 e	finely particulate	細
@@ -26358,7 +26362,7 @@ e	first year of university	大一
 e	first years	初葉
 e	first-aid kit	急救包	急救箱
 e	first-class	上乘	甲等	第一流
-e	first-hand	第一手	親
+e	first-hand	第一手	親	親身
 e	first-person shooter	第一人稱射擊
 e	first-rank concubine	昭儀
 e	first-rate	一品	一級棒	上好	優等	優良
@@ -26426,7 +26430,7 @@ e	fishing net	漁網	羅網
 e	fishing port	漁港
 e	fishing pot	漁籠
 e	fishing reel	捲線器
-e	fishing rod	釣桿	釣竿	釣魚杆	釣魚竿	魚竿
+e	fishing rod	釣竿	釣魚竿	魚竿
 e	fishing season	漁汛	漁汛期
 e	fishing tackle	釣具
 e	fishing using bundled wood	槮
@@ -26642,6 +26646,7 @@ e	flat rice noodles	粿條
 e	flat roof	平頂	露臺
 e	flat silver	洋錢	銀元	銀洋
 e	flat spanner	呆扳手
+e	flat surface	平面
 e	flat white	馥列白	馥芮白
 e	flat-chested	平胸	搓板
 e	flat-faced persian-type cat	加菲貓
@@ -26758,6 +26763,7 @@ e	flintstones	摩登原始人
 e	flip	彈	投擲	空翻	翻轉
 e	flip out	發飆
 e	flip over	翻	翻動	翻車
+e	flip sth over	翻面
 e	flip through	翻閱
 e	flip-flop	觸發器
 e	flip-flop sandals	人字拖鞋
@@ -27091,7 +27097,6 @@ e	folk story	民間故事
 e	folk tune	小曲
 e	folk-song	繇
 e	folklore	民俗學
-e	folks back home	鄉親
 e	folksong	歌謠
 e	folktale	民間故事
 e	folkways	民風
@@ -27141,7 +27146,6 @@ e	following closely	相繼
 e	following day	昱日
 e	following from that	隨之而後
 e	following morning	明朝
-e	following pages	後文
 e	following section	後段
 e	following the author's fancy	嬉笑怒罵
 e	following the model	沿例
@@ -27240,7 +27244,7 @@ e	footnote	腳注	註腳
 e	footpath	徯	走道	蹊
 e	footpath separating fields	垙
 e	footprint	占地面積	印跡	腳印	足印	足跡	蹤跡
-e	footrest	擱腳板	擱腳物	踏板
+e	footrest	擱腳板	踏板
 e	footstep	腳步
 e	footsteps	橐	橐橐
 e	footstool	腳凳	踏板
@@ -27382,6 +27386,7 @@ e	foreign edition	海外版
 e	foreign enterprise	外企
 e	foreign exchange	外匯
 e	foreign exchange collection	收匯
+e	foreign exchange market	匯市
 e	foreign exchange reserves	外匯存底
 e	foreign exchange settlement	結匯
 e	foreign firm	洋行
@@ -27466,7 +27471,7 @@ e	forged note	假鈔
 e	forged scriptures	偽經
 e	forger	偽造者
 e	forgery	假報告	偽造品	冒牌貨
-e	forget	忘	忘卻	忘懷	忘掉	忘記	諼	遺落	還給老師
+e	forget	忘	忘懷	忘掉	忘記	諼	遺落	還給老師
 e	forget about it	算了
 e	forget former enmity	盡釋前嫌
 e	forget it	罷休
@@ -27525,7 +27530,6 @@ e	form of words	詞形
 e	form of writing	體裁
 e	form pairs	成雙成對
 e	form ties	結緣
-e	form word	發語詞
 e	formal	客氣	文
 e	formal attire	禮服
 e	formal betrothal	聘娶婚
@@ -27545,6 +27549,7 @@ e	formalized	形式化
 e	formalized move	招式
 e	formally call on	參拜
 e	formally request	咨請
+e	formamide	甲酰胺
 e	format	制式	格式	格式化	業態	版式
 e	formation	兵團	編隊	行列	陣型	隊列	隊形
 e	formation skydiving	造型跳傘
@@ -27683,7 +27688,6 @@ e	foster son	寄子	養子
 e	fostering	培養
 e	foucault's pendulum	傅科擺
 e	foul	卑污	惡濁	污	污濁	犯規
-e	foul atmosphere	烏煙瘴氣
 e	foul disease	惡疾
 e	foul language	粗口
 e	foul line	邊線
@@ -27699,7 +27703,6 @@ e	found a country	建國	立國
 e	found a dynasty	定鼎
 e	found a school	開學
 e	found a state	開國
-e	found everywhere	到處可見
 e	foundation	依據	地腳	基址	基床	基座	基業	基盤	基金會	底子	底座
 e	foundation groove	基坑
 e	foundation of a building	地盤
@@ -27715,6 +27718,7 @@ e	foundry iron	鑄鐵
 e	foundry work	鑄工
 e	foundry worker	鑄工
 e	fountain	噴水池	噴泉
+e	fountain of youth	不老泉
 e	fountain pen	自來水筆	鋼筆
 e	fountainhead	泉源	源泉
 e	four	乘	四	肆
@@ -28108,7 +28112,7 @@ e	frigate	衛艦
 e	frighten	嚇	嚇一跳	嚇唬	恫	驚嚇
 e	frighten one another	自相驚擾
 e	frightened	一驚一乍	心寒	怔忪	怖	恐	悚	悚然	惝	惶遽	猲
-e	frightening	兇惡	凶惡	嚇人	恐怖	瘮得慌	驚心膽顫
+e	frightening	嚇人	恐怖	瘮得慌	驚心膽顫
 e	frightful	可怕	恐怖
 e	frigid	冷若冰霜	凄	凓	寒冷	惏	淒
 e	frigidity	性冷感	性冷淡
@@ -28471,7 +28475,7 @@ e	fundraising	籌款
 e	funds	款	經費
 e	funds on call	拆放款	活期資金
 e	fundus of the eye	眼底
-e	funeral	告別式	喪	喪禮	殯	殯儀	永訣式	白	白事	葬儀	葬式
+e	funeral	告別式	喪	喪禮	殯	殯儀	永訣式	白事	葬儀	葬式	葬禮
 e	funeral and interment	喪葬	殯葬
 e	funeral arrangements	凶喪	善後	喪事	後事
 e	funeral ceremony	喪儀
@@ -28680,10 +28684,8 @@ e	games	博弈
 e	gamesmanship	小動作
 e	gamete	性細胞	配子
 e	gaming device	遊戲設備
-e	gamma	伽馬	珈
-e	gamma radiation	伽馬輻射
-e	gamma ray	丙種射線	伽瑪射線
-e	gamma rays	伽馬射線
+e	gamma	伽馬
+e	gamma ray	丙種射線	伽馬射線
 e	gampsocleis genus	蟈螽屬
 e	gampsocleis sinensis	蟈螽
 e	ganache	甘納許
@@ -28979,7 +28981,7 @@ e	general election	大選
 e	general electric	通用電器	通用電氣
 e	general emergency	場外應急
 e	general exposition	泛論
-e	general headquarters	總司令部	總指揮部	總部
+e	general headquarters	總司令部	總指揮部
 e	general hospital	總醫院
 e	general idea	大意	大概	大略
 e	general impressions	觀念
@@ -29129,7 +29131,6 @@ e	genus perilla	紫蘇屬
 e	genus rhizobium	根瘤菌屬
 e	genus ruta	芸香屬
 e	genus tyrannosaurus	暴龍屬
-e	geocentric	地心
 e	geocentric latitude	地心緯度
 e	geocentric theory	地心說
 e	geochemistry	地球化學
@@ -29319,7 +29320,7 @@ e	get over sth	看開
 e	get plastered	一醉方休
 e	get popular quickly	暴熱
 e	get promoted	升官	升職
-e	get ready	打點	整妝	整裝	整裝待發
+e	get ready	打點	整裝	整裝待發
 e	get really angry	火冒三丈
 e	get restless	蠢蠢欲動
 e	get results overnight	一蹴而就
@@ -29741,7 +29742,6 @@ e	glucagon	升糖素
 e	glucocorticosteroid	糖皮質激素
 e	glucosamine	氨基葡糖	氨基葡萄糖	葡糖胺	葡萄糖胺
 e	glucose-fructose syrup	果葡糖漿
-e	glucoside	糖苷
 e	glue	糊劑	膠	膠水	膠結	黏合劑
 e	glue gun	打膠槍
 e	glue stick	口紅膠	固體膠	膠棒
@@ -29779,7 +29779,7 @@ e	glycol	乙二醇	二醇
 e	glycolipid	糖脂
 e	glycolysis	糖酵解
 e	glycoprotein	糖蛋白
-e	glycoside	苷	醣苷
+e	glycoside	甙	糖甙	糖苷	苷	醣苷
 e	glyph	字圖
 e	gnarl	木節	節子
 e	gnash one's teeth	切齒
@@ -29917,7 +29917,7 @@ e	go with fashion	靡
 e	go with sb	結伴
 e	go without meals	斷頓
 e	go wrong	出亂子	出岔子	出漏子
-e	go-between	中人	媒	月下老人	月老	牽線人	牽頭	說客	調停者
+e	go-between	中人	媒	牽線人	牽頭	說客	調停者
 e	go-kart	卡丁車	高卡車
 e	goal	入球	宗旨	志向	目標	進球	鵠
 e	goal ball	門球
@@ -29930,6 +29930,7 @@ e	goat-antelope	扭角羚
 e	goat-man	羊男
 e	goatee	山羊鬍子
 e	gobang	五子棋
+e	gobble down	炫
 e	gobble up	吞噬	猛吃
 e	gobbling	大口
 e	gobi	戈壁
@@ -29943,8 +29944,9 @@ e	god	上帝	主	佛爺	天主	天王	天神	神	神人	神祇	神靈
 e	god of city	隍
 e	god of fire	火神
 e	god of heaven	天帝
-e	god of longevity	壽星
+e	god of longevity	壽星	壽星公
 e	god of love	愛神
+e	god of marriage	月下老人	月老
 e	god of the earth	祇
 e	god of the land	社
 e	god of thunder	雷神
@@ -30234,7 +30236,6 @@ e	govern directly	直轄
 e	govern forcefully	敱
 e	govern one's family	齊家
 e	govern the country	治國理政
-e	govern with integrity	廉政
 e	governance	治理	管治
 e	governance and education	理化
 e	governess	姥	媬
@@ -30282,7 +30283,7 @@ e	gown	布拉吉	袍	長袍
 e	gps	全球位置測定系統	全球定位系統	環球定位系統
 e	grab	抄	抓	捉	揪住	搲	搶	摟	攫	攫取	邷
 e	grab money	刻剝	摟錢
-e	grab the limelight	搶鏡頭	搶風頭
+e	grab the limelight	搶風頭
 e	grace	優雅	恩典	恩情	恩惠	雨露	韻緻	韻致	風度	風情	風致
 e	grace period	寬限期
 e	graceful	便嬛	優美	優雅	奕	娜	娟	娟秀	婀	婉	婷
@@ -30491,7 +30492,6 @@ e	grating	光柵	濇
 e	gratitude	謝忱	謝意
 e	gratitude and grudges	恩怨
 e	gratitude for good treatment	感遇
-e	gratuitous	白
 e	gratuitously	平白
 e	gratuity	小費	賞錢
 e	graupel	霰
@@ -30508,12 +30508,12 @@ e	grave-clothes	襚
 e	gravel	石渣	砂	礫石
 e	gravestone	墓碑
 e	graveyard	墓地	墓場	墳地	墳塋	墳山
-e	gravitation	地心吸力	引力
+e	gravitation	引力
 e	gravitational acceleration	重力加速度
 e	gravitational anomaly	重力異常
 e	gravitational field	引力場	重力場
 e	gravitational wave	引力波
-e	gravity	萬有引力	重力
+e	gravity	重力
 e	gravy	滷汁	調味肉汁
 e	gray	戈瑞	戈雷	格雷	淺黑	灰	灰色	駽
 e	gray alder	灰赤楊
@@ -30523,7 +30523,7 @@ e	gray area	灰色地帶
 e	gray cloth	坯布
 e	gray collar	灰領
 e	gray hair	華髮
-e	gray matter	腦髓	髓腦
+e	gray matter	灰質	腦髓	髓腦
 e	gray mongoose	灰獴
 e	gray mullet	烏魚
 e	gray or dark color	褐
@@ -30651,7 +30651,7 @@ e	great work	碩果
 e	great writer	文豪
 e	great-aunt	姨姥姥
 e	great-granddaughter	曾孫女	重孫女
-e	great-grandfather	太公	曾外祖父	曾祖
+e	great-grandfather	太公	曾外祖父
 e	great-grandmother	太婆	曾外祖母
 e	great-grandparents	曾祖父母
 e	great-grandson	曾孫	重孫	重孫子
@@ -30680,7 +30680,6 @@ e	greater than	多於	高於
 e	greater white-fronted goose	白額雁
 e	greater yellownape	大黃冠啄木鳥
 e	greatest	太	最多	莫大
-e	greatest common divisor gcd	最大公因子	最大公約數
 e	greatly	大加	大大	大為
 e	greatly desire	渴求
 e	greatly disappointed	大失所望
@@ -30754,7 +30753,7 @@ e	greenback	美鈔
 e	greenery	綠樹
 e	greenfly	蚜蟲
 e	greenhorn	初出茅廬	外教
-e	greenhouse	大棚	暖房	暖棚	洞子	溫室	花房
+e	greenhouse	暖房	暖棚	洞子	溫室	花房
 e	greenhouse effect	溫室效應
 e	greenhouse gas	溫室氣體
 e	greenish warbler	暗綠柳鶯
@@ -30855,12 +30854,12 @@ e	grill	烤架
 e	grille	格柵
 e	grilled food on skewers	烤串
 e	grim	冷面	凄	嚴峻	嚴酷	正色	淒
-e	grimace	做鬼臉	怪樣	怪相	鬼臉	齜牙咧嘴
+e	grimace	做鬼臉	怪樣	怪相	鬼臉
 e	grimace with displeasure	甩臉子
 e	grime	泥垢
 e	grimm's fairy tales	格林童話
 e	grimstad	格里姆斯塔
-e	grin	咧嘴	露齒	露齒而笑
+e	grin	露齒	露齒而笑
 e	grin of dissatisfaction	冷笑
 e	grin wickedly	壞笑
 e	grind	切	研	研磨	硐	碾	碾磨	磨	磨快	礪	苦差
@@ -30880,7 +30879,6 @@ e	grip forcefully	扼
 e	grip on the road	抓地
 e	grip or clutch	薅
 e	griping pain	絞痛
-e	gripper	抓手
 e	gristle	脆骨
 e	grit	沙子	砂礫	粗砂
 e	gritty	牙磣	磣
@@ -31677,7 +31675,6 @@ e	harbor ulterior motives	心中有鬼
 e	harboring unfathomable motives	居心叵測
 e	hard	凋敝	固	堅固	堅硬	板	沉重	硬性	礐	艱	艱苦
 e	hard and dangerous	高難
-e	hard battle	苦戰
 e	hard candy	硬糖
 e	hard cases	疑難雜症
 e	hard coal	白煤
@@ -32251,7 +32248,7 @@ e	headman	酋長
 e	headmaster	校長
 e	headnotes	眉批
 e	headphones	耳機	耳麥	頭戴式耳機
-e	headquarters	司令部	大本營	指揮部	本部	總管理處	隊部
+e	headquarters	司令部	大本營	指揮部	本部	總管理處	總部	隊部
 e	headquarters of a general	幕
 e	headrest	頭枕
 e	heads-up	平視	預防針
@@ -32385,7 +32382,6 @@ e	heat until red-hot	燒紅
 e	heat up	熱
 e	heat water	燒水
 e	heat wave	熱浪
-e	heat-loving	適溫
 e	heat-resistant	耐高溫
 e	heat-resistant paint	絕熱漆
 e	heat-sensitive	熱敏
@@ -32554,7 +32550,7 @@ e	help disaster victims	救災
 e	help each other	互助
 e	help financially	周
 e	help greatly	大有裨益
-e	help one another	相助	相幫
+e	help one another	相幫
 e	help oneself to	自取	自己動手
 e	help others	助人	與人為善
 e	help out	搭把手	支招
@@ -32701,8 +32697,9 @@ e	hermaphrodite flower	兩性花
 e	hermaphroditism	雌雄同體性
 e	hermeneutics	詮釋學
 e	hermes	赫爾墨斯
-e	hermit	逸民	隱君子	隱士	隱逸
+e	hermit	逸民	隱士	隱逸
 e	hermit crab	寄居蟹
+e	hermit sage	隱君子
 e	hermitage museum	冬宮
 e	hernia	疝	疝氣	痳	脫腸
 e	hero	俠	傑	壯士	好漢	正角	英	英烈	英雄	豪傑
@@ -32722,7 +32719,7 @@ e	heroic warrior	健兒
 e	heroin	幾號	海洛因	海洛英	白粉	白麵	白麵兒
 e	heroine	女主人公
 e	heroism	豪氣
-e	heron	老等	雚	鷥	鷺
+e	heron	老等	雚	鷺
 e	herpes	皰疹
 e	herpes simplex	單純皰疹
 e	herpes simplex virus	單純皰疹病毒
@@ -32755,6 +32752,7 @@ e	heterosexual sex	異性性接觸
 e	heterosexuality	異性戀
 e	heterotroph	異養生物
 e	heterotype	異形
+e	heterozygote	雜合子
 e	heuristic	啟發式
 e	heuristic method	啟發法
 e	heuristics	啟發法
@@ -32995,7 +32993,6 @@ e	high-speed blender	破壁機
 e	high-speed train	動車
 e	high-spirited	來勁	昂奮	昂揚	昂昂	高亢
 e	high-spirited and smug	志高氣揚
-e	high-to-medium-altitude air defense	中高度防空
 e	high-top	高幫
 e	high-topped waterproof boots	涉水靴
 e	high-yield bonds	垃圾股
@@ -33018,7 +33015,6 @@ e	higher education record	高學歷
 e	higher vocational school	高職院校
 e	higher-priced model of lamborghini	大牛
 e	highest	太	最高
-e	highest common factor hcf	最大公因子	最大公約數
 e	highest heaven	九重霄	重霄
 e	highest level	峰	最高等
 e	highest level of specification	頂配
@@ -33245,10 +33241,9 @@ e	hit the net	落網
 e	hit the target	中的	射中	破的
 e	hit-and-run	肇事逃逸
 e	hitch a lift	打車
-e	hitch a ride	搭便車
 e	hitch onto	鉤住
 e	hitch-hike	搭車
-e	hitchhike	便車	攔車
+e	hitchhike	攔車
 e	hither	來
 e	hits	訪問量
 e	hitting the mark	著
@@ -33446,6 +33441,7 @@ e	home rule	地方自治
 e	home run	全壘打	本壘打	紅不讓
 e	home state or region	老家
 e	home team	地主隊
+e	home textiles	家紡
 e	home truths	逆耳之言
 e	home village	本鄉
 e	home village or town	鄉
@@ -33501,6 +33497,7 @@ e	homophonous	諧聲
 e	homoptera	同翅目
 e	homosexual	分桃	同志	同性	同性愛	同性戀者	斷背	斷袖	龍陽君
 e	homosexuality	同性戀
+e	homozygote	純合子
 e	honda	本田
 e	honduras	宏都拉斯	洪都拉斯
 e	hone	磨刀
@@ -33780,14 +33777,14 @@ e	hot food	熱食
 e	hot hatch	小鋼砲
 e	hot item	爆款
 e	hot mom	辣媽
-e	hot money	游資
+e	hot money	游資	熱錢
 e	hot news item	猛料
 e	hot off the press	熱騰騰
 e	hot or boiling water	湯
 e	hot or pungent	辛
 e	hot pants	熱褲
 e	hot patching	熱補
-e	hot pepper	海椒	番椒	秦椒	辣椒	辣胡椒
+e	hot pepper	海椒	番椒	秦椒	辣椒
 e	hot pickled mustard tuber	榨菜
 e	hot plate	電爐
 e	hot pot	打邊爐
@@ -33797,7 +33794,6 @@ e	hot property	搶手貨	躥貨
 e	hot red pepper	紅辣椒
 e	hot sauce	辣汁
 e	hot spell during autumn	秋老虎
-e	hot spicy soup	麻辣燙
 e	hot spot	熱點
 e	hot spring	湯泉	溫泉
 e	hot springs	溫泉城
@@ -33814,7 +33810,6 @@ e	hot war	熱戰
 e	hot water	熱水
 e	hot water dispenser	熱水瓶
 e	hot weather	暑	暑熱
-e	hot-desking	辦公桌輪用
 e	hot-selling	熱銷
 e	hot-selling property	熱賣品
 e	hot-tempered	二杆子
@@ -33827,6 +33822,7 @@ e	hotbed	溫床
 e	hotel	客棧	旅社	旅館	賓館	酒店	飯店
 e	hotel guest	住客
 e	hotel indigo	英迪格酒店
+e	hotel linens	布草
 e	hothead	冒失鬼
 e	hothouse	暖房
 e	hothouse flower	唐花
@@ -33891,7 +33887,7 @@ e	housekeeping money	家用
 e	housekeeping staff	家政員
 e	houses	民居
 e	housetop	房頂
-e	housewife	主婦	家庭主婦	管家婆
+e	housewife	主婦	管家婆
 e	housework	家事	家務
 e	housing	住房	居第
 e	housing agent	房屋中介
@@ -34171,7 +34167,7 @@ e	husband's mother	姑	婆婆	家娘	阿家
 e	husband's older brother	大伯
 e	husband's older sister	大姑
 e	husband's sister	姑	姑子
-e	husband's younger brother	叔	叔子	小叔
+e	husband's younger brother	叔	叔子	小叔	小叔子
 e	husbands of sisters	連襟
 e	hush	吁
 e	hush money	封口費
@@ -34355,12 +34351,13 @@ e	hypothalamus	下丘腦	下視丘
 e	hypothermia	低體溫症	失溫症
 e	hypothesis	假定	假想	假設	假說	猜想	說法
 e	hypothetical	假設性
+e	hypothyroidism	甲減	甲狀腺功能減退
 e	hyssop	牛膝草
 e	hysteresis	遲滯現象
 e	hysteria	歇斯底里	癔病	癔症	癪	臟躁
 e	hysterical	歇斯底里	狂亂
 e	hysteromyoma	子宮肌瘤
-e	i	不才	予	伲	俺	卬	咱家	寡人	小婿	弟	晚生
+e	i	不才	予	伲	卬	咱家	寡人	小婿	弟	晚生	某人
 e	i appreciate your kindness	心領
 e	i have troubled you	多累
 e	i hope so	但願如此
@@ -34435,7 +34432,7 @@ e	icebox	冰箱	雪櫃
 e	icebreaker	破冰船	破冰艦
 e	icebreaker bow	破冰型艏
 e	icecap	冰帽
-e	iced	冰鎮	加冰	加冰塊
+e	iced	冰鎮	加冰
 e	iced coffee	冰咖啡
 e	iced drink	冰飲
 e	iced water	冰水
@@ -34766,7 +34763,6 @@ e	impeccable	一百一	無懈可擊	零缺點
 e	impeccable moral integrity	白璧無瑕
 e	impeccably attired	西裝革履
 e	impecunious vagabond	窮光蛋
-e	impedance	阻抗
 e	impedance converter	阻抗變換器
 e	impedance matching	阻抗匹配
 e	impede	悞	拖後腿	牽制	牽掣	牽絆	阻抑	阻擾	阻遏	阻難
@@ -34906,6 +34902,7 @@ e	important path	要徑
 e	important person	要人
 e	important political leader	政要
 e	important position	要職
+e	important post	衝要
 e	important program	要圖
 e	important road	要路
 e	important substance	要目
@@ -34982,7 +34979,7 @@ e	improvised explosive device	簡易爆炸裝置
 e	impudent	冒失	厚臉皮	放肆	沒大沒小	皮臉	訕臉
 e	impulse	衝動	衝量
 e	impunity	有罪不罰
-e	impure	濁	齷濁
+e	impure	齷濁
 e	impurities	混雜物
 e	impurity	雜質
 e	impurity contracted previously	前塵
@@ -35058,11 +35055,9 @@ e	in a tragic state	涕泗橫流	涕泗縱橫
 e	in a trance	神思恍惚
 e	in a tremendous mess	橫三豎四
 e	in a tremendous muddle	亂麻
-e	in a turmoil	烏煙瘴氣
 e	in a whisper	低聲細語	竊聲
 e	in a wink	一眨眼
 e	in a word	總之	總而言之	要之
-e	in abeyance	暫擱
 e	in absolute secrecy	人不知鬼不覺
 e	in accord with fact	原原本本
 e	in accordance with	依著	准	照	遵照	遹
@@ -35348,7 +35343,7 @@ e	in the newspaper	報上	報端
 e	in the old style	仿古
 e	in the open	露天
 e	in the papers	見報
-e	in the past	在前	宿昔	從先	早已	昔日	舊前	過往
+e	in the past	在前	宿昔	從先	早已	昔日	舊前
 e	in the past always	一直以來
 e	in the pipeline	發展中
 e	in the pit	井下
@@ -35810,7 +35805,7 @@ e	industrialist	實業家
 e	industrialization	工業化	產業化
 e	industrialize	工業化	產業化
 e	industrialized country	工業化國家	工業國
-e	industrious	勤勉	孜孜	孳	懃	用功
+e	industrious	勤勉	孜孜	孳	用功
 e	industrious and conscientious	勤勤懇懇
 e	industrious and frugal	克勤克儉
 e	industry	實業	工商界	工業	業	業界	產業
@@ -36040,7 +36035,7 @@ e	inhomogeneous	非均質
 e	inhuman	不人道	反人類	慘	慘無人道	非人
 e	inimical	對頭
 e	iniquitous	邪
-e	initial	初始	初步	原初	最初	開始	頭文字
+e	initial	初始	初步	原初	最初	頭文字
 e	initial foray	初試身手
 e	initial payment	訂金
 e	initial period	先期
@@ -36141,7 +36136,6 @@ e	inner-spring mattress	席夢思
 e	innermost room	閫奧
 e	inning	回合
 e	innkeeper	棧主
-e	innocence	無辜
 e	innocent	天真	清白	無罪	無辜
 e	innocent and naive person	小白兔
 e	innocent and unaffected	天真爛漫	純真
@@ -36723,7 +36717,7 @@ e	intestine	腸管
 e	intestines	腸	腸子	腸道
 e	intimacy	昵愛
 e	intimacy and alienation	薄厚
-e	intimate	倖	愛昵	戚戚	昵比	暱	梯己	熱絡	狎昵	知心	私密
+e	intimate	倖	愛昵	戚戚	昵比	暱	熱絡	狎昵	知心	私密	膩
 e	intimate conversation	蘭言
 e	intimate friend	同袍	摯友	知交	知己	知音	膩友
 e	intimate friend and companion	摯友良朋
@@ -36775,6 +36769,7 @@ e	introduction	介紹	導言	導語	導論	引子	引導	引言	概論	緒論
 e	introduction to maoism	毛概
 e	introductory chapter	緒論
 e	introductory course	入門課程
+e	introductory particle	發語詞
 e	introductory phase or period	導入期
 e	introductory remarks	例言
 e	introitus	啟應祈禱
@@ -37318,7 +37313,6 @@ e	japan	11區	內地	日	日本	東洋	東瀛	櫻花國	霓虹國
 e	japan airlines	日本航空	日航
 e	japan and korea	日朝	日韓
 e	japan-china	日中
-e	japan-us	日美
 e	japanese	倭	日文	東洋話
 e	japanese -nuta	垈
 e	japanese allspice	臘梅
@@ -37439,7 +37433,7 @@ e	jerry or gerry	傑瑞
 e	jerry seinfeld	傑瑞·宋飛
 e	jerry-building	偷工減料
 e	jerry-built building project	豆腐渣工程
-e	jersey	毛織運動衫	澤西
+e	jersey	毛織運動衫	澤西	球衣
 e	jersey island	澤西島
 e	jerusalem	耶路撒冷
 e	jerusalem artichoke	洋薑	菊芋
@@ -37466,7 +37460,7 @@ e	jetty	埗	棧橋式碼頭	磯
 e	jew	猶太人
 e	jew's harp	口弦	口簧	口簧琴	嘴琴
 e	jewel	寶	明珠	美石
-e	jewelry	珈	飾物	首飾
+e	jewelry	飾物	首飾
 e	jewelry center	銀樓
 e	jewels	橐中裝	珠寶	珠玉
 e	jews	猶太
@@ -37902,7 +37896,7 @@ e	keenly desired	切盼
 e	keenly felt pain	切膚之痛
 e	keep	保守	保持	保有	保留	信守	包養	存	守住	留	留下
 e	keep a copy	留底
-e	keep a lookout	檢點	瞭望
+e	keep a lookout	檢點
 e	keep a promise	履約	踐約
 e	keep a vigil	守夜
 e	keep an appointment	守約	赴約
@@ -37977,7 +37971,6 @@ e	kennedy	甘迺迪	肯尼迪
 e	kennel	犬舍	狗屋	狗舍
 e	kent	肯特
 e	kentish plover	環頸鴴
-e	kentucky fried chicken	肯德基	肯德基炸雞
 e	kenya	肯亞	肯尼亞
 e	kept man	孌童	軟飯男
 e	kept woman	姘婦
@@ -38090,6 +38083,7 @@ e	kidnapper	劫持者	拐子	綁匪
 e	kidnapping	綁架
 e	kidney	腎	腎臟	腰子
 e	kidney bean	芸豆	菜豆
+e	kidney deficiency	腎虛
 e	kidney inflammation	腎炎
 e	kidney of an animal	腰
 e	kidney stone	腎結石
@@ -38272,7 +38266,7 @@ e	knack	江湖一點訣	眉角	竅門	花頭	訣竅	門道
 e	knack of doing business	生意經
 e	knag	木節	樶
 e	knapsack	乾糧袋	背包	背囊
-e	knead	揉	揉制	揉和	搋
+e	knead	揉	揉制	揉和	搋	踩奶
 e	knead dough	和麵	搋麵
 e	kneading or chopping board	案板
 e	knee	磕膝蓋	膝	膝蓋
@@ -38927,7 +38921,7 @@ e	lassa virus	拉沙病毒
 e	lasso	套索	套繩
 e	lasso a horse	套馬
 e	lasso pole	馬竿
-e	last	上個	去	孻	延續	持續	末任	歷時
+e	last	上個	去	孻	延續	末任	歷時
 e	last bus	末車
 e	last bus or train	末班車
 e	last chance	末班車
@@ -39231,7 +39225,7 @@ e	leading	主導	居首	領導	領軍	領銜	頭
 e	leading actors	領銜	領銜主演
 e	leading figure	急先鋒	頭面人物
 e	leading foot	前腳
-e	leading light	元勛	元勳	大牛	牛人	狀元	當世之冠	當世冠
+e	leading light	元勛	元勳	大牛	牛人	狀元
 e	leading principles	大綱
 e	leading singer	領唱
 e	leading to	落得
@@ -39250,7 +39244,6 @@ e	leaf sheath	葉鞘
 e	leaf surface	葉面
 e	leaf through	翻檢
 e	leaf tobacco	煙葉
-e	leaf venation	葉脈序
 e	leaf warbler	柳鶯
 e	leaf-nosed bat	葉鼻蝠
 e	leafcutter bee	切葉蜂
@@ -39388,7 +39381,6 @@ e	leave sb alone	放羊
 e	leave secretly	溜走
 e	leave some leeway	留有餘地
 e	leave sth	停放
-e	leave sth unused	閒置
 e	leave surplus	殘餘
 e	leave the factory	出廠
 e	leave the field	退場
@@ -39426,7 +39418,6 @@ e	lecture sb	訓誡
 e	lecture theater	階梯教室
 e	lecturer	講師
 e	lectures	講辭
-e	led	發光二極管
 e	led strip light	燈帶	燈條
 e	lede	導語
 e	ledge	壁架
@@ -39468,6 +39459,7 @@ e	leftover men	遺民
 e	leftovers	剩菜	落腳	餕
 e	leftovers from a meal	殘羹	殘羹剩飯
 e	leg	腳	腳桿	腿	腿部	骹
+e	leg hair	腿毛
 e	leg press	蹬腿
 e	leg vise	夾棍
 e	leg warmers	襪套
@@ -39661,7 +39653,6 @@ e	lester or leicester	萊斯特
 e	let	任	任由	擦網球	聽任
 e	let alone	何況	放任	莫講	遑論
 e	let bygones be bygones	不咎既往
-e	let down	辜負
 e	let drip	淌下
 e	let droop	低
 e	let drop	沰
@@ -39859,7 +39850,7 @@ e	lie down	倒臥	倒頭	側躺	睡	臥倒	躺	躺下	躺倒
 e	lie fallow	休閒
 e	lie flat	橫躺
 e	lie group	李群
-e	lie idle	拋荒	閒置
+e	lie idle	拋荒
 e	lie in ambush	狙
 e	lie in bed	臥床
 e	lie in disarray	橫陳
@@ -39924,7 +39915,7 @@ e	lifestyle diseases	文明病	都市病
 e	lifetime	一輩子	世	壽命	壽限	輩	輩子
 e	lifetime achievements	生平事跡
 e	lifetime ago	隔世
-e	lift	㧯	升降機	抬	挈	掀	掀動	提	撟	撬	昂
+e	lift	㧯	升力	升降機	抬	挈	掀	掀動	提	撟	撬
 e	lift a ban	解封	開禁
 e	lift a curfew	開禁
 e	lift a prohibition	解禁
@@ -40020,7 +40011,7 @@ e	light weapon	輕武器
 e	light wind	微風	輕風
 e	light yellow	淡黃
 e	light yellow color	緗
-e	light-emitting diode	光二極管	發光二極管	發光二極體
+e	light-emitting diode	發光二極管	發光二極體
 e	light-fingered	手腳不乾淨
 e	light-sensitive	感光
 e	light-vented bulbul	白頭鵯
@@ -40267,7 +40258,7 @@ e	liquor store	酒肆
 e	lira	里拉	鉝
 e	liriodendron chinense	鵝掌楸
 e	lisp	口齒不清	大舌頭
-e	list	列出	列明	列舉	單	收列	目錄	細數	編目	羅列	譜
+e	list	列出	列明	列舉	單	收列	目錄	編目	羅列	譜	開列
 e	list as wanted	通緝
 e	list individually	點檢
 e	list of deaths	報條
@@ -40572,7 +40563,6 @@ e	local management interface	本地管理界面
 e	local official	地方官
 e	local or neighborhood policeman	片兒警
 e	local or regional confrontation	地區衝突
-e	local people	鄉親
 e	local person	當地居民
 e	local police station	派出所
 e	local policy	土政策
@@ -40597,7 +40587,7 @@ e	localized	局限性
 e	localized pain disorder	痺證
 e	locally	就地	局地
 e	located in china	駐華
-e	location	位	地點	場合	場所	廠址	所在	選址
+e	location	位	地點	場所	廠址	所在	選址
 e	location below sth	底下
 e	location of a grave	穴位
 e	locative case	處格
@@ -40807,7 +40797,7 @@ e	long-held opinion	宿見
 e	long-horned grasshopper	紡織孃	蟈蟈
 e	long-lasting	恆久	經久	耐久	遐
 e	long-legged buzzard	棕尾鵟
-e	long-lived	長壽
+e	long-lived	長命	長壽
 e	long-married couple	老夫老妻
 e	long-necked wine flask	鈃
 e	long-nosed pit viper	白花蛇
@@ -40931,6 +40921,7 @@ e	look straight at	直視
 e	look through	翻檢
 e	look tired	面露倦意
 e	look towards	望
+e	look unfamiliar	面生
 e	look unwell	臉都綠了	面帶病容
 e	look up	仰	朝天	查	查找	查檢	檢索
 e	look up at	仰望	仰視
@@ -40946,7 +40937,7 @@ e	looking up expectantly	喁喁
 e	lookism	外貌主義
 e	lookout	觀景台
 e	lookout post	瞭望哨
-e	lookout tower	敵臺	望樓	瞭望臺
+e	lookout tower	敵臺	望樓
 e	looks	人才	姿	姿容	容貌	眉眼	臉相	貌相	采	長相	頭面
 e	looks and demeanor	容止
 e	loom	機杼	織布機	織機
@@ -41139,7 +41130,6 @@ e	loudspeaker	喇叭	擴音器	擴音機
 e	loudspeaker box	音箱
 e	loughborough university	拉夫堡大學
 e	louis	路易
-e	louis or lewis	路易斯
 e	louis vuitton	路易威登
 e	lounge	休息室	躺椅
 e	louse	虱	蝨	蝨子
@@ -41175,7 +41165,7 @@ e	love others as self	愛人如己
 e	love poem	情詩
 e	love song	情歌	戀歌	酸曲
 e	love tenderly	憐愛	撫愛
-e	love triangle	三角戀愛
+e	love triangle	三角戀	三角戀愛
 e	love-struck fool	花痴
 e	lovebirds	情侶鸚鵡
 e	loved by all	人見人愛
@@ -41273,6 +41263,7 @@ e	low-profile	低調
 e	low-quality commodities	假冒偽劣
 e	low-quality goods	臭貨
 e	low-rent housing	廉租房
+e	low-sugar	低糖
 e	low-top	低幫
 e	low-velocity zone	低速區
 e	lower	下	下調	低	低下	削減	壓低	放下	放低	沉	減
@@ -41614,7 +41605,7 @@ e	maggot	蛆	蛆蟲
 e	magi	東方三博士
 e	magic	法術	魅	魔力	魔幻	魔法	魔術
 e	magic cloud	祥雲
-e	magic cube	魔方	魔術方塊	魯畢克方塊
+e	magic cube	魔方	魔術方塊
 e	magic emanation	絪
 e	magic mushroom	迷幻蘑菇
 e	magic number	幻數
@@ -41778,7 +41769,7 @@ e	main item	大項
 e	main job	正職
 e	main key	基調
 e	main line	主線	幹線
-e	main part	主體	大頭	本體	重心
+e	main part	主體	大頭	本體
 e	main part of sth	幹
 e	main peak	主峰
 e	main plan	要圖
@@ -41955,7 +41946,7 @@ e	make by hand	手製
 e	make ceramics	拉坯
 e	make certain	確定
 e	make changes in writing	雌黃
-e	make clear	昭示	白	表明
+e	make clear	昭示	表明
 e	make clothes	裁製
 e	make compatible	合理化
 e	make concessions	退後
@@ -41980,7 +41971,6 @@ e	make exaggerated claims	放衛星
 e	make excuses	推托	狡辯	貸
 e	make expectoration easy	潤肺
 e	make explicit	曉
-e	make explosive allegations	爆料
 e	make extra efforts	加勁
 e	make extra money	撈外快
 e	make extravagant demands	奢求
@@ -42073,6 +42063,7 @@ e	make restitution	退繳
 e	make right	糾正
 e	make sarcastic comments	冷言冷語
 e	make sb	讓
+e	make sb angry	惹惱
 e	make sb laugh	逗趣	逗趣兒
 e	make sb leave	打發
 e	make secret inquiries	暗訪
@@ -42153,9 +42144,10 @@ e	makings of	坯子
 e	malabar spinach	木耳菜	蠶菜
 e	malachi	瑪拉基亞
 e	malady	弊病
-e	malaria	冷熱病	擺子	瘧	瘧子	瘧疾	瘧疾病	瘴	瘴癘
+e	malaria	冷熱病	擺子	瘧	瘧子	瘧疾	瘧疾病
 e	malarial fever	痁
 e	malarial mosquito	按蚊
+e	malatang	麻辣燙
 e	malawi	馬拉威	馬拉維
 e	malay language	馬來文	馬來語
 e	malay peninsula	馬來半島
@@ -42891,7 +42883,7 @@ e	matriarchy	母權制
 e	matricaria recutita	洋甘菊
 e	matricide	弒母
 e	matrilineality	母系社會
-e	matrix	基體	方陣	模	模具	模型	模子	母體	矩陣	黑客帝國
+e	matrix	基體	方陣	模	模型	模子	母體	矩陣	黑客帝國
 e	matron	女舍監	婆
 e	matron of honor	伴娘	喜娘
 e	matsu islands	馬祖列島
@@ -43085,7 +43077,6 @@ e	mechanical	刻板	機械	機械性
 e	mechanical clock	機械鐘
 e	mechanical energy	機械能
 e	mechanical engineering	機械工程
-e	mechanical hand	抓手
 e	mechanical pencil	自動鉛筆
 e	mechanical planter	栽種機
 e	mechanical plow	火犁
@@ -43186,7 +43177,7 @@ e	meditate	冥想	打坐	打禪	靜坐	默想
 e	meditation	冥想	沉思	瞑想	禪	靜修	靜心
 e	meditation room	禪堂
 e	mediterranean sea	地中海
-e	medium	中常	中等	五分熟	介質	媒	媒介	媒材	媒質
+e	medium	中常	中等	五分熟	介質	媒	媒介	媒材	媒質	靈媒
 e	medium access control	介質訪問控制
 e	medium depth earthquake	中源地震
 e	medium egret	中白鷺
@@ -43211,7 +43202,7 @@ e	medusa	水母	水母體	美杜莎
 e	medvedyev	梅德韋傑夫
 e	meek	溫順	溫馴	謙和
 e	meerkat	狐獴	細尾獴
-e	meet	交接	交會	佸	晤	會合	會晤	滿足	相逢	相遇	碰上
+e	meet	交接	交會	佸	晤	會合	滿足	相逢	相遇	碰上	碰到
 e	meet a challenge	迎接挑戰
 e	meet a contingency	應急
 e	meet a person	接人
@@ -43239,7 +43230,7 @@ e	meet with danger	遇險
 e	meet with disaster	慘遭不幸	蒙難
 e	meet with luck	交運
 e	meet with misfortune	坎壈	落難
-e	meeting	晤談	會合	會晤	會議	會面	集會
+e	meeting	晤談	會合	會議	會面	集會
 e	meeting of heroes	群英會
 e	meeting of minds	蘭交	靈犀
 e	meeting place	會場	會所
@@ -43339,7 +43330,7 @@ e	memorial arch	牌坊
 e	memorial archway	坊
 e	memorial badge	紀念章
 e	memorial day	亡兵紀念日	念日	紀念日	陣亡戰士紀念日
-e	memorial hall	祠堂	紀念堂	紀念館
+e	memorial hall	祠堂	紀念堂
 e	memorial hall and tomb	祠墓
 e	memorial meeting	追思會
 e	memorial mound	烈士陵
@@ -43569,6 +43560,7 @@ e	metallic bond	金屬鍵
 e	metalloid	類金屬
 e	metallophone	鐵琴
 e	metallurgy	冶金	冶金學
+e	metalworking	金工
 e	metamorphic rock	變質岩
 e	metamorphism	變質	變質作用
 e	metamorphose	幻化	蛻化	蝶變	變態
@@ -43670,7 +43662,7 @@ e	mg motor	名爵
 e	mi county in henan	密縣
 e	miami	邁阿密
 e	miao ethnic group	苗	苗族
-e	miasma	氛	沴	瘴
+e	miasma	氛	沴	瘴	瘴氣
 e	mib	管理信息庫
 e	mic	麥
 e	mic hog	麥霸
@@ -43814,7 +43806,7 @@ e	midstream	中流	中游
 e	midsummer	仲夏	盛夏
 e	midterm	期中
 e	midterm election	中期選舉
-e	midway	中路	中途	半路	半途
+e	midway	中路	半路	半途
 e	midway islands	中途島
 e	midweek	周中
 e	midwest	中西部
@@ -43850,7 +43842,7 @@ e	mild-tempered	溫吞
 e	mildew	毛	霉	霉病
 e	mildew-proof	防霉
 e	mildly spicy	微辣
-e	mile	哩	英里
+e	mile	哩	英里	邁
 e	mile high club	高空俱樂部
 e	mileage	里程
 e	milestone	里程碑
@@ -44529,7 +44521,7 @@ e	mokuma-gane	木目金
 e	molar	板牙	磨牙
 e	molar tooth	臼齒
 e	molasses	糖蜜	餳
-e	mold	冶容	坯模	型	捏	模	模具	模型	模子	毛	澆
+e	mold	冶容	坯模	型	捏	模	模型	模子	毛	澆	澆鑄
 e	mold making	製模
 e	mold on liquids	醭
 e	mold pressing	模壓
@@ -44680,6 +44672,7 @@ e	monograph	專著
 e	monogyny	一妻制
 e	monolingual	單語
 e	monomer	單體
+e	monomial	單項式
 e	mononuclear cell	單核細胞
 e	mononucleosis	單核細胞增多症
 e	monoplane	單翼飛機
@@ -44771,7 +44764,7 @@ e	moorhen	水雞
 e	mooring	停泊
 e	mooring bollard	纜樁
 e	mooring rope	纜索	纜繩
-e	moose	大鹿	駝鹿	麋
+e	moose	堪達罕	大鹿	駝鹿	麋
 e	mop	墩布	拖	拖布	拖把
 e	mop the floor	拖地	拖地板
 e	mop up	掃蕩	清掃
@@ -45007,6 +45000,7 @@ e	motorcycle taxi	摩托車的士	摩的
 e	motorhome	旅居車
 e	motorists	開車族
 e	motorized	機動
+e	motorized three-wheeler	三蹦子
 e	motorola	摩托羅拉
 e	mottled	斑駁	駁落
 e	mottled bamboo	斑竹
@@ -45259,7 +45253,7 @@ e	muddled accounts	糊塗賬
 e	muddled and inferior	蕪劣
 e	muddled and limited	蕪鄙
 e	muddleheaded	天然呆	悖晦	昏庸	渾渾噩噩	稀裏糊塗
-e	muddy	污濁	沾滿	泥濘	泥質	淟	混濁	渾濁	溷	濁	濘
+e	muddy	污濁	沾滿	泥濘	泥質	淟	混濁	渾濁	溷	濘	灢
 e	muddy and wet	拖泥帶水
 e	muddy swamp	泥淖
 e	muddy water	泥水	涊
@@ -45427,7 +45421,7 @@ e	murata	村田
 e	murder	兇殺	刺	害命	殺人	殺人案件	殺害	誅殺	謀殺	謀殺罪
 e	murder a superior	弒
 e	murder by poison	屠毒
-e	murder case	兇殺案	命案	殺人案	血案	謀殺案
+e	murder case	兇案	兇殺案	命案	殺人案	血案	謀殺案
 e	murder mystery game	劇本殺
 e	murder one's parent	弒
 e	murder weapon	兇器
@@ -45439,7 +45433,6 @@ e	murine typhus fever	地方性斑疹傷寒	鼠蚤型斑疹傷寒
 e	murk	黝暗
 e	murkiness	黝暗
 e	murky	昏沉	濃密	灰暗	陰暗
-e	murky atmosphere	烏煙瘴氣
 e	murmur	低吟	咕噥	囔囔	潺潺	讟
 e	murmur endearments	談情說愛
 e	murmuring	呢喃
@@ -45559,7 +45552,6 @@ e	mutual repulsion	相斥
 e	mutual respect in marriage	齊眉
 e	mutual supervision	互相監督
 e	mutual trust	互信
-e	mutual understanding	默契
 e	mutual-consent divorce	和離
 e	mutually	互相	相
 e	mutually agree	商約
@@ -45840,7 +45832,7 @@ e	narrow and small	窄小
 e	narrow bed	臥榻
 e	narrow escape	天幸
 e	narrow forehead	頲
-e	narrow gap	少間	窄縫
+e	narrow gap	窄縫
 e	narrow lane	狹徑
 e	narrow mountain pass	埡口
 e	narrow one's eyes	瞇	瞇眼
@@ -46439,6 +46431,7 @@ e	new latin	新拉
 e	new lease of life	九死一生
 e	new life	新生
 e	new low	新低
+e	new media	新媒體
 e	new model	新款
 e	new moon	新月	月缺	朔月	朔望
 e	new or unfamiliar words	生詞語
@@ -46532,6 +46525,7 @@ e	news one has heard	聽聞
 e	news service	新聞處	通訊社
 e	news story	通訊
 e	news tidbits	珍聞
+e	news tip	報料
 e	newsflash	快訊
 e	newsgroup	新聞組
 e	newsletter	簡訊
@@ -46849,7 +46843,7 @@ e	noisy drinking sound	咕嚕
 e	noisy prattle	絮聒
 e	nokia	諾基亞
 e	nomadic	流浪	遊牧
-e	nomadic camp	浩特	營盤
+e	nomadic camp	浩特
 e	nomenclature	命名法
 e	nomex	諾美克斯
 e	nominal	公稱	名義	有名亡實	有名無實	標稱
@@ -47071,6 +47065,7 @@ e	northern sea	溟池
 e	northern shoveler	琵嘴鴨
 e	northern shrike	灰伯勞
 e	northern side	北面
+e	northern snakehead	烏鱧	黑魚
 e	northern song dynasty	北宋
 e	northern taiwan	頂港
 e	northern thailand	泰北
@@ -47184,7 +47179,7 @@ e	not good	不佳	難
 e	not good at	不善
 e	not good enough	欠佳
 e	not good for	無益
-e	not guilty	無罪	無辜
+e	not guilty	無罪
 e	not happy	沉悶
 e	not have	冇	毋	沒有
 e	not having the face	沒臉
@@ -47497,8 +47492,7 @@ e	nuclear electro-magnetic pulse	核電磁脈衝
 e	nuclear energy	核能
 e	nuclear engineering	核工程
 e	nuclear equipoise	核僵持
-e	nuclear explosion	核爆炸
-e	nuclear explosion device	核爆炸裝置
+e	nuclear explosion	核爆	核爆炸
 e	nuclear export control	核出口控制
 e	nuclear facility	核設施
 e	nuclear fission	核分裂	核裂變
@@ -47547,8 +47541,6 @@ e	nuclear test site	核試驗場
 e	nuclear threshold	核門檻
 e	nuclear transformation	核轉變
 e	nuclear transmutation	核轉變
-e	nuclear underground burst	地下核爆炸
-e	nuclear underwater burst	水下核爆炸
 e	nuclear warfare	核戰
 e	nuclear warhead	核彈頭	核戰鬥部
 e	nuclear waste	核廢物
@@ -47787,7 +47779,6 @@ e	observation by naked eye	肉眼觀察
 e	observation deck	觀景台
 e	observation platform	觀象臺
 e	observation satellite	觀測衛星
-e	observation tower	瞭望塔	瞭望臺
 e	observation wheel	摩天輪
 e	observational	實測
 e	observations	觀感
@@ -47852,7 +47843,7 @@ e	obviously pregnant	顯懷
 e	oc spray	胡椒噴霧
 e	ocarina	塤	陶笛
 e	occam's razor	奧卡姆剃刀
-e	occasion	場合	場面	機會	際
+e	occasion	場面	機會	際
 e	occasional	偶然	偶見	應時
 e	occasionally	不時	偶然	偶爾	偶而	間或
 e	occasions	天次
@@ -47993,7 +47984,7 @@ e	of marriageable age	適婚
 e	of mountainous appearance	嵡
 e	of no account	算不了
 e	of no avail	無補
-e	of no consequence	不當緊	不足道	不關痛癢	百不咋
+e	of no consequence	不當緊	不足道	不關痛癢
 e	of no interest	沒勁	沒意思	沒有意思
 e	of no value	不值一笑
 e	of one mind	冥合	同心同德	暗合
@@ -48044,10 +48035,11 @@ e	off-putting	下頭
 e	off-road vehicle	越野車
 e	off-site monitoring	遠距離監視
 e	off-target	脫靶
+e	off-the-shelf mold	公模
 e	offal	下水	雜碎
 e	offbeat	不落俗套	另類
 e	offcut	下腳料
-e	offend	冒犯	惹人	惹惱	犯	絓	衝撞	觸犯
+e	offend	冒犯	惹人	犯	絓	衝撞	觸犯
 e	offend one's elders	以下犯上
 e	offend one's superiors	犯上
 e	offend sb	得罪	開罪
@@ -48094,7 +48086,7 @@ e	offhand	輕率
 e	office	任	公室	局	廳	署	職	衙	辦	隊部
 e	office automation	辦公自動化
 e	office building	寫字樓	辦公大樓	辦公樓
-e	office desk	班檯
+e	office desk	班檯	辦公桌
 e	office hours	辦公時間
 e	office of an association	會所
 e	office of punishment	刑房
@@ -48131,7 +48123,6 @@ e	official language	官方語言
 e	official leave from work	公假
 e	official letter	公函
 e	official manner	官樣
-e	official media	官媒
 e	official messenger	差使
 e	official newspaper	機關報
 e	official pay	祿俸	祿食	糈
@@ -48525,7 +48516,7 @@ e	on the previous occasion	頭回
 e	on the right track	對頭
 e	on the riverbank	岸上
 e	on the road	路上
-e	on the rocks	加冰	加冰塊
+e	on the rocks	加冰
 e	on the same day	同日
 e	on the same level	同級
 e	on the same track	合轍
@@ -48849,11 +48840,12 @@ e	one-volume edition	合訂本
 e	one-way	單程
 e	one-way road	單行線
 e	one-way street	單行道
+e	one-way ticket	單程票
 e	one-way traffic	單行
 e	one-word sentence	獨詞句
 e	oneiromancy	圓夢
 e	onerous	繁重
-e	oneself	一己	己	暗自	自家	自身	親自	親身	身
+e	oneself	一己	己	暗自	自家	自身	親自	身
 e	oneself and one's family	身家
 e	onigiri	御飯糰	飯糰
 e	onion	洋蔥	皮牙子	蔥頭
@@ -49042,7 +49034,7 @@ e	operations	運作	運籌
 e	operations and maintenance	運維
 e	operations research	運籌學
 e	operative	特務
-e	operator	主子	操作員	操作符	操作者	機師	算子	運營商
+e	operator	主子	操作員	操作符	操作者	機師	算子	算符	運營商	運算符
 e	operculum	厴
 e	ophiolite	蛇綠岩	蛇綠混雜岩
 e	ophiolite belt	蛇綠混雜岩帶
@@ -49056,7 +49048,6 @@ e	opinionated	有主見	認死理	跂訾
 e	opinionless person	應聲蟲
 e	opinions differ	眾說紛紜	見仁見智
 e	opium	大煙	阿片	阿芙蓉	鴉片
-e	opium eater	癮君子
 e	opium pipe	煙槍	鴉片槍
 e	opium trade	販毒
 e	opium war	鴉片戰爭
@@ -49899,7 +49890,6 @@ e	ovum	卵子
 e	ow	哎喲	啊喲
 e	owe	欠	虧欠	該	逋
 e	owe a debt	欠債	欠款	欠賬
-e	owe nothing	不該
 e	owe wages	欠薪
 e	owen	歐文
 e	owens	歐文斯
@@ -50036,7 +50026,6 @@ e	page of a publication	版面
 e	page views	瀏覽量
 e	pageant	盛會
 e	pager	呼機
-e	pages ahead	後文
 e	paginate	分頁
 e	pagination	分頁
 e	pagoda	佛塔	寶塔	層樓
@@ -50045,8 +50034,6 @@ e	pagrus major	鯛
 e	pah	咅
 e	pahang province of malaysia	彭亨
 e	pai gow	牌九
-e	pai hsiao-yen	白曉燕
-e	pai ping-ping	白冰冰
 e	paid	付訖	受僱	帶薪	有償
 e	paid by state stipend	官費
 e	paid leave	帶薪休假
@@ -50704,6 +50691,7 @@ e	passion or egg fruit	雞蛋果
 e	passionate	動情	多情	火熱	熱情	熾熱
 e	passionate love	男歡女愛
 e	passionately	熱情
+e	passivate	鈍化
 e	passive	消極	消極性	被動	靜態
 e	passive immunity	被動免疫
 e	passive income	被動收入
@@ -50737,7 +50725,6 @@ e	pasteur	巴氏
 e	pasteurization	巴氏殺菌
 e	pasteurized beer	熟啤酒
 e	pastiche	拼貼	擬作	擬古之作
-e	pasties	乳貼
 e	pastime	消遣
 e	pasting table	塗漿檯
 e	pastor	牧人	牧師	監牧
@@ -50773,8 +50760,7 @@ e	paternal grandfather	祖父
 e	paternal grandmother	王母
 e	paternal grandparents	祖父母
 e	paternal great-aunt	姑奶奶
-e	paternal great-grandfather	曾祖父	老爺爺
-e	paternal great-grandmother	曾祖母	老奶奶
+e	paternal great-grandmother	老奶奶
 e	paternal line	父系
 e	paternal love	父愛
 e	paternal male cousin	堂兄弟
@@ -50783,6 +50769,7 @@ e	paternity leave	陪產假
 e	paternity or maternity test	親子鑒定
 e	path	俓	傒	塗徑	徑跡	徑路	徑道	徯徑	溪徑	走勢	走道
 e	path between fields	田陌
+e	path dependence	路徑依賴
 e	path to the underworld	冥道
 e	path traveled	路程
 e	pathetic	可憐	可憐巴巴	弱爆	沒起子	洩氣
@@ -50841,7 +50828,7 @@ e	pattering	漓	瀟瀟
 e	pattering sound	滴答
 e	pattern	型式	型態	套路	式	形態	態樣	格局	楷	模	模型
 e	pattern matching	連連看
-e	pattern or die	模具	模子
+e	pattern or die	模子
 e	pattern sheet	樣張
 e	paul	保爾	保羅
 e	paulownia	泡桐
@@ -50870,6 +50857,7 @@ e	pawn	典當	典質	小卒	押	棋子	爪牙	當	當掉	當當	質
 e	pawn in chinese chess	卒
 e	pawn shop	質鋪
 e	pawnshop	典當行	當鋪	質庫
+e	pawpaw	巴婆果	泡泡果
 e	paws	爪兒
 e	paws of animal	蹯
 e	pax americana	美利堅治世
@@ -51457,7 +51445,7 @@ e	permission	允准
 e	permission graciously granted	恩准
 e	permission to proceed	綠燈
 e	permissive	放縱
-e	permit	允	允准	允許	准予	准許	容許	得	許	許可	許可證
+e	permit	允	允准	准予	准許	容許	得	許	許可	許可證	許和
 e	permit or allow	興
 e	permutation	排列	置換
 e	permutation group	置換群
@@ -51493,7 +51481,7 @@ e	persian gulf	波斯灣
 e	persian silk tree	馬纓花
 e	persicaria orientalis	葒草
 e	persimmon	柿	柿子
-e	persist	堅執	復現	持續
+e	persist	堅執	復現
 e	persist in	堅持
 e	persist obstinately	執迷
 e	persistence	持久
@@ -51568,7 +51556,7 @@ e	person's secrets	包袱底兒
 e	person's status	名分
 e	person-times	人次
 e	personage	名人
-e	personal	人身	切身	手	私	私人	私房	親身	貼身
+e	personal	人身	切身	手	私	私人	私房	貼身
 e	personal address book	電話本
 e	personal attack	人身攻擊
 e	personal bodyguard	貼身衛隊
@@ -51593,7 +51581,7 @@ e	personal pronoun	人稱代詞
 e	personal prop	隨身道具
 e	personal property	動產
 e	personal safety	人身安全
-e	personal savings	個人儲蓄
+e	personal savings	個人儲蓄	體己
 e	personal spite	私憤
 e	personal strength	特長
 e	personal trainer	私教
@@ -51758,7 +51746,7 @@ e	pheasant-tailed jacana	水雉
 e	phelps	菲爾普斯
 e	phenazine	吩嗪
 e	phencyclidine	苯環利定
-e	phenol	酚	酚類化合物
+e	phenol	酚
 e	phenolic aldehyde	酚醛
 e	phenolic resin	酚醛	酚醛膠
 e	phenology	物候學
@@ -51867,7 +51855,7 @@ e	photocopier	影印機	複印機
 e	photocopier paper	複印紙
 e	photocopy	影印本	複印
 e	photocopying	影印
-e	photodiode	光二極管	光電二極管
+e	photodiode	光電二極管
 e	photoelectric	光電
 e	photoelectric effect	光電效應
 e	photoelectron	光電子
@@ -51890,7 +51878,8 @@ e	photolysis	光化作用
 e	photon	光子
 e	photoresist	光刻膠
 e	photosensitive	光敏
-e	photosynthesis	光化作用	光合	光合作用	光能合成
+e	photosynthesis	光化作用	光合作用	光能合成
+e	photosynthetic	光合
 e	phototelegram	傳真電報
 e	phototherapy	光照治療
 e	phototypesetting	照排	照相排版
@@ -51928,7 +51917,7 @@ e	physical examination	體格檢查
 e	physical exercise	健身	體育鍛煉
 e	physical fitness	體適能
 e	physical fitness test	體育達標測驗
-e	physical labor	勞動	體力勞動
+e	physical labor	勞動	體力勞動	體力活
 e	physical layer	實體層	物理層
 e	physical or emotional pain	創痛
 e	physical pain	皮肉之苦
@@ -52146,8 +52135,7 @@ e	pilot scheme	試辦	試點
 e	pilot test	中試
 e	pilot's seat	駕駛席
 e	pilothouse	操舵室
-e	pimp	三七仔	淫媒	男妓	皮條	皮條客	郎君	馬伕	龜公
-e	pimping	淫媒罪
+e	pimp	三七仔	男妓	皮條	皮條客	郎君	馬伕	龜公
 e	pimple	丘疹	痘	痘皰	癤	皰	粉刺
 e	pimple containing pus	膿皰
 e	pin	別針	引腳	栓	球瓶	釘	針	銷子
@@ -52551,7 +52539,7 @@ e	platitude	濫套子	濫調	陳腐
 e	platonism	柏拉圖哲學
 e	platoon	排
 e	platoon leader	排長
-e	platter	大淺盤	大盤子
+e	platter	大淺盤
 e	platypus	鴨嘴獸
 e	play	去	吹奏	嫽	嬉耍	彈	彈奏	戲	打法	扮	抏
 e	play a drum	打鼓
@@ -52587,7 +52575,7 @@ e	play in several acts	多幕劇
 e	play knucklebones	邷麼兒
 e	play mahjong	搓麻將	搬磚	摸八圈	摸牌	玩牌	砌長城	碼長城
 e	play marbles	彈球
-e	play matchmaker	撮合
+e	play matchmaker	撮合	牽紅線
 e	play music	奏	弦而鼓之
 e	play of passions	耍私情
 e	play on words	雙關	雙關語
@@ -53044,6 +53032,7 @@ e	political correctness	政治正確
 e	political discipline	政紀
 e	political dissident	政治異議人士
 e	political division	政治部
+e	political donation	政治獻金
 e	political economy	政治經濟學
 e	political education	政教
 e	political education office	政教處
@@ -53154,7 +53143,7 @@ e	polytheism	多神論
 e	polytheist	多神論者
 e	polythene	聚乙烯
 e	polytope	多胞形
-e	polytunnel	大棚	暖棚
+e	polytunnel	暖棚
 e	polyunsaturated fatty acid	多元不飽和脂肪酸
 e	polyurethane	聚氨酯
 e	polyvinyl chloride	聚氯乙烯
@@ -53320,7 +53309,6 @@ e	poria five powder	五苓散
 e	poria mushroom	豬苓
 e	porifera	多孔動物
 e	pork	大肉	豬肉
-e	pork and scrambled eggs	木犀肉
 e	pork ball	貢丸
 e	pork belly	五花肉
 e	pork bouillon powder	豬精
@@ -53461,6 +53449,7 @@ e	post horse	驛	驛馬
 e	post information	啟事
 e	post office	郵局	郵政局
 e	post office box	信箱	郵政信箱	郵箱
+e	post on x	推文
 e	post-credits scene	彩蛋
 e	post-it note	利貼	方便貼
 e	post-nut clarity moment	賢者時間
@@ -53557,7 +53546,7 @@ e	potency	效價	效價能
 e	potent	攻伐	霸道
 e	potential	位	勢	潛在	潛能	潛質
 e	potential drop	勢降
-e	potential energy	勢能
+e	potential energy	位能	勢能
 e	potential for attack	攻擊力
 e	potential menace	潛在威脅
 e	potential threat	潛在威脅
@@ -54044,7 +54033,6 @@ e	presentation pack	郵摺
 e	presentation seminar	發表會
 e	presentation slide	幻燈片
 e	presently	俄頃	少頃	隨即
-e	preservation	持續
 e	preservation of soil moisture	保墒
 e	preservative	防腐劑
 e	preservative film	保鮮膜
@@ -54174,7 +54162,7 @@ e	preventive	防範
 e	preventive measure	預防針
 e	preview	試映	試演	預覽
 e	preview screening	點映
-e	previous	上任	上個	以前	在先	往	過往
+e	previous	上任	上個	以前	在先	往
 e	previous condition	原狀
 e	previous convictions	前科
 e	previous day	上天
@@ -54296,7 +54284,7 @@ e	print and circulate	刊行
 e	print and distribute	印發	印行
 e	print head	打印頭
 e	print larger	擴印
-e	print media	平面	紙媒
+e	print media	平面媒體	紙媒
 e	print out	列印	打印
 e	print run	印刷量	印數
 e	print shop	印刷廠
@@ -54470,7 +54458,7 @@ e	proctoscope	直腸鏡
 e	procurator	公訴人	檢控官
 e	procuratorate	檢察院
 e	procure	拉皮條	採購	採辦
-e	procurer	淫媒	皮條	馬伕
+e	procurer	皮條	馬伕
 e	procuress	鴇
 e	procuring	淫媒罪
 e	prod	撥動
@@ -54631,7 +54619,7 @@ e	prolate spheroid	類球面
 e	proletariat	工農兵	普羅	普羅列塔利亞	普羅大眾	無產者	無產階級
 e	proliferate	再育	蕃
 e	proliferate unchecked	氾濫
-e	prolific	多產	多育
+e	prolific	多產	多育	著作等身
 e	prolix	煩冗
 e	prologue	序幕	序章	楔子
 e	prologue of play	開場白
@@ -55310,7 +55298,7 @@ e	purchase online	網購
 e	purchasing agent	採購員
 e	purchasing power	購買力
 e	purdue university	普渡大學
-e	pure	單純	洌	淳	清白	清真	湜	白	皭	粹	精純
+e	pure	單純	洌	淳	清白	清真	湜	皭	粹	精純	純
 e	pure and concise	精粹
 e	pure and high-minded	清風勁節
 e	pure and holy	聖潔
@@ -55426,7 +55414,7 @@ e	pustule	挫瘡	痘	膿包	膿泡
 e	put	厝	放	放置	置	置放
 e	put a roof	封頂
 e	put about	揚言
-e	put aside	丟	寘	屏	擱
+e	put aside	丟	寘	屏
 e	put away	收
 e	put back	轉回
 e	put back on	穿回
@@ -55454,10 +55442,10 @@ e	put into production	上線	投產
 e	put into water	下水
 e	put it briefly	簡而言之
 e	put money into	注資
-e	put off	宕	延緩	拖延	推	推遲	緩期	駛出
+e	put off	宕	延緩	拖延	推	推遲	緩期	耽擱	駛出
 e	put off hiring	緩聘
 e	put on	上身	戴上	扮	演出	登	穿上	穿回	衣	配戴
-e	put on airs	人模狗樣	假招子	拿大	拿架子	擺架子	擺譜	神氣活現	端架子
+e	put on airs	人模狗樣	拿大	拿架子	擺架子	擺譜	神氣活現	端架子
 e	put on display	展出	展覽	彰顯	揭舉	獻
 e	put on dress	披掛
 e	put on makeup	化妝	塗脂抹粉
@@ -55699,7 +55687,6 @@ e	queen of flowers	花魁
 e	queen victoria	維多利亞女王
 e	queen's ceremonial gowns	褘
 e	queen's counsel	御用大律師
-e	queen's university	女皇大學
 e	queensland	昆士蘭州
 e	queer	不對	不是味兒	奇特	左	酷兒
 e	queer face	怪樣
@@ -56281,6 +56268,7 @@ e	ratzinger	拉青格
 e	raucous	吵鬧	粗啞	聒	聒耳
 e	ravage	摧	摧殘	斫喪	蹂躪
 e	ravaged by successive wars	兵連禍結
+e	ravages of war	兵燹
 e	rave	怒吼
 e	raven	大烏鴉	烏鴉
 e	ravenclaw	拉文克勞
@@ -56332,7 +56320,6 @@ e	reach a verdict	定案	結論
 e	reach adulthood	成人
 e	reach agreement	相約	諧	達成協議
 e	reach an agreement	協定	議定
-e	reach an end	告終
 e	reach by stretching	搆
 e	reach directly	直達
 e	reach everywhere	無所不至
@@ -56354,7 +56341,7 @@ e	reaction	反作用	反動	反應	反響	感應	迴響
 e	reaction force	反作用力
 e	reaction to light	光感應
 e	reactionaries	反動派
-e	reactionary	反動	右傾	守舊	白
+e	reactionary	反動	右傾	守舊
 e	reactionary faction	賊船
 e	reactionary forces	反動勢力
 e	reactionary framework	老框框
@@ -56456,7 +56443,7 @@ e	reality	實在	實物	實際	實際情況	真事	真實性	真際
 e	reality show	真人秀
 e	realizable	行得通
 e	realization	體認
-e	realize	了解	想通	發覺	省悟	瞭解	覺悟	認知	領略	體悟	體會
+e	realize	想通	發覺	省悟	覺悟	認知	領略	體悟	體會	體認
 e	realize abruptly	頓覺
 e	realize clearly	了了
 e	realize only then	方知
@@ -56596,7 +56583,6 @@ e	receiving materials	領料
 e	receiving much help	多助
 e	receiving party	收方
 e	recent	晚近	近期
-e	recent developments	近況
 e	recent graduate	應屆畢業生
 e	recent photo	近照
 e	recent year	近年
@@ -56659,7 +56645,7 @@ e	reclassify	轉歸
 e	recline	斜倚	斜躺	斜靠	橫臥	躺
 e	recliner	躺椅
 e	reclining buddha	臥佛
-e	recluse	家裡蹲	逸民	隱君子	隱逸
+e	recluse	家裡蹲	逸民	隱逸
 e	reclusive	佚	逸	隱逸
 e	recognition	承認	認出
 e	recognize	承認	相認	確定	認	認出	認同	認得	認知	認識	辨
@@ -57028,7 +57014,6 @@ e	reference news	參考消息
 e	referendum	全民公決	全民投票	公投	公民投票	公民表決	公決
 e	referral	轉介
 e	referring to	齒及
-e	refers to abrupt transformation	搖身
 e	refers to lovemaking	煙花風月
 e	refers to mahatma gandhi	聖雄
 e	refill	續杯
@@ -57892,7 +57877,7 @@ e	resist corrosion	耐蝕
 e	resist foreign aggression	攘外
 e	resist japan	抗日
 e	resist the enemy	抗敵
-e	resistance	抗性	抵制	抵抗	抵抗力	耐受性	阻力	電阻
+e	resistance	抗性	抵制	抵抗	抵抗力	耐受性	阻力
 e	resistant to cold	耐寒
 e	resistor	電阻	電阻器
 e	resit	補考
@@ -57933,7 +57918,6 @@ e	respect the aged	尊老
 e	respect the elderly	敬老
 e	respect the law	守分
 e	respectable	尊貴	本本分分
-e	respectable woman	良家女子
 e	respected	尊貴
 e	respectful	廙	恪	恭	恭敬	恭順	惕	祗	竦	肅	肅敬
 e	respectful form of address	伯
@@ -57988,6 +57972,7 @@ e	restore old way	復舊
 e	restrain	克	克制	剋	垔	壓住	憋	扼制	抑	抑止	拘
 e	restrain anger	眕
 e	restrain one's emotions	隱忍不發	隱忍不言
+e	restrain one's grief	節哀
 e	restrain oneself	忍	戢
 e	restrained	含蓄	拘牽	有節制	檢點	泥	蘊藉
 e	restrained and cautious	拘檢
@@ -58063,7 +58048,7 @@ e	reticulated veins	網狀脈
 e	reticulum	網罟座
 e	retina	網膜	視網膜
 e	retinue	人從	扈
-e	retire	撤走	斂跡	退任	退役	退隱	隱退	離休
+e	retire	撤走	斂跡	退任	退役	退隱	隱退
 e	retire early	早退
 e	retire from acting	息影
 e	retire from office	引退
@@ -58346,6 +58331,7 @@ e	rice and noodles	米麵
 e	rice au gratin	焗飯
 e	rice ball	摶飯	飯糰
 e	rice bowl	飯碗
+e	rice bran	米糠
 e	rice cake	粿
 e	rice cereal for infants	米精
 e	rice cracker	米果
@@ -58588,7 +58574,7 @@ e	rings on the yokes	轙
 e	ringtone	鈴聲
 e	ringworm	癬	體癬
 e	rinpoche	仁波切
-e	rinse	染髮	染髮劑	沖	洗滌	浣	浣滌	浣濯	浸洗	清滌	漂洗
+e	rinse	染髮劑	沖	洗滌	浣	浣滌	浣濯	浸洗	清滌	漂洗	灌濯
 e	rinse in water	投
 e	rinse rice	淘米
 e	rinsing machine	洗滌機
@@ -58949,6 +58935,7 @@ e	romantic couple's world	二人世界
 e	romantic fiction	言情小說
 e	romantic heartbreak	情傷
 e	romantic love	戀情	艷情
+e	romantic surroundings	花前月下
 e	romanticism	浪漫主義
 e	romeo	羅密歐
 e	ron	羅恩
@@ -59076,6 +59063,7 @@ e	rotation grazing	輪牧
 e	rotation of crops	倒茬	換茬	輪作	輪種
 e	rotational angular velocity	旋轉角速度
 e	rotational symmetry	旋轉對稱
+e	rotator cuff	肩袖
 e	rotavirus	輪狀病毒
 e	rote learning	滿堂灌
 e	rothschild	洛希爾
@@ -59123,7 +59111,7 @@ e	roughly divide	粗分
 e	roughly the same	大差不差
 e	roughneck	老粗
 e	roulette	輪盤	輪盤賭
-e	round	合	回合	圓	圓形	團	圜	圞	輪唱	輪次
+e	round	合	回合	圓	圓形	團	圜	輪唱	輪次
 e	round and bulging	圓鼓鼓
 e	round and fat	滾瓜溜圓
 e	round and plump	滴溜溜
@@ -59244,7 +59232,7 @@ e	rube	山藥蛋
 e	rubella	德國麻疹	風疹
 e	rubicene	玉紅省
 e	rubidium	銣
-e	rubik's cube	魔方	魔術方塊	魯畢克方塊
+e	rubik's cube	魔方	魔術方塊
 e	rubin	魯賓
 e	ruble	盧布
 e	rubric	名目	評價量規	量規
@@ -59373,7 +59361,6 @@ e	run a school	辦學
 e	run about helplessly	慌成一團
 e	run after	馳騖
 e	run against	扻
-e	run aground	擱淺
 e	run amok	大鬧
 e	run amuck	橫行
 e	run around	跑	跑來跑去	轉圈
@@ -59405,7 +59392,7 @@ e	run quickly	奔	奔馳	連奔帶跑	驅
 e	run risks	走險
 e	run short of	缺
 e	run the meter	打錶
-e	run through	細數	貫穿
+e	run through	貫穿
 e	run through sth	預演
 e	run together	重疊
 e	run up	助跑
@@ -59913,7 +59900,7 @@ e	sanitary napkin	衛生棉
 e	sanitary sewer system	衛生下水道
 e	sanitary towel	姨媽巾	月經墊	衛生巾
 e	sanitation	保潔	環衛
-e	sanitation worker	環衛工人
+e	sanitation worker	環衛工	環衛工人
 e	sanitorium	療養所
 e	sank	涼了半截
 e	sankei shimbun	產經新聞
@@ -60182,7 +60169,7 @@ e	scansion	音步
 e	scant	寡	甚微
 e	scant knowledge	淺學
 e	scanty	微薄	疏
-e	scapegoat	代罪羔羊	墊背	替死鬼	替罪羊	替身
+e	scapegoat	代罪羔羊	墊背	替死鬼	替罪羊
 e	scapula	琵琶骨	肩胛	肩胛骨
 e	scapular region	肩胛
 e	scar	傷疤	傷痕	創痕	疤	疤痕	痕	瘡疤	瘡痕	瘢痕
@@ -60256,7 +60243,6 @@ e	scented tea	花茶	香片
 e	scepter	權杖	珽
 e	schadenfreude	幸災樂禍
 e	schedule	排定	日程	明細表	時刻表	時程	時間表	班期	行事曆	調度
-e	schedule in advance	預定
 e	schedule movie screenings	排片
 e	scheduled at	定於
 e	scheduler	調度
@@ -60330,6 +60316,7 @@ e	school report or transcript	成績單
 e	school rules and regulations	校規
 e	school song	校歌
 e	school studies	業
+e	school team	校隊
 e	school timetable	課表
 e	school traditions	學風
 e	school uniform	校服
@@ -60592,6 +60579,7 @@ e	sea land air	海陸空
 e	sea level	海平面
 e	sea lily	海百合
 e	sea lion	海獅
+e	sea monster	海怪
 e	sea of clouds	雲海
 e	sea of evil	業海
 e	sea of flames	火海
@@ -60789,6 +60777,7 @@ e	second-rate	二流	二等
 e	second-run movie	二輪片	復映片
 e	second-tier	二流
 e	secondary	副	次	次生	次級	次要	第二	裨	附帶
+e	secondary bedroom	次臥
 e	secondary capital	陪都
 e	secondary disaster	次生災害
 e	secondary education	中等教育
@@ -60840,7 +60829,7 @@ e	secret telegram	密電
 e	secret trouble	苦衷
 e	secret virtue	陰德
 e	secret worry	心病
-e	secretariat	文書	書記處
+e	secretariat	文書	書記處	秘書處
 e	secretary	文書	文牘	文秘	書記	秘	秘書	部長
 e	secretary of state	國務卿	國務長官	外長
 e	secretary-general	幹事長	秘書長	總幹事
@@ -61391,7 +61380,6 @@ e	sentiments	情操
 e	sentinel	哨兵	步哨	警戒
 e	sentry	哨	崗哨	步哨	門衛
 e	sentry post	哨所	觀察哨
-e	seoul national university snu	國立首爾大學
 e	sepak takraw	藤球
 e	sepal	花萼
 e	separable word	離合詞
@@ -61465,7 +61453,6 @@ e	serial number	字號	序列號	序號	編號	號數	號頭
 e	serial port	串口	串行口
 e	serial verb construction	連動
 e	serialized	連載
-e	serialized drama	連續劇
 e	sericulturist	蠶農
 e	series	串行	列	系列	級數
 e	series of	一系列	一連串	連串
@@ -61562,7 +61549,7 @@ e	set about	下手	做手	動手	起手
 e	set afire	燎
 e	set afoot	發軔
 e	set apart	派任	選派
-e	set aside	撥	擱置	計提	預留
+e	set aside	撥	計提	預留
 e	set aside for	留給
 e	set at	定於
 e	set down	手定
@@ -61623,7 +61610,7 @@ e	setback	受挫	失風	岔子	挫折	退步
 e	seth	賽特
 e	setose asparagus	文竹
 e	setter	塞特犬
-e	setting	場合	設定
+e	setting	設定
 e	setting off each other	掩映
 e	setting sun	夕陽	斜陽	落日
 e	settle	了卻	了結	低陷	和解	奠	奠定	安家落戶	底定	搞定	擺平
@@ -61936,7 +61923,6 @@ e	share dealing	證券經營
 e	share equally	均攤	平攤
 e	share everything	不分彼此
 e	share grant	送股
-e	share issue	股集資
 e	share nuptial cup	合巹	巹飲	連巹
 e	share offer	招股
 e	share price	股價
@@ -61987,7 +61973,6 @@ e	sharp pointed end	尖端
 e	sharp sword	利劍
 e	sharp weapon	利器
 e	sharp-eyed	眼毒
-e	sharp-eyed and adroit	眼疾手快
 e	sharp-sighted and deft	眼明手快
 e	sharp-tailed sandpiper	尖尾濱鷸
 e	sharp-tongued	嘴尖	嘴損	毒舌
@@ -62006,7 +61991,7 @@ e	shart	放水屁
 e	shatter	崩摧	破碎	砸破
 e	shattered	殘缺
 e	shatterproof or safety glass	不碎玻璃
-e	shave	刮	刮鬍子	剃	脫毛	薙
+e	shave	刮	刮鬍子	剃	剃鬚	脫毛	薙
 e	shave off	刨	刮掉
 e	shave one's face	刮臉
 e	shave one's head	削髮
@@ -62045,6 +62030,7 @@ e	sheep or goat pen	羊棧
 e	sheep's fat	羊油
 e	sheep's head	羊頭
 e	sheep's milk	羊奶
+e	sheep's or goat's horn	羊角
 e	sheepdog	牧羊犬
 e	sheepskin	羊皮
 e	sheer	純屬
@@ -62077,7 +62063,7 @@ e	shelley	雪萊
 e	shellfish	貝	貝類
 e	shelter	帡幪	庇	收留所	窩藏	蔽身處	藏身處	遮擋	隱藏	隱藏處
 e	shelter from	遮擋
-e	shelve	冰封	擱	擱置
+e	shelve	冰封
 e	shelve as useless	廢置
 e	shen county in hebei	深縣
 e	shenzhen and hong kong	深港
@@ -62325,7 +62311,7 @@ e	short training course	短訓班
 e	short tree	矮樹
 e	short trip	小遊
 e	short wavelength	短波長
-e	short while	少刻	少間	歇	頃
+e	short while	少刻	歇	頃
 e	short while ago	頃者
 e	short- or medium-term loan	中短債
 e	short-barreled mortar	虎蹲砲
@@ -62435,21 +62421,19 @@ e	show forth	躍然
 e	show great creativity	匠心獨運	獨具匠心
 e	show great regard	抬舉
 e	show how	指點
-e	show in parts	連續劇
 e	show ingenuity	別具匠心
 e	show initiative	率先	進取
 e	show kindness	示恩
 e	show no quarter	毫不留情
 e	show of extravagance	排場
 e	show of strength	奮武揚威
-e	show off	作秀	得瑟	打把勢	招搖	掉	搬弄	炫	耍寶	衒	表現
+e	show off	作秀	得瑟	打把勢	招搖	掉	搬弄	耍寶	衒	表現	賣弄
 e	show one's colors	旗幟鮮明
 e	show one's face	露臉	露面
 e	show one's feelings	形於色
 e	show one's hand	亮底牌
 e	show one's head	露頭
 e	show one's support	應援
-e	show one's teeth	齜牙咧嘴
 e	show one's wealth	露富
 e	show oneself	現身
 e	show or expose	暴
@@ -62657,7 +62641,7 @@ e	sides in a dispute	陣營
 e	sideshow	雜耍
 e	sidestep	橫步	閃避
 e	sidestep the question	答非所問
-e	sideswipe	刮蹭	擦撞
+e	sideswipe	擦撞
 e	sidewalk	人行道	便道	走道	邊路
 e	sidewalls of a palace	掖垣
 e	sideways	側身
@@ -62766,11 +62750,12 @@ e	siliceous sand	玻璃砂
 e	silicic acid	硅酸
 e	silicon	矽	硅
 e	silicon carbide	碳化硅
-e	silicon chip	矽晶片	矽片	硅晶片	硅片
+e	silicon chip	矽晶片	硅晶片
 e	silicon dioxide	二氧化硅
 e	silicon rod	硅棒
 e	silicon sand	硅沙
 e	silicon valley	矽谷	硅谷
+e	silicon wafer	矽片	硅片
 e	silicon-based	硅基
 e	silicone	矽利康	硅酮
 e	silicone grease	硅脂
@@ -62930,6 +62915,7 @@ e	simple yet elegant	素雅
 e	simple-minded	悾	憨	沒心沒肺
 e	simple-minded person	三炮
 e	simpleton	憨子
+e	simplex	單工
 e	simplicity	簡易
 e	simplification	簡單化
 e	simplified character	略字
@@ -62956,7 +62942,7 @@ e	simultaneous interpretation headset	同傳耳麥
 e	simultaneous translation	同聲翻譯
 e	simultaneously	一頭	一齊	並	載	邊	齊頭
 e	simvastatin	辛伐他汀
-e	sin	作孽	冤孽	冤業	孽	罪	罪孽	罪惡	罪愆	罪過	辜
+e	sin	作孽	冤孽	冤業	孽	罪	罪孽	罪惡	罪愆	罪過
 e	sinai	西乃
 e	sinai peninsula	西奈	西奈半島
 e	since	以來	以降	打從	既	既是	由於	自從	自打	茲因
@@ -63183,7 +63169,7 @@ e	sitting	在朝
 e	sitting posture	坐姿
 e	sitting room	起居室
 e	sitting toilet	坐廁
-e	situation	事態	勢	勢態	勢頭	地步	場合	場面	局	局勢	局面
+e	situation	事態	勢	勢態	勢頭	地步	場面	局	局勢	局面	形勢
 e	situation in a state	國勢
 e	situation is grim	形勢嚴峻
 e	situation is hopeless	病入膏肓
@@ -63418,7 +63404,6 @@ e	sleepiness	睡意
 e	sleeping bag	睡袋
 e	sleeping beauty	睡美人
 e	sleeping car	臥車
-e	sleeping compartment	臥房
 e	sleeping dragon	臥龍
 e	sleeping mat	衽
 e	sleeping pill	安眠藥
@@ -63487,9 +63472,10 @@ e	slightest difference	分毫
 e	slightest thing	秋毫
 e	slighting	褻慢
 e	slightly	些微	小幅	微	有點兒	略作	略為	稍稍
-e	slightly better	少間	略勝一籌
+e	slightly better	略勝一籌
 e	slightly bitter	苦不唧
 e	slightly cold	涼涼
+e	slightly improved	少間
 e	slightly less than	弱
 e	slightly more than	強
 e	slightly salty	鹹絲絲
@@ -63624,7 +63610,7 @@ e	slush fund	小金庫
 e	slushie	冰沙
 e	slut	淫娃	潑賤人	爛污貨	破鞋	賤人	賤貨
 e	slut-shame	蕩婦羞辱
-e	sly	奇譎	油猾	狡	猾	詭詐	詭譎	鬼計多端
+e	sly	奇譎	油猾	狡	猾	詭詐	鬼計多端
 e	sly and cunning person	白骨精
 e	slyboots	滑頭
 e	slytherin	斯萊特林
@@ -63642,8 +63628,7 @@ e	small as a mite	點大
 e	small bag	縏
 e	small bell	釪	鉌	鎤
 e	small bird	小鳥	雀
-e	small boat	划船	舴艋	鶩舲
-e	small boat with windows	舲
+e	small boat	划船	舴艋
 e	small box	匣子	匭	盒
 e	small broom	笤帚
 e	small buddhist temple	萻
@@ -63867,7 +63852,7 @@ e	snake skin	蛇皮
 e	snake venom	蛇毒
 e	snake's tongue	蛇信
 e	snakefish	鮦	鱧
-e	snakehead fish	烏魚	烏鱧
+e	snakehead fish	烏魚
 e	snakehead mullet	斑鱧	月鱧	鱧
 e	snap	抓拍	折	撧	斷
 e	snap a twig	折枝
@@ -63968,7 +63953,7 @@ e	snowscape	雪景
 e	snowshoe	踏雪板
 e	snowshoes	雪鞋
 e	snowstorm	風雪
-e	snowy	似雪	白
+e	snowy	似雪
 e	snowy night	雪夜
 e	snowy owl	雪鴞
 e	snowy peak	雪峰
@@ -64151,7 +64136,7 @@ e	soft palate	軟口蓋	軟齶
 e	soft pedal	弱音踏板
 e	soft power	軟實力
 e	soft roll	軟包
-e	soft seat	軟坐	軟席	軟座
+e	soft seat	軟席	軟座
 e	soft sleeper	軟臥
 e	soft tissue	軟組織
 e	soft touch	軟柿子
@@ -64239,7 +64224,7 @@ e	solemn and respectful	肅穆
 e	solemn and stirring	悲壯
 e	solemnly	謹
 e	solemnly silent	肅靜
-e	solenoid	感應線圈	線圈	線圈般	螺線管
+e	solenoid	感應線圈	螺線管
 e	soles of the feet	腳底
 e	solfege	唱名
 e	solicit	兜攬	徵求	徵選	拉客	招徠	邀
@@ -64251,7 +64236,7 @@ e	solicit contributions	徵稿	捐募
 e	solicit customers	拉生意	招嫖
 e	solicit financial help	打把勢
 e	solicitor	事務律師
-e	solicitous	勤勤	慇	懃
+e	solicitous	勤勤	慇
 e	solicitously	殷勤
 e	solicitude	關懷
 e	solid	厚實	固	固體	堅	堅實	堅硬	寔	實	實心	扎實
@@ -64374,7 +64359,7 @@ e	sonorant	響音
 e	sonorous	鏗鏘
 e	sony	新力	索尼
 e	soochow university	東吳大學
-e	soon	不一會	不久	少刻	少間	快	最近	未幾	無何	然頃	眼看
+e	soon	不一會	不久	少刻	快	最近	未幾	無何	然頃	眼看
 e	soon after	不久	旋即	既而	沒多久
 e	soon afterwards	便
 e	sooner or later	遲早
@@ -64583,7 +64568,7 @@ e	south face	南側
 e	south island	南島
 e	south korea	南朝鮮	南韓	泡菜國	韓國
 e	south korea and australia	韓澳
-e	south korean media	韓媒
+e	south korean news media	韓媒
 e	south korean-us	韓美
 e	south latitude	南緯
 e	south magnetic pole	南極
@@ -64672,7 +64657,6 @@ e	space heater	暖爐
 e	space of sections	切空間
 e	space out	拉開
 e	space probe	空間探測器
-e	space ship	幽浮
 e	space shuttle	太空梭	航天飛機
 e	space shuttle challenger	挑戰者號
 e	space shuttle discovery	發現號
@@ -64791,6 +64775,7 @@ e	speak without thinking	信口開河
 e	speaker	揚聲器	演說者	語者	音箱
 e	speaking rudely	髒話
 e	speaking softly	喁喁
+e	speaking speed	語速
 e	spear	厹	戭	杸	梭鏢	槍	矠	鎗	鏦
 e	spear-shaft	籚
 e	spearhead	矛頭	鋒芒
@@ -65073,7 +65058,6 @@ e	spire	塔尖	尖塔
 e	spirit	一靈真性	勁	幽魂	心靈	志氣	情態	氣概	氣韻	氣魄	神采
 e	spirit lamp	酒精燈
 e	spirit level	水平儀	水平尺	水準儀
-e	spirit medium	靈媒
 e	spirit of buddha	佛心
 e	spirit so invited	筆仙
 e	spirit tablet	神位	靈牌
@@ -65645,7 +65629,7 @@ e	stand up	尌	平身	站起來	雄起
 e	stand up to	抵拒	頂住
 e	stand upright	㩳	兀立	戳	挺立	立身
 e	stand-by counter	補票處
-e	stand-in	替身
+e	stand-in	光替
 e	stand-up comedy	脫口秀
 e	stand-up paddleboard	槳板
 e	stand-up paddleboarding	槳板
@@ -65736,7 +65720,6 @@ e	stare angrily	嗔目
 e	stare at	偢	定睛	注目	盯	瞪	瞵	矚	迫視
 e	stare back	瞠目以對
 e	stare blankly	愣	愣神兒	犯傻	發呆	發懵	直瞪瞪	看呆	眼睜睜	睖
-e	stare coldly	白
 e	stare fixedly	盯視	緊盯
 e	stare fixedly at	凝望
 e	stare in awe	看呆
@@ -65812,7 +65795,7 @@ e	starting from	起
 e	starting line	起跑線	起點線
 e	starting pistol	發令槍
 e	starting pitcher	先發投手
-e	starting point	出發點	原點	始點	抓手	肇端	起點
+e	starting point	出發點	原點	始點	肇端	起點
 e	starting price	標底
 e	starting salary	起薪
 e	startle	咢	駭	驚	驚動	驚起
@@ -65849,7 +65832,6 @@ e	state in detail	申論
 e	state in writing	明文
 e	state key laboratories	國家重點實驗室
 e	state marketing monopoly	統銷
-e	state media	官媒
 e	state oceanic administration	國家海洋局
 e	state of affairs	事勢
 e	state of an illness	病情	病況
@@ -66275,7 +66257,7 @@ e	stimulate to effort	劭
 e	stimulated	亢奮
 e	stimulating	刺激性
 e	stimulus	刺激物
-e	sting	刺	叮咬	蜇	螫中	蠚	辣
+e	sting	刺	蜇	螫中	蠚	辣
 e	sting or bite	叮	螫
 e	stinging words	刺兒話
 e	stingray	黃貂魚
@@ -66429,7 +66411,7 @@ e	stop leasing	退租
 e	stop menstruating	停經
 e	stop motion	定格
 e	stop one's pen	煞筆
-e	stop over	停留	勾留	經停	耽擱	落腳
+e	stop over	停留	勾留	經停	落腳
 e	stop pain	止痛
 e	stop plowing	輟耕
 e	stop production	停工	停產
@@ -66606,6 +66588,7 @@ e	strategic place	鎖鑰
 e	strategic point	戰略要點	據點
 e	strategic stronghold	塞
 e	strategic town	重鎮
+e	strategically important	衝要
 e	strategist	戰略家	策士	謀士
 e	strategy	戰略	方策	謀略
 e	stratford	斯特拉特福
@@ -66699,6 +66682,7 @@ e	stretch	乀	伸	彄	懶腰	抻	拉伸	楦	舒
 e	stretch across	橫跨
 e	stretch fingers out	揸
 e	stretch forward	探
+e	stretch marks	妊娠紋
 e	stretch of road	路段
 e	stretch oneself	伸懶腰
 e	stretch out	伸直	伸開
@@ -66733,7 +66717,7 @@ e	strictly impartial and incorruptible	鐵面無私
 e	strictly maintain	嚴守
 e	strictly prohibit	嚴禁
 e	strictly speaking	嚴格來說	嚴格來講
-e	stride	縱步	踏步	踔	蹽	邁	闊躡
+e	stride	縱步	踏步	踔	蹽	闊躡
 e	stride forward	邁進	闊步
 e	stride over	跨
 e	stride toward	邁向
@@ -66921,6 +66905,7 @@ e	stud gun	射釘槍
 e	stud horse	種馬
 e	studded	點綴
 e	student	學員	學子	學生	門生
+e	student counselor	導員	輔導員
 e	student dormitory	學舍
 e	student grant	助學金
 e	student id number	學號
@@ -66991,7 +66976,7 @@ e	stunning legs	腿玩年
 e	stunning scenery	絕景
 e	stunt	特技	絕技
 e	stunt wires	威亞
-e	stuntman	替身	替身演員	特技演員
+e	stuntman	特技演員
 e	stupa	佛骨塔
 e	stupefied	懵逼	木然	目怔口呆	驚槑
 e	stupid	三八	二	低能	傻帽	傻裡傻氣	冥	呆傻	嚚	惷	愚笨
@@ -67186,8 +67171,7 @@ e	substantiate	充實
 e	substantive	實質性
 e	substation	分站	變電站
 e	substituent	取代基
-e	substitute	代換	候補	換	更遞	替代品	替補	替身	遞補	頂
-e	substitute actor	替身演員
+e	substitute	代換	候補	換	更遞	替代品	替補	遞補	頂
 e	substitute driver	代駕
 e	substitute for	替	替代	頂崗	頂班	頂補
 e	substitute into	代入
@@ -67224,7 +67208,6 @@ e	subwoofer	低音炮
 e	succeed	成	成事	成功	打響	繼	繼述	遂
 e	succeed in life	成龍
 e	succeed sb	接班
-e	succeed through failure	以失敗而告終
 e	succeed to	繼承
 e	succeeding in	著
 e	success	勝	勝出	成功	成就
@@ -67767,7 +67750,6 @@ e	surface in joint	關節面
 e	surface irrigation	地面灌溉
 e	surface layer	表層
 e	surface mount	貼片式
-e	surface nuclear explosion	地面核爆炸
 e	surface of a river	河面
 e	surface of discontinuity	不連續面
 e	surface of revolution	旋轉曲面
@@ -68092,7 +68074,7 @@ e	surname zhuo	卓
 e	surname zi	菑	訾
 e	surname zong	宗
 e	surname zou	棸	鄒	鄹	騶	鯫
-e	surname zu	祖	組
+e	surname zu	祖
 e	surname zuo	坐	左
 e	surpass	優於	勝	勝似	勝過	拔	有過之而無不及	獨秀	賽	超	超度
 e	surpass one's father	跨竈
@@ -68177,6 +68159,7 @@ e	suspended animation	假死
 e	suspended bunk	吊鋪
 e	suspended hook	吊鉤
 e	suspended in midair	懸空
+e	suspended ladder	懸梯
 e	suspended matter	懸浮物
 e	suspended meal	待用餐
 e	suspended sentence	緩刑
@@ -68195,7 +68178,7 @@ e	sustain a loss	折
 e	sustain an injury	負傷
 e	sustain injuries	受傷
 e	sustain losses	賠本
-e	sustainable	可持續	持續	永續
+e	sustainable	可持續	永續
 e	sustainable city	永續城市	生態城市
 e	sustainable development	可持續發展
 e	sustaining pedal	強音踏板
@@ -68588,7 +68571,6 @@ e	tabun	塔崩
 e	tachometer	轉速錶
 e	tacit	默示
 e	tacit approval	默認
-e	tacit understanding	默契
 e	taciturn	寡言	沉默	無聲無息
 e	taciturn person	悶葫蘆
 e	tack	大頭釘	繃	轉帆
@@ -68669,7 +68651,6 @@ e	taiwan fulvetta	玉山雀鶥
 e	taiwan hwamei	臺灣畫眉
 e	taiwan independence	台獨
 e	taiwan island	臺灣島
-e	taiwan media	臺媒
 e	taiwan partridge	臺灣山鷓鴣
 e	taiwan province	臺灣省
 e	taiwan relations act	台灣關係法
@@ -68689,6 +68670,7 @@ e	taiwanese businessperson or company	台商
 e	taiwanese food	台菜
 e	taiwanese hokkien	台灣話	台語
 e	taiwanese indigenous peoples	山地同胞	山胞
+e	taiwanese news media	臺媒
 e	taiwanese word	臺詞
 e	taiwanese-style	台式
 e	taixu	太虛
@@ -68730,7 +68712,7 @@ e	take a sample	取樣
 e	take a seat	坐	就座	落座
 e	take a shortcut	抄	抄近	抄近路	抄道
 e	take a shower	沖涼	沖淋浴	沖澡	洗澡	淋浴
-e	take a step	跨步	邁	邁出
+e	take a step	跨步	邁出
 e	take a stroll	遊玩
 e	take a taxi	打的	打車
 e	take a tonic	進補
@@ -69133,7 +69115,6 @@ e	tarpaulin	油布	篷布
 e	tarpaulin fabric	篷蓋布
 e	tarragon	菌陳蒿	蛇蒿	龍蒿
 e	tarred road	柏油路	柏油馬路
-e	tarry	耽擱
 e	tarsier	跗猴
 e	tarsier monkey	眼鏡猴
 e	tarsus	跗
@@ -69502,7 +69483,6 @@ e	temporal	凡
 e	temporal bone	顳骨
 e	temporal lobe	顳葉
 e	temporarily	權且	權時	苟
-e	temporarily stopped	暫擱
 e	temporarily transfer	借調
 e	temporary	一時	暫	權	浮	臨時
 e	temporary arrangement	暫定
@@ -69994,8 +69974,8 @@ e	the earliest ancestor	鼻祖
 e	the early ming	明初
 e	the earth	人間	地球	壤
 e	the earth's axis	地軸
-e	the earth's core	地心
 e	the earth's crust	地殼
+e	the earth's interior	地心
 e	the earth's magnetic field	地磁場
 e	the earthworm	螾
 e	the east	東土	東部
@@ -70027,6 +70007,7 @@ e	the entire country	舉國
 e	the entire internet	全網
 e	the entire nation	舉國上下
 e	the entire sum	全數	悉數
+e	the eponymous daoist classic	莊子
 e	the equinox	二分	晝夜平分點
 e	the essence	內核
 e	the essential character	神髓
@@ -70073,11 +70054,9 @@ e	the flintstones	摩登原始人
 e	the floating ribs	季肋
 e	the flow of time	歲月如流
 e	the flowering season	花期
-e	the folks back home	鄉親
 e	the following	下個	下面	以下	以次
 e	the following day	昱日
 e	the following morning	明朝
-e	the following pages	後文
 e	the following section	後段
 e	the following year	嗣歲	翌年
 e	the forbidden city	故宮	紫禁城
@@ -70172,6 +70151,7 @@ e	the indian subcontinent	天竺
 e	the individual	小我
 e	the inferno	陰曹
 e	the injured	傷殘人員
+e	the innocent	無辜
 e	the ins and outs	始末
 e	the inside	內裡
 e	the insured person	受保人
@@ -70363,7 +70343,6 @@ e	the other side	反面	對過
 e	the other woman	小三
 e	the others	其餘
 e	the outside world	外界
-e	the pages ahead	後文
 e	the pagoda bearing god	托塔天王	李天王
 e	the palace guard	禁衛
 e	the pan-pearl river delta	泛珠江三角
@@ -70789,7 +70768,7 @@ e	there's no lack of	有的是
 e	there's no shortage	多得是
 e	thereafter	嗣後	爾後
 e	thereby	以此	由此看來
-e	therefore	乃	因而	所以	故	故此	故而	於是乎	是以	是故	爰
+e	therefore	乃	因而	所以	故	故此	故而	是以	是故	爰
 e	therein	個中
 e	theresa	特里薩	特雷莎
 e	thereupon	乃	叵	爰	遂	隨之
@@ -70826,7 +70805,6 @@ e	thermometer screen	百葉箱
 e	thermonuclear	熱核
 e	thermonuclear fusion reaction	熱核聚變反應
 e	thermonuclear weapon	熱核武器
-e	thermophile	適溫
 e	thermos	保溫瓶	暖瓶	膳魔師
 e	thermos bottle	熱水瓶
 e	thermos flask	暖壺
@@ -70855,7 +70833,6 @@ e	thick congee	糊糊	饘
 e	thick fog	大霧	濃霧
 e	thick grass	丵
 e	thick ice	凌
-e	thick line	槓
 e	thick liquid	漿
 e	thick silkwaste padded clothes	重繭
 e	thick skull	榆木腦袋
@@ -71212,7 +71189,6 @@ e	throw a game	做球	放水
 e	throw a net	撒網
 e	throw a punch	出拳
 e	throw a rider	覂
-e	throw a tantrum	撒嬌
 e	throw at	投擲
 e	throw away	丟掉	扔	扔掉	扔棄	拚棄	撱	棄	棄置
 e	throw brickbats	拍磚
@@ -71287,7 +71263,7 @@ e	thymine nucleotide	胸腺嘧啶
 e	thymus	胸腺
 e	thyroid cartilage	甲狀軟骨
 e	thyroid gland	甲狀腺
-e	thyroid hormone	甲狀腺素
+e	thyroid hormone	甲狀腺激素	甲狀腺素
 e	thyroxine	甲狀腺素
 e	thyssenkrupp	蒂森克虜伯
 e	tiananmen square	天安門廣場
@@ -71525,7 +71501,7 @@ e	tinkling or jingling sound	叮	叮叮
 e	tinnitus	耳鳴	聎
 e	tinplate	馬口鐵
 e	tinstone	錫石
-e	tint	染髮	染髮劑
+e	tint	染髮劑
 e	tintinnabulation	鈴聲
 e	tiny	么	孑孑	小	小不點	幾微	微	微末	戔戔	渺小	眇
 e	tiny bit	一丁點	一丟丟	丁點	微乎其微	紋絲
@@ -71705,7 +71681,7 @@ e	to accumulate wealth	斂財
 e	to accuse	參劾	彈	彈糾	指控	控	控訴	攻	攻擊	歸咎	舉發
 e	to accuse falsely	誣	誣告	誣賴
 e	to accuse the victim	反污
-e	to accuse unjustly	攀誣	讕言	讕調
+e	to accuse unjustly	攀誣	讕言
 e	to accuse wrongly	冤枉
 e	to ache	作痛	痠	酸疼	酸痛
 e	to ache dully	隱隱作痛
@@ -71753,7 +71729,6 @@ e	to act brilliantly	演活
 e	to act condescending	神氣活現
 e	to act contrary to	佷
 e	to act cool	扮酷
-e	to act coquettishly	撒嬌
 e	to act cute	裝可愛	裝萌	賣萌
 e	to act discourteously	失禮
 e	to act dumb	耍賴
@@ -71933,7 +71908,7 @@ e	to alleviate fever	清熱
 e	to alleviate stress	紓壓
 e	to allocate	分派	分配	劃撥	撥	撥出	支配	調撥	調用	調配	配
 e	to allocate funds	撥款	斥資
-e	to allow	任	任令	任憑	任由	任聽	任隨	允	允許	准	准許
+e	to allow	任	任令	任憑	任由	任聽	任隨	允	准	准許	容
 e	to allow for	備抵	酌量
 e	to allow no explanation	不由分說
 e	to allow to fly	放飛
@@ -72096,6 +72071,7 @@ e	to arrange	侖	備下	列	安排	布下	打兌	扦	接洽	措	措置
 e	to arrange a deal	說合
 e	to arrange an interview	約見
 e	to arrange for	安置	安頓
+e	to arrange in advance	預定
 e	to arrange in order	排列	排序	排放	排班	編列
 e	to arrange in pairs	搭	搭配
 e	to arrange matters	操辦
@@ -72345,7 +72321,6 @@ e	to bare fangs	嘊
 e	to bare one shoulder	偏袒
 e	to bare one's arms	攘臂
 e	to bare one's chest	光膀子	打赤膊
-e	to bare one's fangs	齜牙咧嘴
 e	to bare one's teeth	齜牙
 e	to bare the breast	袒胸
 e	to bare the feet	打赤腳
@@ -72464,6 +72439,7 @@ e	to be awake	醒
 e	to be aware	憬然	知	覺察
 e	to be away from	離
 e	to be awfully	不可開交
+e	to be backed by	背靠
 e	to be baffled	一頭霧水	奇怪
 e	to be balding	歇頂
 e	to be baptized	受浸	領洗
@@ -72653,11 +72629,9 @@ e	to be enchanted by	迷戀
 e	to be engaged in	務
 e	to be engrossed	沉迷
 e	to be enraged	著惱
-e	to be enthralled	入神
 e	to be entirely different	涇渭分明
 e	to be entitled	有資格
 e	to be entitled to	有權
-e	to be entranced	入神
 e	to be entrenched	固守
 e	to be entrusted	受託
 e	to be entrusted with	託
@@ -73072,7 +73046,7 @@ e	to be steeped in	沾濕
 e	to be stifling	燻蒸
 e	to be still angry	餘怒未息
 e	to be stingy	摳腳
-e	to be stranded	擱淺	流落
+e	to be stranded	流落
 e	to be stringed together	貫
 e	to be strong in	健
 e	to be struck by	中
@@ -73374,7 +73348,7 @@ e	to beg forgiveness	乞恕	求饒	請罪
 e	to beg humbly	打拱作揖	打躬作揖
 e	to beg piteously	哀告
 e	to beg to differ	不敢苟同
-e	to begin	俶	入手	始	昉	興辦	謖	開場	開始	開學	開演
+e	to begin	俶	入手	始	昉	興辦	謖	開場	開學	開演
 e	to begin a lecture	開講
 e	to begin abruptly	大作
 e	to begin an exam	開考
@@ -73447,7 +73421,7 @@ e	to bestow alms	賙	賙人
 e	to bestow on	賦
 e	to bet	打賭	投注	押注
 e	to betoken	預示
-e	to betray	叛	叛變	叛賣	叛離	背叛	貳	賣	辜負	逆	露
+e	to betray	叛	叛變	叛賣	叛離	背叛	貳	賣	逆	露
 e	to betray one's country	賣國
 e	to betray one's party	叛黨
 e	to betray oneself	顯形
@@ -73482,7 +73456,7 @@ e	to bind with hoops	箍
 e	to binge	大吃二喝	暴食
 e	to binge-watch	刷劇	追	追劇
 e	to bisect	平分
-e	to bite	咬	啃	噬	噬咬	蚛	齮	齰
+e	to bite	叮咬	咬	啃	噬	噬咬	蚛	齮	齰
 e	to bite the dust	吹燈拔蠟
 e	to blab	口無遮攔	多嘴	搬口	搬唇遞舌	爛舌頭
 e	to black out	昏天黑地	暈倒
@@ -73558,7 +73532,7 @@ e	to board a plane	登機
 e	to board a ship	登輪
 e	to board at school	住校
 e	to board out	寄養
-e	to boast	伐	侃	吹	吹擂	吹牛皮	哃	嗙	大言	炫	瞎吹
+e	to boast	伐	侃	吹	吹擂	吹牛皮	哃	嗙	大言	瞎吹	矜
 e	to boast and flatter	吹吹拍拍
 e	to boast loudly	咋呼
 e	to boast one's merits	逞能
@@ -74386,7 +74360,7 @@ e	to close for business	收市
 e	to close in around	合圍
 e	to close in on	緊逼	逼	逼近
 e	to close lightly	抿
-e	to close one's eyes	交睫	合眼	瞑目
+e	to close one's eyes	交睫	合眼	瞑目	閉眼
 e	to close securely	緊閉
 e	to close the book	掩卷
 e	to close the door	帶上門	杜門
@@ -74788,7 +74762,7 @@ e	to contest	爭奪	角逐
 e	to contest a lawsuit	諍訟
 e	to contest first place	爭先
 e	to continually plunder	裒斂無厭
-e	to continue	下去	延續	承	持續	接續	接著	紹	繼	繼嗣	續
+e	to continue	下去	延續	承	接續	接著	紹	繼	繼嗣	續
 e	to continue blundering	一錯再錯
 e	to continue in office	連任
 e	to continue to exist	存續
@@ -74992,7 +74966,8 @@ e	to crop up	冒頭	蹦出來
 e	to cross	交叉	叉	周遊	橫	橫斷	橫渡	橫穿	橫越	渡	翻
 e	to cross a barrier	過關
 e	to cross a border	出界	越境	越界
-e	to cross a river	渡河	濟	過河
+e	to cross a river	渡江	渡河	濟	過河
+e	to cross a sea	渡海
 e	to cross lengthwise	縱貫
 e	to cross off	劃掉
 e	to cross one's arms	抱臂
@@ -75037,6 +75012,7 @@ e	to cry bitterly	痛哭
 e	to cry from hunger	靠腰
 e	to cry loudly	大哭
 e	to cry out	出聲	叫喚	喊叫
+e	to cry profusely	飆淚
 e	to crystallize	結晶
 e	to cuddle	偎
 e	to cudgel	笞擊
@@ -75476,7 +75452,6 @@ e	to disambiguate	消除歧義
 e	to disappear	失蹤	泯滅	溶沒	絕	逃遁	隱去	隱沒	隱滅
 e	to disappear from view	隱遁
 e	to disappear without trace	不翼而飛
-e	to disappoint	辜負
 e	to disapprove	不以為然	不贊成	看不慣
 e	to disarm	繳械	繳槍
 e	to disassemble	拆解	拆開
@@ -75758,7 +75733,7 @@ e	to downsize	瘦身	縮編
 e	to downvote	踩
 e	to dox	起底	開盒
 e	to doze	假寐	小睡	瞌睡
-e	to doze off	度估	度姑	打盹	打瞌睡	督龜	肚孤
+e	to doze off	度估	度姑	打盹	督龜	肚孤
 e	to draft	徵	徵召	打底子	撰擬	擬	擬定	擬稿	擬製	擬議	起
 e	to drag	抴	拉	拉扯	拖	拖動	拖移	拫	搲	曳
 e	to drag along	強拉	拖拉
@@ -75776,6 +75751,7 @@ e	to dramatize historical events	演義
 e	to draw	不分勝負	作出	劃	吸住	吸取	引	打成平手	抽取	拉	拉伸
 e	to draw a circle	圈圈	畫圓
 e	to draw a distinction	區分
+e	to draw a gun	拔槍
 e	to draw a lesson	吸取教訓
 e	to draw a line	劃線
 e	to draw a parallel	比擬	比附
@@ -75922,7 +75898,6 @@ e	to dwell together	庉
 e	to dye	上色	擩	染	染色
 e	to dye black	涅
 e	to dye cloth	染布
-e	to dye one's hair	染髮
 e	to eagerly anticipate	切望
 e	to earn	掙得	賺	賺得
 e	to earn a fortune	賺大錢
@@ -76084,13 +76059,13 @@ e	to encroach	侵	憑陵	超出
 e	to encroach on	侵害	侵犯
 e	to encrypt	加密
 e	to encumber	拖累
-e	to end	告終	完畢	散場	止息	歾	歿	沒	盡	終了	開交
+e	to end	完畢	散場	止息	歾	歿	沒	盡	終了	開交
 e	to end a lockdown	解封
 e	to end a relationship	斷交
 e	to end abstinence	開戒
 e	to end disastrously	吃大虧
 e	to end here	到此為止
-e	to end in failure	吹
+e	to end in failure	以失敗告終	吹
 e	to end up abruptly	草草收場
 e	to end up empty-handed	一無所獲
 e	to endanger	危	危及	蠹害
@@ -76213,7 +76188,7 @@ e	to entrench	盤踞
 e	to entrust	交托	侂	信託	委	委託	寄託	托付	託	賦予
 e	to entrust to	付托
 e	to entwine	虆
-e	to enumerate	列舉	枚舉	歷數	細數	羅列	舉
+e	to enumerate	列舉	枚舉	歷數	羅列	舉
 e	to enumerate exactly	數清
 e	to enumerate in detail	悉數
 e	to enumerate sb's shortcomings	數落
@@ -76411,7 +76386,7 @@ e	to experience sheer ecstasy	欲仙欲死
 e	to experience tenesmus	下墜
 e	to experiment	實驗	試做	試錯	試驗
 e	to expire	到期	屆滿	期滿	滿期	絕氣	過期
-e	to explain	分訴	分說	剖辯	啟發	申	白	白事	破解	索解	解
+e	to explain	分訴	分說	剖辯	啟發	申	白事	破解	索解	解	解釋
 e	to explain a sutra	談經
 e	to explain clearly	悉數	辯明	闡明
 e	to explain in detail	詳解
@@ -76540,6 +76515,7 @@ e	to fall back	倒退	回落	回跌
 e	to fall behind	名落孫山	掉隊	落後	落敗
 e	to fall below	跌破
 e	to fall dead	倒斃	踣
+e	to fall directly on	直射
 e	to fall down	偃	掉落	摔倒	撲倒	跌跤	隕落	顛踣
 e	to fall dramatically	跳水
 e	to fall due	到期	滿期
@@ -76639,7 +76615,6 @@ e	to feel deeply	深感	痛感
 e	to feel deeply concerned	殊深軫念
 e	to feel deeply hurt	傷心
 e	to feel dejected	憋悶
-e	to feel despondent	惆悵若失
 e	to feel discouraged	洩勁
 e	to feel disgusted	不是滋味	作嘔
 e	to feel disheartened	喪氣
@@ -76651,7 +76626,7 @@ e	to feel empty	若有所失
 e	to feel for sth	探摸
 e	to feel gratified	窩心
 e	to feel great	爽歪歪
-e	to feel guilty	負疚
+e	to feel guilty	負疚	負罪
 e	to feel happy	開心
 e	to feel hatred	懷恨
 e	to feel helpless	無助感
@@ -76792,7 +76767,7 @@ e	to find it galling	不服氣
 e	to find one's niche	適得其所	靠山吃山，靠水吃水
 e	to find oneself at	處在
 e	to find oneself in	身處
-e	to find out	了解	尋出	得知	探知	查出	查清	獲悉	瞭解
+e	to find out	尋出	得知	探知	查出	查清	獲悉
 e	to find out about	窺知
 e	to find relief in	聊以自慰
 e	to find some consolation	聊以自慰
@@ -76896,6 +76871,7 @@ e	to fling vigorously	狂甩
 e	to flip	彈	投擲	翻轉
 e	to flip out	發飆
 e	to flip over	翻	翻動	翻車
+e	to flip sth over	翻面
 e	to flip through	翻閱
 e	to flirt	吊膀子	招蜂引蝶	撩騷	調情	逗情
 e	to flit	飛來飛去
@@ -77048,7 +77024,7 @@ e	to forge	假造	偽造	打製	打造	結成	鍛	鍛打	鍛造	鑄就	鑄成
 e	to forge ahead	前進	邁進
 e	to forge ahead vigorously	精進
 e	to forge ironware	打鐵
-e	to forget	忘	忘卻	忘懷	忘掉	忘記	諼	遺落	還給老師
+e	to forget	忘	忘懷	忘掉	忘記	諼	遺落	還給老師
 e	to forget former enmity	盡釋前嫌
 e	to forget one's lines	忘詞
 e	to forget one's manners	失態
@@ -77316,7 +77292,7 @@ e	to get over sth	看開
 e	to get plastered	一醉方休
 e	to get popular quickly	暴熱
 e	to get promoted	升官	升職
-e	to get ready	打點	整妝	整裝	整裝待發
+e	to get ready	打點	整裝	整裝待發
 e	to get really angry	火冒三丈
 e	to get restless	蠢蠢欲動
 e	to get results overnight	一蹴而就
@@ -77624,6 +77600,7 @@ e	to go with	就	跟
 e	to go with sb	結伴
 e	to go without meals	斷頓
 e	to go wrong	出亂子	出岔子	出漏子
+e	to gobble down	炫
 e	to gobble up	吞噬	猛吃
 e	to goof off	偷懶	打混
 e	to gore	牾
@@ -77638,10 +77615,9 @@ e	to govern directly	直轄
 e	to govern forcefully	敱
 e	to govern one's family	齊家
 e	to govern the country	治國理政
-e	to govern with integrity	廉政
 e	to grab	抄	抓	捉	揪住	搲	搶	摟	攫	攫取	邷
 e	to grab money	刻剝	摟錢
-e	to grab the limelight	搶鏡頭	搶風頭
+e	to grab the limelight	搶風頭
 e	to graciously permit	恩准
 e	to grade	分級	定級	打分	評分
 e	to grade by examination	甄別考試
@@ -77671,9 +77647,9 @@ e	to greet the eye	映入眼簾
 e	to grieve	傷心	傷心蒿目	怞	悼念
 e	to grieve and lament	痛心疾首
 e	to grieve to death	傷心致死
-e	to grimace	做鬼臉	怪樣	鬼臉	齜牙咧嘴
+e	to grimace	做鬼臉	怪樣	鬼臉
 e	to grimace with displeasure	甩臉子
-e	to grin	咧嘴	露齒	露齒而笑
+e	to grin	露齒	露齒而笑
 e	to grin wickedly	壞笑
 e	to grind	切	研	研磨	碾	碾磨	磨	磨快	錯
 e	to grind one's teeth	磨牙
@@ -78070,7 +78046,7 @@ e	to help disaster victims	救災
 e	to help each other	互助
 e	to help financially	周
 e	to help greatly	大有裨益
-e	to help one another	相助	相幫
+e	to help one another	相幫
 e	to help oneself to	自取	自己動手
 e	to help others	助人	與人為善
 e	to help out	搭把手	支招
@@ -78127,10 +78103,9 @@ e	to hit the market	上市	問市	面市
 e	to hit the net	落網
 e	to hit the target	中的	射中	破的
 e	to hitch a lift	打車
-e	to hitch a ride	搭便車
 e	to hitch onto	鉤住
 e	to hitch-hike	搭車
-e	to hitchhike	便車	攔車
+e	to hitchhike	攔車
 e	to hive off	分拆
 e	to hoard	囤積	居奇	戢	攢	貯藏
 e	to hoard and profiteer	囤積居奇
@@ -78697,7 +78672,7 @@ e	to justify	對齊	辯解
 e	to justify oneself	分訴	解嘲
 e	to keep	保守	保持	保有	保留	信守	包養	存	守住	留	留下
 e	to keep a copy	留底
-e	to keep a lookout	檢點	瞭望
+e	to keep a lookout	檢點
 e	to keep a promise	履約	踐約
 e	to keep a vigil	守夜
 e	to keep an appointment	守約	赴約
@@ -78795,7 +78770,7 @@ e	to kiss passionately	熱吻
 e	to kiss sb's ass	舔屁股
 e	to kiss sth goodbye	肉包子打狗
 e	to kiss up to	趨奉
-e	to knead	揉	揉制	揉和	搋
+e	to knead	揉	揉制	揉和	搋	踩奶
 e	to knead dough	和麵	搋麵
 e	to kneel	下跪	跪
 e	to kneel and bow	下拜
@@ -78872,7 +78847,7 @@ e	to lapse an insurance	退保
 e	to lash	擊打	甩動	鞭打	鞭笞
 e	to lash out	斥責
 e	to lasso a horse	套馬
-e	to last	延續	持續	歷時
+e	to last	延續	歷時
 e	to last long	持久
 e	to latch	閂
 e	to laud	讚許
@@ -79016,7 +78991,6 @@ e	to leave sb alone	放羊
 e	to leave secretly	溜走
 e	to leave some leeway	留有餘地
 e	to leave sth	停放
-e	to leave sth unused	閒置
 e	to leave surplus	殘餘
 e	to leave the factory	出廠
 e	to leave the field	退場
@@ -79049,7 +79023,6 @@ e	to lengthen out to	長達
 e	to lessen	減除	裁減
 e	to let	任	任由	聽任
 e	to let alone	放任
-e	to let down	辜負
 e	to let drip	淌下
 e	to let droop	低
 e	to let drop	沰
@@ -79097,7 +79070,7 @@ e	to lie deep	深藏
 e	to lie down	倒臥	倒頭	側躺	睡	臥倒	躺	躺下	躺倒
 e	to lie fallow	休閒
 e	to lie flat	橫躺
-e	to lie idle	拋荒	閒置
+e	to lie idle	拋荒
 e	to lie in ambush	狙
 e	to lie in bed	臥床
 e	to lie in disarray	橫陳
@@ -79155,7 +79128,7 @@ e	to liquefy	液化
 e	to liquid-cool	液冷
 e	to liquidate	清算
 e	to lisp	口齒不清
-e	to list	列出	列明	列舉	收列	細數	羅列	開列
+e	to list	列出	列明	列舉	收列	羅列	開列
 e	to list as wanted	通緝
 e	to list individually	點檢
 e	to list systematically	整理
@@ -79284,6 +79257,7 @@ e	to look straight at	直視
 e	to look through	翻檢
 e	to look tired	面露倦意
 e	to look towards	望
+e	to look unfamiliar	面生
 e	to look unwell	臉都綠了	面帶病容
 e	to look up	仰	朝天	查	查找	查檢	檢索
 e	to look up at	仰望	仰視
@@ -79495,7 +79469,7 @@ e	to make by fermentation	釀造
 e	to make by hand	手製
 e	to make ceramics	拉坯
 e	to make certain	確定
-e	to make clear	昭示	白	表明
+e	to make clear	昭示	表明
 e	to make clothes	裁製
 e	to make compatible	合理化
 e	to make concessions	退後
@@ -79520,7 +79494,6 @@ e	to make exaggerated claims	放衛星
 e	to make excuses	推托	狡辯	貸
 e	to make expectoration easy	潤肺
 e	to make explicit	曉
-e	to make explosive allegations	爆料
 e	to make extra efforts	加勁
 e	to make extra money	撈外快
 e	to make extravagant demands	奢求
@@ -79612,6 +79585,7 @@ e	to make restitution	退繳
 e	to make right	糾正
 e	to make sarcastic comments	冷言冷語
 e	to make sb	讓
+e	to make sb angry	惹惱
 e	to make sb laugh	逗趣	逗趣兒
 e	to make sb leave	打發
 e	to make secret inquiries	暗訪
@@ -79753,7 +79727,7 @@ e	to mediate	介導	勸和	圓場	排解	斡旋	牽線	牽頭	疏解	疏通	解�
 e	to mediate a dispute	解紛
 e	to mediate between	居間
 e	to meditate	冥想	打坐	打禪	靜坐	默想
-e	to meet	交接	交會	晤	會合	會晤	滿足	相逢	相遇	碰上	碰到
+e	to meet	交接	交會	晤	會合	滿足	相逢	相遇	碰上	碰到	碰見
 e	to meet a challenge	迎接挑戰
 e	to meet a contingency	應急
 e	to meet a person	接人
@@ -80138,7 +80112,7 @@ e	to occur	案發	發案	發病
 e	to occur suddenly	突發
 e	to occur together with	伴隨
 e	to occur unexpectedly	猝發
-e	to offend	冒犯	惹人	惹惱	犯	絓	衝撞	觸犯
+e	to offend	冒犯	惹人	犯	絓	衝撞	觸犯
 e	to offend one's elders	以下犯上
 e	to offend one's superiors	犯上
 e	to offend sb	得罪	開罪
@@ -80331,7 +80305,6 @@ e	to overwrite the firmware	刷入
 e	to ovulate	排卵
 e	to owe	欠	虧欠	該	逋
 e	to owe a debt	欠債	欠款	欠賬
-e	to owe nothing	不該
 e	to owe wages	欠薪
 e	to own	佔有	吊打	領有
 e	to own jointly	共有
@@ -80436,6 +80409,7 @@ e	to pass through	俓	徹	歷	渡	渡過	穿過	經	縱貫	貫	透過
 e	to pass time idly	耍廢
 e	to pass to	傳給
 e	to pass water	撒尿
+e	to passivate	鈍化
 e	to paste	帖	粘貼	貼
 e	to pat	拍	拍打	撲
 e	to patch	補	補綴	靪
@@ -80541,7 +80515,7 @@ e	to perk up	揚起
 e	to perm	燙
 e	to perm hair	燙頭髮
 e	to permeate	沁入	沉浸	浸潤	滲入	滲透
-e	to permit	允	允准	允許	准予	准許	容許	得	許	許可	讓
+e	to permit	允	允准	准予	准許	容許	得	許	許可	讓	開許
 e	to permit or allow	興
 e	to permute	置換
 e	to perpetrate a fraud	偷梁換柱
@@ -80550,7 +80524,7 @@ e	to perplex	困擾	繞
 e	to persecute	廹	迫害
 e	to persevere	堅執	持	鍥而不捨
 e	to persevere with	堅持
-e	to persist	堅執	復現	持續
+e	to persist	堅執	復現
 e	to persist in	堅持
 e	to persist obstinately	執迷
 e	to personalize	人格化	個性化
@@ -80629,7 +80603,7 @@ e	to pity	惜	憐
 e	to pixelate	打馬賽克
 e	to pixelate an image	打碼
 e	to placate	安撫	調和
-e	to place	安放	擱	放	置	置放
+e	to place	安放	放	置	置放
 e	to place a bet	對賭
 e	to place a ward	插眼
 e	to place above	凌駕
@@ -80693,7 +80667,7 @@ e	to play house	扮家家酒	過家家
 e	to play knucklebones	邷麼兒
 e	to play mahjong	搓麻將	搬磚	摸八圈	摸牌	玩牌	砌長城	碼長城
 e	to play marbles	彈球
-e	to play matchmaker	撮合
+e	to play matchmaker	撮合	牽紅線
 e	to play music	奏	弦而鼓之
 e	to play poker	打撲克
 e	to play pubg	吃雞
@@ -81195,7 +81169,7 @@ e	to push-start	推車發動
 e	to put	厝	放	放置	置	置放
 e	to put a roof	封頂
 e	to put about	揚言
-e	to put aside	丟	寘	屏	擱
+e	to put aside	丟	寘	屏
 e	to put away	收
 e	to put back	轉回
 e	to put back on	穿回
@@ -81222,10 +81196,10 @@ e	to put into production	上線	投產
 e	to put into water	下水
 e	to put it briefly	簡而言之
 e	to put money into	注資
-e	to put off	延緩	拖延	推	推遲	緩期	駛出
+e	to put off	延緩	拖延	推	推遲	緩期	耽擱	駛出
 e	to put off hiring	緩聘
 e	to put on	上身	戴上	扮	演出	登	穿上	穿回	衣	配戴
-e	to put on airs	人模狗樣	假招子	拿大	拿架子	擺架子	擺譜	神氣活現	端架子
+e	to put on airs	人模狗樣	拿大	拿架子	擺架子	擺譜	神氣活現	端架子
 e	to put on display	展出	展覽	彰顯	揭舉	獻
 e	to put on dress	披掛
 e	to put on makeup	化妝	塗脂抹粉
@@ -81386,7 +81360,6 @@ e	to reach a verdict	定案	結論
 e	to reach adulthood	成人
 e	to reach agreement	相約	諧	達成協議
 e	to reach an agreement	協定	議定
-e	to reach an end	告終
 e	to reach by stretching	搆
 e	to reach directly	直達
 e	to reach everywhere	無所不至
@@ -81423,7 +81396,7 @@ e	to read very rapidly	一目十行
 e	to readily consent	滿口答應
 e	to reaffirm	重申
 e	to realign one's allegiance	歸附
-e	to realize	了解	想通	發覺	省悟	瞭解	覺悟	認知	領略	體悟	體會
+e	to realize	想通	發覺	省悟	覺悟	認知	領略	體悟	體會	體認
 e	to realize abruptly	頓覺
 e	to realize clearly	了了
 e	to realize only then	方知
@@ -81995,6 +81968,7 @@ e	to restore old way	復舊
 e	to restrain	克	克制	剋	垔	壓住	憋	扼制	抑	抑止	拘
 e	to restrain anger	眕
 e	to restrain one's emotions	隱忍不發	隱忍不言
+e	to restrain one's grief	節哀
 e	to restrain oneself	忍	戢
 e	to restrict	制約	抑	拘束	拴住	杜	框	牽制	禁制	管制	節制
 e	to restrict to	限定
@@ -82022,7 +81996,7 @@ e	to retard	延緩	拖慢	減緩
 e	to retch	乾嘔	乾噦
 e	to retell	傳述
 e	to rethink	反思
-e	to retire	撤走	斂跡	退任	退役	退隱	隱退	離休
+e	to retire	撤走	斂跡	退任	退役	退隱	隱退
 e	to retire early	早退
 e	to retire from acting	息影
 e	to retire from office	引退
@@ -82251,7 +82225,6 @@ e	to run a school	辦學
 e	to run about helplessly	慌成一團
 e	to run after	馳騖
 e	to run against	扻
-e	to run aground	擱淺
 e	to run amok	大鬧
 e	to run amuck	橫行
 e	to run around	跑	跑來跑去	轉圈
@@ -82281,7 +82254,7 @@ e	to run quickly	奔	奔馳	連奔帶跑	驅
 e	to run risks	走險
 e	to run short of	缺
 e	to run the meter	打錶
-e	to run through	細數	貫穿
+e	to run through	貫穿
 e	to run through sth	預演
 e	to run together	重疊
 e	to run up	助跑
@@ -82390,7 +82363,6 @@ e	to scatter in fear	獝
 e	to scatter money	散錢
 e	to scavenge	覓食
 e	to schedule	排定	調度
-e	to schedule in advance	預定
 e	to schedule movie screenings	排片
 e	to scheme	圖	打算盤	猷	盤算	策劃	算計	規	謀劃
 e	to scheme together	共謀
@@ -82666,7 +82638,7 @@ e	to set about	下手	做手	動手	起手
 e	to set afire	燎
 e	to set afoot	發軔
 e	to set apart	派任	選派
-e	to set aside	撥	擱置	計提	預留
+e	to set aside	撥	計提	預留
 e	to set aside for	留給
 e	to set down	手定
 e	to set fire to	火燒	焌
@@ -82763,7 +82735,7 @@ e	to sharpen on grindstone	磨礪
 e	to sharpen one's sword	磨刀霍霍
 e	to shart	放水屁
 e	to shatter	崩摧	破碎	砸破
-e	to shave	刮	刮鬍子	剃	脫毛
+e	to shave	刮	刮鬍子	剃	剃鬚	脫毛
 e	to shave off	刨	刮掉
 e	to shave one's face	刮臉
 e	to shave one's head	削髮
@@ -82781,7 +82753,7 @@ e	to shell	剝	炮擊	砲擊	脫殼
 e	to shell out	交錢
 e	to shelter	帡幪	窩藏	遮擋	隱藏
 e	to shelter from	遮擋
-e	to shelve	冰封	擱	擱置
+e	to shelve	冰封
 e	to shelve as useless	廢置
 e	to shield	包庇	屏蔽	庇蔭	掩護	蔽	袒庇	護著
 e	to shift	倒騰	委	嫁	挪	挪動	挪用	挪開	搬	移	移位
@@ -82864,14 +82836,13 @@ e	to show ingenuity	別具匠心
 e	to show initiative	率先	進取
 e	to show kindness	示恩
 e	to show no quarter	毫不留情
-e	to show off	作秀	得瑟	打把勢	招搖	掉	搬弄	炫	耍寶	衒	表現
+e	to show off	作秀	得瑟	打把勢	招搖	掉	搬弄	耍寶	衒	表現	賣弄
 e	to show one's colors	旗幟鮮明
 e	to show one's face	露臉	露面
 e	to show one's feelings	形於色
 e	to show one's hand	亮底牌
 e	to show one's head	露頭
 e	to show one's support	應援
-e	to show one's teeth	齜牙咧嘴
 e	to show one's wealth	露富
 e	to show oneself	現身
 e	to show or expose	暴
@@ -82914,7 +82885,7 @@ e	to side with	偏袒	向	向著
 e	to sideload	側載
 e	to sidestep	閃避
 e	to sidestep the question	答非所問
-e	to sideswipe	刮蹭	擦撞
+e	to sideswipe	擦撞
 e	to sift	羅
 e	to sift chaff	篩糠
 e	to sigh	哀嘆	唉	唏噓	喟	嘅	嘆	嘆口氣	嘆氣	嚝	感嘆
@@ -83444,7 +83415,6 @@ e	to stare angrily	嗔目
 e	to stare at	偢	定睛	注目	盯	瞪	瞵	矚	迫視
 e	to stare back	瞠目以對
 e	to stare blankly	愣	愣神兒	犯傻	發呆	發懵	直瞪瞪	看呆	眼睜睜	睖
-e	to stare coldly	白
 e	to stare fixedly	盯視	緊盯
 e	to stare fixedly at	凝望
 e	to stare in awe	看呆
@@ -83495,7 +83465,7 @@ e	to startle	駭	驚	驚動	驚起
 e	to starve	餓	餓肚子
 e	to starve to death	餓死
 e	to stash away	祕藏
-e	to state	具	啟	建言	申	申說	申述	白	稱	聲明	聲稱
+e	to state	具	啟	建言	申	申說	申述	稱	聲明	聲稱	臚
 e	to state a view	建白
 e	to state clearly	表明	言明
 e	to state explicitly	明示
@@ -83627,7 +83597,7 @@ e	to stop halfway	中輟
 e	to stop leasing	退租
 e	to stop menstruating	停經
 e	to stop one's pen	煞筆
-e	to stop over	停留	勾留	經停	耽擱	落腳
+e	to stop over	停留	勾留	經停	落腳
 e	to stop pain	止痛
 e	to stop plowing	輟耕
 e	to stop production	停工	停產
@@ -83691,7 +83661,7 @@ e	to strictly control	嚴控
 e	to strictly enforce	嚴肅
 e	to strictly maintain	嚴守
 e	to strictly prohibit	嚴禁
-e	to stride	縱步	踔	蹽	邁	闊躡
+e	to stride	縱步	踔	蹽	闊躡
 e	to stride forward	邁進	闊步
 e	to stride over	跨
 e	to stride toward	邁向
@@ -83805,7 +83775,6 @@ e	to subvert	顛覆
 e	to succeed	成	成事	成功	打響	繼	繼述	遂
 e	to succeed in life	成龍
 e	to succeed sb	接班
-e	to succeed through failure	以失敗而告終
 e	to succeed to	繼承
 e	to succumb	屈服
 e	to such a degree	偌
@@ -84070,7 +84039,7 @@ e	to take a sample	取樣
 e	to take a seat	坐	就座	落座
 e	to take a shortcut	抄	抄近	抄近路	抄道
 e	to take a shower	沖涼	沖淋浴	沖澡	洗澡	淋浴
-e	to take a step	跨步	邁	邁出
+e	to take a step	跨步	邁出
 e	to take a stroll	遊玩
 e	to take a taxi	打的	打車
 e	to take a tonic	進補
@@ -84275,7 +84244,6 @@ e	to tape out	流片
 e	to tare	去皮	去皮重
 e	to target	對準	鎖定
 e	to tarnish	污衊	污辱	玷污
-e	to tarry	耽擱
 e	to taste	呫	咂	啖	嘗鮮	試飲	領教
 e	to taste tea	品茗	品茶
 e	to taste wine	品酒
@@ -84425,7 +84393,6 @@ e	to throw a game	做球	放水
 e	to throw a net	撒網
 e	to throw a punch	出拳
 e	to throw a rider	覂
-e	to throw a tantrum	撒嬌
 e	to throw at	投擲
 e	to throw away	丟掉	扔	扔掉	扔棄	拚棄	棄	棄置
 e	to throw brickbats	拍磚
@@ -84801,9 +84768,9 @@ e	to undergo metamorphosis	蛻化
 e	to undergo nuclear fission	裂變
 e	to underline	劃下	劃線
 e	to undermine	傾覆	妨害	挖牆腳	敗壞	顛覆
-e	to understand	了解	悟入	懂	明	理會	瞭解	知情	知曉	聽得懂	聽懂
+e	to understand	悟入	懂	明	理會	知情	知曉	聽得懂	聽懂	解	諒解
 e	to understand and sympathize	體惜
-e	to understand clearly	了	明了	明瞭	瞭	瞭然	通達
+e	to understand clearly	明了	明瞭	瞭然	通達
 e	to understand completely	了知	通徹
 e	to understand each other	交情匪淺
 e	to understand instantly	秒懂
@@ -84923,7 +84890,7 @@ e	to validate	驗證
 e	to valuate	計價
 e	to value	估價	寶貴	尊重	尙	尚	珍惜	顧惜	高看
 e	to value both equally	手心手背都是肉
-e	to value highly	尊尚	珍
+e	to value highly	珍
 e	to value loyalty	講義氣
 e	to value money highly	重利
 e	to vandalize	毀壞
@@ -85408,7 +85375,6 @@ e	to write out	開
 e	to write personally	手書
 e	to write prose	屬文
 e	to write without basis	亂寫
-e	to write wrong character	白
 e	to yak	大談
 e	to yank	強拉	扽
 e	to yaw	偏航
@@ -85433,7 +85399,7 @@ e	to zigzag	蛇行
 e	to zip by	呼嘯而過
 e	to-and-fro tussle	拉鋸戰
 e	to-do list	待辦事項列表
-e	toad	癩蛤蟆	蜍	蟆	蟾	蟾蜍	蠩	黽
+e	toad	癩蛤蟆	蟆	蟾	蟾蜍	蠩	黽
 e	toadstool	毒蕈
 e	toady	掇臀捧屁	溜舐	溜鬚拍馬	阿諛	順民
 e	toadying	拍馬屁
@@ -86304,7 +86270,7 @@ e	trawl	拖網
 e	trawlnet	拖網
 e	tray	托盤	盤子
 e	tray of a mill	磨盤
-e	treacherous	傾危	兇險	叵測	奇譎	奸猾	奸險	詭詐	詭譎	變幻莫測	陰險
+e	treacherous	傾危	兇險	叵測	奇譎	奸猾	奸險	詭詐	變幻莫測	陰險	陰鷙
 e	treacherous and murderous	陰險毒辣
 e	treacherous assault	毒手
 e	treacherous bandit	奸賊
@@ -86811,7 +86777,7 @@ e	tuple	元組
 e	tuplet	連音	連音符
 e	turban	包巾	包頭	幘	盤頭	鞨	頭巾
 e	turbellaria	渦蟲綱
-e	turbid	淟	混濁	渾濁	濁
+e	turbid	淟	混濁	渾濁
 e	turbid flow	濁流
 e	turbidite	濁積岩
 e	turbidity	濁度
@@ -86944,14 +86910,13 @@ e	tv drama	電視劇
 e	tv or radio receiver	接收機
 e	tv play	片
 e	tv screen	熒屏	熒幕	銀屏
-e	tv series	影集	連續集	電視劇
+e	tv series	影集	連續劇	電視劇
 e	tv show	電視秀
 e	tv streaming stick	電視棒
 e	tv tower	電視塔
 e	twang	抽痛
 e	twat	淫穴
 e	tweedledum and tweedledee	半斤八兩
-e	tweet	推文
 e	tweeter	高音喇叭
 e	tweezers	眉毛鉗	鑷
 e	twelfth lunar month	臘月
@@ -87161,7 +87126,7 @@ e	tyvek	特衛強
 e	tzigane	茨岡
 e	u-bend	存水彎
 e	u-turn	U形轉彎	轉頭
-e	ubiquitous	到處可見	普及
+e	ubiquitous	普及
 e	ubiquity	普遍性
 e	uchida	內田
 e	ucla	加利福尼亞大學洛杉磯分校
@@ -87171,7 +87136,7 @@ e	udon noodles	烏冬麵
 e	ueda	上田	植田
 e	uefa champions league	歐冠
 e	ueno	上野
-e	ufo	幽浮
+e	ufo	不明飛行物
 e	ufo enthusiast	幽浮迷
 e	ugali	烏加利
 e	uganda	烏干達
@@ -87372,7 +87337,7 @@ e	unconstrained	自如	自由散漫
 e	unconstrained in one's sexuality	開放
 e	unconstrained in style	天馬行空
 e	uncontroversial	無爭議
-e	unconventional	不落俗套	反時勢	另類	放浪	落托	落拓	落泊	落魄	超脫	非標準
+e	unconventional	不落俗套	反時勢	另類	放浪	落托	落拓	落泊	落魄	超脫
 e	unconventional gambit	劍走偏鋒	劍走蜻蛉
 e	unconventional method	變法
 e	unconvinced	不忿
@@ -87472,7 +87437,6 @@ e	underground	井下	在地下	地下	地底
 e	underground bank	地下錢莊
 e	underground drainpipe	地漏
 e	underground mine storage room	峒室
-e	underground nuclear explosion	地下核爆炸
 e	underground nuclear test	地下核試驗
 e	underground palace	地宮
 e	underground passage	隧
@@ -87502,9 +87466,9 @@ e	undersecretary of state	副國務卿
 e	undershirt	汗衫	汗褂兒	汗褟兒
 e	underside	下方	下邊
 e	undersized	矮小
-e	understand	了解	悟入	懂	明	理會	瞭解	知情	知曉	聽得懂	聽懂
+e	understand	悟入	懂	明	理會	知情	知曉	聽得懂	聽懂	解	諒解
 e	understand and sympathize	體惜
-e	understand clearly	了	明了	明瞭	瞭	瞭然	通達
+e	understand clearly	明了	明瞭	瞭然	通達
 e	understand completely	了知	通徹
 e	understand each other	交情匪淺
 e	understand instantly	秒懂
@@ -87527,7 +87491,6 @@ e	undertake standardized training	規培
 e	undertaking	事業	工程	約定
 e	undervalue oneself	妄自菲薄
 e	underwater camera	水底相機
-e	underwater nuclear explosion	水下核爆炸
 e	underwear	內衣	內衣褲
 e	underwire	鋼圈
 e	underworld	冥	冥府	黃壤
@@ -87585,7 +87548,7 @@ e	unenthusiastic	淡淡
 e	unequal	不等	參	有別
 e	unequal clause	霸王條款
 e	unequaled	舉世無雙
-e	unequalled	無敵	當世之冠	當世冠
+e	unequalled	無敵
 e	unequalled in his time	當世無雙
 e	unequivocal	一是一，二是二	不含糊
 e	uneven	七扭八歪	不均	不平	偨	傞	凹凸	參	參差不齊	坑坎	嵾
@@ -87686,7 +87649,6 @@ e	unicode	單一碼	統一碼	萬國碼
 e	unicorn	廌	獨角獸
 e	unicycle	單輪車	獨輪車
 e	unidentified	未名
-e	unidentified flying object	不明飛行物	幽浮
 e	unidentified origin	來路不明
 e	unidirectional	單向	單方向
 e	unidirectional current	單向電流
@@ -87790,6 +87752,7 @@ e	universal celebration	普天同慶
 e	universal character set ucs	通用字符集
 e	universal differential equation	泛定方程
 e	universal exposition	萬國博覽會
+e	universal gravitation	萬有引力
 e	universal hypothesis	普遍性假設
 e	universal music group	環球音樂集團
 e	universal postal union	萬國郵政聯盟	萬國郵聯
@@ -88127,7 +88090,7 @@ e	unwise	不智	失策
 e	unwise move	失手	失著
 e	unwitting	不知就裡
 e	unworldly	不諳世故
-e	unworthy	不值得	不肖	無似	菲	辜負
+e	unworthy	不值得	不肖	無似	菲
 e	unworthy person	非人
 e	unworthy son	孽子
 e	unwritten	不成文
@@ -88348,7 +88311,6 @@ e	us federal government	華府
 e	us open	美網
 e	us-china	美中
 e	us-china-taiwan	美中台
-e	us-japan	美日
 e	usa	美	花旗國
 e	usa and germany	美德
 e	usa eastern standard time	美東時間
@@ -88581,7 +88543,7 @@ e	value both equally	手心手背都是肉
 e	value deduced by calculation	導出值
 e	value engineering	價值工程
 e	value for money	划算
-e	value highly	尊尚	珍
+e	value highly	珍
 e	value loyalty	講義氣
 e	value money highly	重利
 e	value of a currency	幣值
@@ -88826,7 +88788,6 @@ e	velvet	天鵝絨	立絨	絨	絲絨
 e	velvet-fronted nuthatch	絨額鳾
 e	velvety	軟綿綿
 e	venal and selfish behavior	損公肥私
-e	venation	葉脈
 e	vendetta	宿仇
 e	vending machine	自動售貨機	自動販賣機	販賣機
 e	vendor	供貨商
@@ -88879,7 +88840,7 @@ e	ventriloquist	腹語師
 e	venture capital fund	創投基金
 e	venture capital investment	創投	創業投資	風投	風險投資
 e	venture to	不揣冒昧
-e	venue	地點	場合
+e	venue	地點
 e	venus	啟明星	太白	太白星	維納斯	金星
 e	venus flytrap	捕蠅草
 e	veracity	真事	真實性
@@ -89226,7 +89187,7 @@ e	village girl	村姑
 e	village of three households	三家村
 e	village school	書會	村塾
 e	village within a city	城中村
-e	villager	村民	鄉人	鄉民	鄉親
+e	villager	村民	鄉人	鄉民
 e	villain	反派	反角	壞人	奸人	奸民	宵小	醜類
 e	villi capillary	絨毛
 e	vinaceous rosefinch	酒紅朱雀
@@ -89240,9 +89201,8 @@ e	vinegar	醋
 e	vinegar jar	醋罈子
 e	vineyard	葡萄園
 e	vinous-throated parrotbill	棕頭鴉雀
-e	vinyl	乙烯	乙烯基	黑膠
+e	vinyl	黑膠
 e	vinyl chloride	氯乙烯
-e	vinyl group	乙烯基
 e	viola	中提琴
 e	viola vaginata	荁
 e	violate	仵	侵權	侵犯	俷	姦污	戾	犯	蘁	觸犯	蹂躪
@@ -89983,7 +89943,7 @@ e	watchman	看守者	看門人
 e	watchman's clapper	梆子
 e	watchman's rattle	柝	梆
 e	watchspring	弦
-e	watchtower	墩	守望台	望樓	瞭望塔
+e	watchtower	墩	守望台	望樓
 e	water	上水	水	溍	澆	澆水	澆灌
 e	water and fire	龍虎
 e	water and grass	水草
@@ -90301,6 +90261,7 @@ e	wedding invitation	喜帖	紅色炸彈
 e	wedding night	初夜	春宵	洞房花燭夜
 e	wedding photos	婚紗攝影
 e	wedding reception	婚宴	婚筵
+e	wedding ring	婚戒
 e	wedding veil	頭紗
 e	wedding witness	證婚人
 e	weddings and funerals	紅白喜事
@@ -90363,7 +90324,7 @@ e	weightlessness	失重
 e	weimar republic	威瑪共和國
 e	weir	堰
 e	weir valve	節流
-e	weird	古怪	另類	奇	怪氣	怪誕	神神道道	詭異	詭譎
+e	weird	古怪	另類	奇	怪氣	怪誕	神神道道	詭異
 e	weird and wonderful	古里古怪	奇麗
 e	weirdo	奇葩
 e	weixin or wechat	微信
@@ -90386,7 +90347,6 @@ e	welfare committee	福委會
 e	welfare services	福利事業
 e	well	井	到位	好好兒	好過	安好	平安	水井	良好	適
 e	well bucket	水筲
-e	well coordinated	默契
 e	well developed	豐滿
 e	well disciplined	罄然
 e	well established	相沿成習
@@ -90404,6 +90364,7 @@ e	well shaped	勻稱
 e	well supported	多助
 e	well sweep	桔槔
 e	well up	噴出	湧溢	湧起
+e	well water	井水
 e	well-behaved	乖乖	老實	老實巴交	規矩	飭
 e	well-being	哿	愃	福祉	禔
 e	well-bred young lady	閨秀
@@ -90728,6 +90689,7 @@ e	white granulocyte	粒白細胞
 e	white hair	白毛
 e	white hairy melon	冬瓜
 e	white hand	素手
+e	white hat hacker	白帽子
 e	white head of hair	皓首
 e	white heat	白熱	白熾
 e	white herring	曹白魚	鰳
@@ -90743,6 +90705,7 @@ e	white line	白線
 e	white lotus	白蓮
 e	white lotus society	白蓮	白蓮教
 e	white marble	漢白玉
+e	white matter	白質
 e	white meat	白肉
 e	white mouse	小白鼠
 e	white night	白夜
@@ -91416,7 +91379,6 @@ e	with great scope	堂而皇之
 e	with great trouble	辛辛苦苦
 e	with gusto	津津有味
 e	with heart and soul	全心
-e	with ice	加冰塊
 e	with indifference	冷眼
 e	with irresistible force	勢如破竹
 e	with keen interest	津津有味
@@ -92070,7 +92032,8 @@ e	wrinkled giant hyssop	藿香
 e	wrinkled up	皺縮
 e	wrinkles	紋縷	紋路
 e	wrist	手脖子	手腕	手腕子	手頸	腕	腕子
-e	wristband	手環
+e	wrist strap	腕帶
+e	wristband	手環	腕帶
 e	wristwatch	手錶	腕錶
 e	writ	令	令狀
 e	write	修	執筆	寫	寫作	寫字	寫道	揮毫	撰寫	撰稿	撰述
@@ -92100,7 +92063,6 @@ e	write out	開
 e	write personally	手書
 e	write prose	屬文
 e	write without basis	亂寫
-e	write wrong character	白
 e	writer	作手	做手	撰述	文學家
 e	writing	字句	寫作	文	文墨	文字	筆墨	翰	著述
 e	writing as a livelihood	硯田
@@ -92435,7 +92397,6 @@ e	yield-to-weight ratio	比威力
 e	yielding	嫕	柔	柔順	遜
 e	yin	陰
 e	yin and yang	兩儀	陰陽
-e	yingpan township in yunnan	營盤
 e	ymca	青年會
 e	yo-yo	悠悠球	溜溜球
 e	yodel	嶽得爾歌
@@ -93345,6 +93306,7 @@ z	三寸金蓮	bound foot
 z	三對三鬥牛	three-on-three basketball game
 z	三尖杉酯鹼	harringtonine
 z	三尖瓣	tricuspid valve
+z	三局兩勝	best of three
 z	三屜桌	three-drawer desk
 z	三度	third
 z	三廂	sedan
@@ -93442,6 +93404,7 @@ z	三角帶	v-belt
 z	三角座	triangulum
 z	三角形	triangle
 z	三角恐龍	triceratops
+z	三角戀	love triangle
 z	三角戀愛	love triangle
 z	三角板	set square	triangle
 z	三角柱體	triangular prism
@@ -93461,6 +93424,7 @@ z	三趾濱鷸	sanderling
 z	三趾翠鳥	black-backed dwarf kingfisher
 z	三趾鴉雀	three-toed parrotbill
 z	三趾鷗	black-legged kittiwake
+z	三蹦子	motorized three-wheeler
 z	三輪車	pedicab	tricycle
 z	三輪車夫	pedicab driver
 z	三通	t-joint	t-piece	t-pipe	three links
@@ -94181,7 +94145,7 @@ z	不斷	unceasing	uninterrupted	continuous	constant
 z	不方便	inconvenience	inconvenient
 z	不明	not clear	unknown	fail to understand
 z	不明確	indefinite	unclear
-z	不明飛行物	unidentified flying object
+z	不明飛行物	ufo
 z	不易	difficult	unchanging
 z	不易之論	perfectly sound proposition	unalterable truth	irrefutable argument
 z	不是	no	is not	not
@@ -94325,6 +94289,7 @@ z	不羈	unruly	uninhibited
 z	不義	injustice
 z	不義之財	ill-gotten wealth or gains
 z	不翼而飛	disappear without trace	spread fast	spread like wildfire
+z	不老泉	fountain of youth
 z	不耐受	intolerance
 z	不耐煩	impatient	lose patience
 z	不聞不問	uncritical
@@ -94379,7 +94344,7 @@ z	不計	disregard
 z	不計其數	innumerable
 z	不記名投票	secret ballot
 z	不許	not to allow	must not	can't
-z	不該	should not	owe nothing
+z	不該	should not
 z	不詳	not in detail	not quite clear
 z	不語	not to speak
 z	不調和	discord
@@ -94967,7 +94932,6 @@ z	中轉	change	transfer	correspondence
 z	中轉櫃檯	transfer desk	correspondence desk
 z	中辣	hot	medium level of spiciness
 z	中農	middle peasant
-z	中途	midway
 z	中途島	midway islands
 z	中遠	china ocean shipping company
 z	中醫	traditional chinese medical science
@@ -94999,7 +94963,6 @@ z	中飽	embezzle	misappropriate
 z	中飽私囊	stuff one's pockets	take bribes
 z	中餐	lunch
 z	中餐館	chinese restaurant
-z	中高度防空	high-to-medium-altitude air defense
 z	中點	midpoint	half-way point
 z	丮	catch
 z	丰	luxuriant	buxom	appearance	charm
@@ -95053,7 +95016,7 @@ z	丹鳳眼	red phoenix eyes
 z	丹麥	denmark
 z	丹麥包	danish pastry
 z	主	owner	master	host	individual or party concerned	god	lord	main	indicate or signify	trump card
-z	主人	master	host	owner
+z	主人	owner	host	master
 z	主人翁	master	hero or heroine
 z	主任	director	head
 z	主使	mastermind	orchestrate	instigate	instigator
@@ -95288,8 +95251,7 @@ z	乙氧基	ethoxy
 z	乙氨基	ethylamino group
 z	乙流	type b influenza
 z	乙炔	acetylene
-z	乙烯	ethylene	vinyl
-z	乙烯基	vinyl	vinyl group
+z	乙烯	ethylene
 z	乙烷	ethane
 z	乙狀結腸	sigmoid colon
 z	乙硫醇	ethanethiol
@@ -95394,7 +95356,6 @@ z	乳膠漆	latex paint	emulsion paint
 z	乳草	milkweeds
 z	乳製品	dairy products
 z	乳豬	suckling pig
-z	乳貼	pasties
 z	乳部	breasts
 z	乳酪	cheese
 z	乳酪蛋糕	cheesecake
@@ -95500,7 +95461,7 @@ z	亂講	talk nonsense
 z	亂跳	jump about	beat wildly
 z	亂麻	in a tremendous muddle	confused
 z	亂黨	rebel party
-z	了	finish	understand clearly
+z	了	finish
 z	了不得	terrific	terrible	very
 z	了不起	amazing	terrific	extraordinary
 z	了了	realize clearly	settle a matter
@@ -95514,7 +95475,6 @@ z	了得	exceptional	outstanding	dreadful	appalling
 z	了無新意	unoriginal	stereotyped
 z	了知	fully understand	understand completely
 z	了結	settle	finish	conclude	wind up
-z	了解	understand	realize	find out
 z	予	i	me	give
 z	予以	give	impose	apply
 z	事	matter	thing	item	work	affair
@@ -95843,6 +95803,7 @@ z	井井	always clean
 z	井口	mouth of a well
 z	井噴	blowout	surge	gush
 z	井字棋	tic-tac-toe
+z	井水	well water
 z	井田制	well-field system
 z	井蓋	manhole cover
 z	井號	hash symbol	pound sign
@@ -96724,7 +96685,7 @@ z	以太	ether
 z	以太坊	ethereum
 z	以太網	ethernet
 z	以太網絡	ethernet
-z	以失敗而告終	succeed through failure
+z	以失敗告終	end in failure
 z	以巴	israeli-palestinian
 z	以律	eluid
 z	以後	after	later	afterwards	following	later on	in the future
@@ -97053,13 +97014,11 @@ z	似水年華	fleeting years
 z	似的	seems as if	rather like
 z	似雪	snowy
 z	伽倻琴	gayageum
-z	伽瑪射線	gamma ray
 z	伽羅瓦理論	galois theory
 z	伽羅華理論	galois theory
 z	伽藍	buddhist temple
 z	伽馬	gamma
-z	伽馬射線	gamma rays
-z	伽馬輻射	gamma radiation
+z	伽馬射線	gamma ray
 z	伾	multitudinous	powerful
 z	佃	cultivate	hunt
 z	佃戶	tenant farmer
@@ -97102,6 +97061,7 @@ z	位次	place	degree on employment scale
 z	位移	displacement
 z	位置	position	place	seat
 z	位置效應	position effect
+z	位能	potential energy
 z	位面	plane
 z	低	low	beneath	lower	let droop	hang down	incline
 z	低三下四	servile
@@ -97156,6 +97116,7 @@ z	低窪	low-lying
 z	低端	low-end
 z	低等	inferior
 z	低筋麵粉	low-gluten flour	cake flour	pastry flour	soft flour
+z	低糖	low-sugar
 z	低級	low level	rudimentary	vulgar	low	inferior
 z	低級語言	low-level language
 z	低維	low-dimensional
@@ -97718,7 +97679,6 @@ z	便衣	plainclothesman
 z	便衣警察	plain-clothed policeman
 z	便裝	casual dress
 z	便覽	brief guide
-z	便車	hitchhike
 z	便道	pavement	sidewalk	shortcut	makeshift road
 z	便酌	informal dinner
 z	便門	side door	wicket door
@@ -98098,7 +98058,6 @@ z	俸祿	official's salary
 z	俸給	pay	salary
 z	俸銀	official salary
 z	俸錢	salary
-z	俺	i
 z	俾	cause	enable	phonetic bi
 z	俾使	in order that	so that	so as to	cause sth
 z	俾倪	parapet	look askance
@@ -98409,7 +98368,6 @@ z	假戲真唱	fiction comes true
 z	假手	prosthetic hand
 z	假托	pretend	use a pretext	make sth up	make use of
 z	假扮	impersonate
-z	假招子	put on airs
 z	假拱	blind arch	false arch
 z	假摔	diving	simulation	flopping
 z	假期	vacation
@@ -99381,7 +99339,6 @@ z	允	just	fair	permit	allow
 z	允准	approve	permit	approval	permission
 z	允宜	appropriate	apt
 z	允當	proper	suitable
-z	允許	permit	allow
 z	允諾	promise	consent
 z	元	surname yuan	yuan dynasty	currency unit	era	eon
 z	元件	element	component
@@ -99470,9 +99427,9 @@ z	兇	terrible	fearful
 z	兇器	lethal weapon	murder weapon
 z	兇宅	inauspicious abode	haunted house
 z	兇悍	violent	fierce and tough	shrewish
-z	兇惡	fierce	ferocious	fiendish	frightening
 z	兇戾	cruel	tyrannical
 z	兇手	murderer	assassin
+z	兇案	murder case
 z	兇死	die in violence
 z	兇殘	savage	cruel	fierce
 z	兇殺	murder	assassination
@@ -99535,7 +99492,6 @@ z	先驅	pioneer
 z	先驗	priori
 z	先驗概率	prior probability
 z	光	leave uncovered
-z	光二極管	photodiode	light-emitting diode
 z	光亮	bright
 z	光亮度	brightness	luminosity
 z	光伏	photovoltaic
@@ -99549,7 +99505,7 @@ z	光功率	optical power
 z	光動嘴	empty talk	mere rhetoric	palaver
 z	光化作用	photochemical effect	photosynthesis	photolysis
 z	光化學	photochemistry
-z	光合	photosynthesis
+z	光合	photosynthetic
 z	光合作用	photosynthesis
 z	光圈	aperture	diaphragm	halo	aureole
 z	光大	splendid	magnificent
@@ -99580,6 +99536,7 @@ z	光明正大	out in the open
 z	光是	solely	just
 z	光景	circumstances	scene	about	probably
 z	光暈	halo	halation
+z	光替	stand-in
 z	光束	light beam
 z	光柱	light beam	light pillar
 z	光柵	grating	raster
@@ -99846,7 +99803,6 @@ z	入球	score a goal	goal
 z	入盟	join
 z	入眠	fall asleep
 z	入睡	fall asleep
-z	入神	be enthralled	be entranced
 z	入籍	become naturalized	become a citizen
 z	入罪	criminalize
 z	入罪化	criminalize
@@ -100421,6 +100377,7 @@ z	公有	publicly owned	communal	held in common
 z	公有制	public ownership
 z	公有化	nationalize
 z	公案	judge's desk	complex legal case	contentious issue	koan
+z	公模	off-the-shelf mold
 z	公款	public money
 z	公母倆	husband and wife
 z	公毫	centigram
@@ -100475,7 +100432,6 @@ z	公立學校	public school
 z	公章	official seal
 z	公筷	serving chopsticks
 z	公約	convention
-z	公約數	common factor	common divisor
 z	公網	public network	wide area network	internet
 z	公署	government office
 z	公羊	ram
@@ -100636,6 +100592,7 @@ z	兵權	military leadership	military power
 z	兵法	art of war	military strategy and tactics
 z	兵源	manpower resources	sources of troops
 z	兵營	military camp	barracks
+z	兵燹	ravages of war
 z	兵痞	army riffraff	army ruffian	soldier of fortune
 z	兵站	army service station	military depot
 z	兵船	man-of-war	naval vessel	warship
@@ -100960,7 +100917,7 @@ z	冰帽	icecap
 z	冰斗	cirque
 z	冰晶	ice crystals
 z	冰晶石	cryolite
-z	冰染染料	azoic dyes
+z	冰染染料	azoic dye
 z	冰柱	icicle
 z	冰桶	ice bucket
 z	冰棍	popsicle	ice lolly
@@ -101070,6 +101027,7 @@ z	冷暴力	non-physical abuse	emotional abuse	silent treatment
 z	冷森森	chilling cold	cold and threatening
 z	冷槍	sniper's shot
 z	冷氣	cold air	air conditioning
+z	冷氣團	cold air mass
 z	冷氣機	air conditioner
 z	冷水	cold water	unboiled water
 z	冷水機組	chiller
@@ -101246,7 +101204,6 @@ z	凶光	ominous glint
 z	凶喪	funeral arrangements
 z	凶巴巴	harsh	savage	fierce
 z	凶年	year of famine
-z	凶惡	ferocious	fiendish	frightening
 z	凶暴	brutal
 z	凶服	mourning clothes
 z	凶殘	savage
@@ -101684,7 +101641,7 @@ z	分而治之	divide and rule
 z	分至點	point of difference	point of divergence
 z	分色	color separation
 z	分色鏡頭	process lens
-z	分號	semicolon
+z	分號	semicolon	branch
 z	分行	subsidiary bank
 z	分袂	leave each other	part company
 z	分裂	split up	divide	break up	fission	schism
@@ -102077,7 +102034,6 @@ z	刮擦	scrape
 z	刮痧	gua sha
 z	刮皮刀	peeler	potato peeler
 z	刮臉	shave one's face
-z	刮蹭	sideswipe
 z	刮鏟	scraper
 z	刮鬍刀	razor
 z	刮鬍子	shave
@@ -102099,7 +102055,6 @@ z	到此	hereto	hereunto
 z	到此為止	end here
 z	到現在	up until now	date
 z	到處	everywhere
-z	到處可見	ubiquitous	commonplace	found everywhere
 z	到訪	pay a visit
 z	到貨	arrive
 z	到達大廳	arrival hall
@@ -102220,6 +102175,7 @@ z	剃	shave
 z	剃光頭	crushing defeat
 z	剃刀	razor
 z	剃度	take the tonsure	shave the head	tonsure
+z	剃鬚	shave
 z	剃鬚刀	shaver	razor
 z	剃鬚膏	shaving cream
 z	剄	cut the throat
@@ -102796,7 +102752,6 @@ z	加價	increase a price
 z	加入	become a member	join	mix into	participate in	add in
 z	加冕	crown	coronation
 z	加冰	iced	on the rocks
-z	加冰塊	on the rocks	with ice	iced
 z	加利利	galilee
 z	加利福尼亞	california
 z	加利福尼亞大學	university of california
@@ -103639,6 +103594,7 @@ z	匯合	confluence	converge	join	fuse	fusion
 z	匯回	remit home
 z	匯報	report
 z	匯寄	remit
+z	匯市	foreign exchange market
 z	匯攏	collect	gather
 z	匯映	joint screening
 z	匯業財經集團	delta asia financial group
@@ -103833,6 +103789,7 @@ z	升上	be promoted to	enter
 z	升任	be promoted to
 z	升值	rise in value	appreciate
 z	升入	progress to
+z	升力	lift
 z	升壓	boost the pressure	boost the voltage
 z	升壓劑	vasopressor agent	antihypotensive agent
 z	升天	die
@@ -104131,7 +104088,7 @@ z	南魚座	piscis austrinus
 z	南齊	qi of southern dynasties
 z	博	doctoral degree	blog
 z	博世	bosch
-z	博主	blogger
+z	博主	blogger	content creator
 z	博取	win
 z	博古通今	erudite and informed
 z	博士	doctor	court academician
@@ -104146,7 +104103,7 @@ z	博彩	gambling
 z	博徒	gambler
 z	博德利圖書館	bodleian library
 z	博愛座	priority seat
-z	博文	blog article
+z	博文	blog post
 z	博斯普魯斯	bosphorus
 z	博斯沃思	bosworth
 z	博斯騰湖	bosten lake in xinjiang
@@ -105426,7 +105383,7 @@ z	叮叮	tinkling or jingling sound
 z	叮叮噹噹	ding dong	jingling of bells	clanking sound
 z	叮叮貓	dragonfly
 z	叮咚	ding dong	jingling of bells	clanking sound
-z	叮咬	sting	bite
+z	叮咬	bite
 z	叮問	question closely	probe	ask repeatedly
 z	叮噹	ding dong	jingling of bells	clanking sound
 z	叮噹聲	tinkle
@@ -106566,7 +106523,6 @@ z	告白	announce publicly	explain oneself	reveal one's feelings	confess	declare
 z	告示	announcement
 z	告示牌	notice	placard	signboard
 z	告竣	be completed
-z	告終	end	reach an end
 z	告罄	run out	have exhausted
 z	告誡	warn	admonish
 z	告誦	tell	inform
@@ -106855,7 +106811,6 @@ z	咥	gnaw	bite	loud laugh
 z	咦	expression of surprise
 z	咧	modal particle expressing exclamation
 z	咧咧	talk drivel
-z	咧嘴	grin
 z	咧開嘴笑	laugh
 z	咨嗟	gasp in admiration
 z	咨文	official communication
@@ -107751,6 +107706,7 @@ z	單寧酸	tannic acid
 z	單層	single layer	single story	single deck	single level
 z	單層塔	single-storied pagoda
 z	單峰駝	dromedary
+z	單工	simplex
 z	單幹	work single-handed	individual farming
 z	單引號	single quotes
 z	單張	flyer	leaflet	single-sheet
@@ -107797,6 +107753,7 @@ z	單眼	ommatidium	one eye
 z	單眼皮	single eyelid
 z	單眼相機	single-lens reflex camera
 z	單程	one-way
+z	單程票	one-way ticket
 z	單穩	monostable	single-side stable
 z	單端	single-ended
 z	單簧管	clarinet
@@ -107851,6 +107808,7 @@ z	單音節	monosyllabic	monosyllable
 z	單音詞	monosyllabic word
 z	單韻母	simple finals
 z	單項	single-item
+z	單項式	monomial
 z	單飛	fly solo
 z	單體	monomer
 z	單點	single point
@@ -108794,7 +108752,6 @@ z	國界線	national border
 z	國畫	traditional chinese painting
 z	國立	national	state-run	public
 z	國立西南聯合大學	national southwest combined university
-z	國立首爾大學	seoul national university snu
 z	國策	national policy
 z	國籍	nationality
 z	國粹	national essence	quintessence of national culture
@@ -109076,7 +109033,6 @@ z	團體行	group travel
 z	團魚	softshell turtle
 z	圛	mist rolling upwards
 z	圜	circle	encircle	round
-z	圞	round
 z	土	surname tu	tu ethnic group	earth	dust	clay	local	indigenous	crude opium	unsophisticated
 z	土丘	mound	hillock	barrow
 z	土人	native	aborigine	clay figure
@@ -109190,6 +109146,7 @@ z	在內	in it	among them
 z	在前	ahead	formerly	in the past
 z	在即	near at hand	imminent	within sight
 z	在台	in taiwan
+z	在售	available for purchase
 z	在地下	underground
 z	在外	outer	excluded
 z	在家	be at home	be in	remain a layman
@@ -109237,7 +109194,6 @@ z	地下	underground	subterranean	covert
 z	地下城	dungeon
 z	地下室	basement	cellar
 z	地下情	secret love affair
-z	地下核爆炸	nuclear underground burst	underground nuclear explosion
 z	地下核試驗	underground nuclear test
 z	地下水	groundwater
 z	地下莖	underground stem
@@ -109279,6 +109235,7 @@ z	地堡	bunker
 z	地塊	parcel of land	massif
 z	地塞米松	dexamethasone
 z	地壇	temple of earth
+z	地外文明	extraterrestrial civilization
 z	地契	title deed
 z	地委	prefectural party committee
 z	地宮	underground palace
@@ -109295,8 +109252,8 @@ z	地底	subterranean	underground
 z	地府	hell	nether world	hades
 z	地形	topography	terrain	landform
 z	地形圖	topographic map
-z	地心	earth's core	geocentric
-z	地心吸力	gravitation
+z	地心	earth's interior
+z	地心吸力	earth's gravitational pull
 z	地心引力	earth's gravity
 z	地心緯度	geocentric latitude
 z	地心說	geocentric theory
@@ -109314,7 +109271,7 @@ z	地方自治	local autonomy	home rule
 z	地景	landscape	terrain
 z	地板	floor
 z	地板磚	floor tile
-z	地核	core of the earth
+z	地核	earth's core
 z	地標	landmark
 z	地檢署	district prosecutor's office
 z	地步	situation	leeway
@@ -109420,7 +109377,6 @@ z	地震速報	earthquake alert
 z	地面	floor	ground	surface
 z	地面層	ground floor	first floor
 z	地面控制	ground control
-z	地面核爆炸	surface nuclear explosion
 z	地面氣壓	ground pressure
 z	地面水	surface water
 z	地面灌溉	surface irrigation
@@ -110010,6 +109966,7 @@ z	堪比	be comparable to
 z	堪稱	can be rated as
 z	堪虞	worrisome	precarious	be at risk
 z	堪輿	geomancy
+z	堪達罕	moose
 z	堭	dry ditch
 z	堮	boundary	border
 z	堯	surname yao
@@ -110058,6 +110015,7 @@ z	報捷	report a success	announce a victory
 z	報摘	news digest
 z	報攤	newsstand
 z	報收	close at
+z	報料	news tip
 z	報春花	primrose
 z	報條	list of deaths
 z	報業	newspaper industry
@@ -110098,7 +110056,6 @@ z	堳	low wall
 z	場	threshing floor	stage	scene
 z	場區	field area
 z	場區應急	site area emergency
-z	場合	situation	occasion	context	setting	location	venue
 z	場地	space	site	place	sports pitch
 z	場地自行車	track bike	track cycling
 z	場外應急	general emergency
@@ -110620,6 +110577,7 @@ z	壽堂	mourning hall
 z	壽帶	amur paradise flycatcher
 z	壽數	predestined length of life
 z	壽星	god of longevity
+z	壽星公	god of longevity
 z	壽材	coffin
 z	壽桃包	longevity peach bun	birthday peach bun
 z	壽禮	birthday present
@@ -111373,7 +111331,7 @@ z	大數	large number
 z	大數據	big data
 z	大斑啄木鳥	great spotted woodpecker
 z	大斑鶺鴒	white-browed wagtail
-z	大料	chinese anise	star anise
+z	大料	star anise
 z	大方	expert	scholar	mother earth	generous	magnanimous	stylish	in good taste	easy-mannered	natural and relaxed
 z	大方之家	learned person
 z	大族	large and influential family	clan
@@ -111395,7 +111353,6 @@ z	大染缸	big dyeing vat	corrupting environment
 z	大校	senior colonel
 z	大桶	barrel	vat
 z	大棒	big stick
-z	大棚	greenhouse	polytunnel
 z	大業	great cause	great undertaking
 z	大概	roughly	probably	rough	approximate	about	general idea
 z	大樓	building
@@ -111499,7 +111456,6 @@ z	大白話	colloquial speech
 z	大白鯊	great white shark
 z	大白鷺	great egret
 z	大白鼠	white lab rat
-z	大盤子	platter
 z	大盤尾	greater racket-tailed drongo
 z	大相徑庭	poles apart
 z	大眾	volkswagen	masses	popular
@@ -112575,7 +112531,6 @@ z	女王	queen
 z	女生	schoolgirl	female student	girl
 z	女的	woman
 z	女皇	empress
-z	女皇大學	queen's university
 z	女皇帝	empress
 z	女真語	jurchen language
 z	女眷	womenfolk
@@ -112601,6 +112556,7 @@ z	女陰	vulva	pudenda
 z	女雙	women's doubles
 z	女高	female high school student	all-girls high school
 z	女高音	soprano
+z	女鬼	female ghost
 z	奴	slave
 z	奴僕	servant
 z	奴婢	slave servant
@@ -112828,6 +112784,7 @@ z	妄言	lies	wild talk	tell lies	talk nonsense	fantasy
 z	妄說	talk irresponsibly	ridiculous presumption talk
 z	妊	pregnant	pregnancy
 z	妊娠	pregnancy	gestation
+z	妊娠紋	stretch marks
 z	妊娠試驗	pregnancy test
 z	妊婦	expecting mother
 z	妍	beautiful
@@ -113205,6 +113162,7 @@ z	婚宴	wedding reception
 z	婚後	after getting married
 z	婚慶	wedding celebration
 z	婚戀	love and marriage
+z	婚戒	wedding ring
 z	婚房	newlyweds' home
 z	婚書	marriage contract
 z	婚期	wedding day
@@ -113249,6 +113207,7 @@ z	媄	beautiful
 z	媅	content	happy
 z	媒	medium	intermediary	matchmaker	go-between
 z	媒人	matchmaker
+z	媒人婆	female matchmaker
 z	媒介	intermediary	vehicle	vector	medium	media
 z	媒合	match up
 z	媒妁之言	matchmaker's services
@@ -113797,7 +113756,6 @@ z	學舍	school building	school	student dormitory
 z	學號	student id number
 z	學術	learning	science	academic
 z	學術水平	academic level
-z	學術界	academic circles	academia
 z	學術自由	academic freedom
 z	學說	theory	doctrine
 z	學識	erudition	scholarly knowledge
@@ -114028,7 +113986,6 @@ z	安身	make one's home	take shelter
 z	安逸	easy and comfortable	easy
 z	安道爾	andorra
 z	安道爾共和國	republic of andorra
-z	安達仕	andaz
 z	安達曼島	andaman islands
 z	安達曼海	andaman sea
 z	安達曼群島	andaman islands
@@ -114144,7 +114101,6 @@ z	官名	official position
 z	官吏	bureaucrat	official
 z	官員	official	administrator
 z	官場	officialdom	bureaucracy
-z	官媒	official media	state media
 z	官子	endgame
 z	官學	school or academic institution
 z	官客	male guest at party
@@ -114475,7 +114431,6 @@ z	家常菜	home cooking
 z	家常豆腐	home-style tofu
 z	家底	family property	patrimony
 z	家庭主夫	househusband
-z	家庭主婦	housewife
 z	家庭作業	homework
 z	家庭地址	home address
 z	家庭成員	family member
@@ -114512,6 +114467,7 @@ z	家祖	my paternal grandfather
 z	家禽	poultry	domestic fowl
 z	家私	family property	family wealth
 z	家童	servant
+z	家紡	home textiles
 z	家臣	henchman
 z	家舅	my maternal uncle
 z	家蠅	house fly
@@ -114818,7 +114774,7 @@ z	寡頭政治	oligarchy
 z	寢	bedroom	imperial tomb
 z	寢具	bedding
 z	寢室	bedroom	dormitory
-z	寢食難安	extremely worried and troubled
+z	寢食難安	deeply worried or troubled
 z	寤	awake from sleep
 z	寥	empty	lonesome	very few
 z	寥寥	very few
@@ -115292,7 +115248,6 @@ z	尊嚴	dignity	sanctity	honor	majesty
 z	尊堂	your mother
 z	尊奉	worship	revere	venerate
 z	尊容	august countenance	your face
-z	尊尚	value highly
 z	尊崇	revere	admire	honor	venerate
 z	尊師	revered master
 z	尊師愛徒	revered master
@@ -115484,6 +115439,7 @@ z	導出值	value deduced by calculation	derived value
 z	導出範疇	derived category
 z	導函數	derived function
 z	導向	be oriented towards	orientation
+z	導員	student counselor
 z	導報	guide
 z	導尿管	urinary catheter
 z	導師	tutor	teacher	academic advisor
@@ -115561,6 +115517,7 @@ z	小半	lesser part	smaller part
 z	小卒	foot soldier	minor figure	nobody	pawn
 z	小卷	young squid
 z	小叔	husband's younger brother	brother-in-law
+z	小叔子	husband's younger brother
 z	小受	bottom
 z	小可	small	unimportant	my humble person
 z	小可愛	cutie	sweetie	camisole
@@ -115583,7 +115540,6 @@ z	小型貨車	light van
 z	小型車	compact car
 z	小城	small town
 z	小報	tabloid newspaper
-z	小壽星	birthday boy	birthday girl
 z	小夜曲	serenade
 z	小天鵝	little swan	tundra swan
 z	小太太	concubine	mistress
@@ -115907,7 +115863,7 @@ z	少艾	young and pretty	pretty girl
 z	少選	little while
 z	少部分	small proportion of
 z	少量	smidgen	little bit	few
-z	少間	soon	short while	narrow gap	slightly better
+z	少間	slightly improved
 z	少頃	in a short while	presently
 z	尕	little
 z	尖	make shrill
@@ -117057,6 +117013,7 @@ z	巴士	bus	motor coach
 z	巴士底	bastille
 z	巴士拉	basra
 z	巴士站	bus stop
+z	巴婆果	pawpaw
 z	巴寶莉	burberry
 z	巴尼亞盧卡	banja luka
 z	巴州	east sichuan and chongqing
@@ -117240,6 +117197,7 @@ z	布爾代數	boolean algebra
 z	布痕瓦爾德	buchenwald
 z	布穀	cuckoo
 z	布線	wiring
+z	布草	hotel linens
 z	布萊克史密斯	blacksmith
 z	布萊克本	blackburn
 z	布萊尼	bryne
@@ -117714,8 +117672,9 @@ z	平郵	ordinary mail
 z	平野	hirano
 z	平鍋	pan
 z	平靖	calm and peaceful	tranquil
-z	平面	plane	print media
+z	平面	plane	flat surface
 z	平面圖	plan	planar graph	plane figure
+z	平面媒體	print media
 z	平面幾何	plane geometry
 z	平面曲線	plane curve
 z	平面波	plane wave
@@ -117895,7 +117854,6 @@ z	幽徑	secluded path
 z	幽微	faint	subtle	profound	mysterious	dim
 z	幽暗	gloom
 z	幽會	rendezvous in secret
-z	幽浮	ufo	unidentified flying object	space ship
 z	幽浮迷	ufo enthusiast
 z	幽綠	moss green	dark sea green
 z	幽美	beautiful and tranquil
@@ -118167,7 +118125,6 @@ z	廆	used in personal names
 z	廈門大學	xiamen university
 z	廉	surname lian	incorruptible	honest	inexpensive	investigate
 z	廉恥	honor and shame	sense of honor
-z	廉政	govern with integrity	clean and honest government
 z	廉正	upright and honest	integrity
 z	廉直	upright and honest	incorruptible	squeaky clean
 z	廉租房	low-rent housing
@@ -118293,7 +118250,7 @@ z	廣為	widely
 z	廣目天	virupaksa
 z	廣硯	guangnan and yanshan
 z	廣義	broad sense	general sense
-z	廣義相對論	general relativity	einstein's theory of gravity
+z	廣義相對論	general relativity
 z	廣而告之	publicize widely
 z	廣藿香	patchouli
 z	廣袤	vast
@@ -119112,7 +119069,6 @@ z	後搖滾	post-rock
 z	後撤	pull back	retreat
 z	後擋板	backboard
 z	後效	after-effect
-z	後文	pages ahead	following pages
 z	後方	rear
 z	後日	day after tomorrow	from hence	from now	from now on	henceforth
 z	後期	late stage	later period
@@ -119822,7 +119778,6 @@ z	忘	forget	overlook	neglect
 z	忘不了	cannot forget
 z	忘八旦	turtle's egg
 z	忘八蛋	turtle's egg
-z	忘卻	forget
 z	忘性	forgetfulness
 z	忘恩	be ungrateful
 z	忘情	unmoved	indifferent	unruffled by sentiment
@@ -120606,7 +120561,6 @@ z	情面	feelings and sensibilities	sentiment and face	sensitivity to other's fe
 z	情願	willingness	would rather
 z	惆	forlorn	vexed	disappointed
 z	惆悵	melancholy	depression
-z	惆悵若失	feel despondent
 z	惇	kindhearted	honest
 z	惈	courageous	resolute and daring
 z	惋惜	regret
@@ -120772,7 +120726,7 @@ z	惹人注意	attract attention
 z	惹人注目	attract attention	noticeable
 z	惹婁子	stir up trouble
 z	惹怒	provoke anger
-z	惹惱	offend
+z	惹惱	make sb angry
 z	惹是生非	stir up trouble
 z	惹是非	stir up trouble
 z	惹毛	irritate	annoy	piss sb off
@@ -121311,7 +121265,6 @@ z	懂局	be savvy
 z	懂眼	know the ropes	expert
 z	懂行	know the ropes
 z	懂門兒	professional	expert	au fait
-z	懃	industrious	solicitous
 z	懅	bashful	ashamed
 z	懆	anxious	sad
 z	懇	earnest
@@ -121468,6 +121421,7 @@ z	懸掛式滑翔	hang-gliding
 z	懸掛式滑翔機	hang-glider
 z	懸揣	speculate	conjecture
 z	懸案	unresolved question	unresolved case
+z	懸梯	suspended ladder
 z	懸河	waterfall	cataract	torrent of words
 z	懸浮	float	suspension
 z	懸浮微粒	particulates	particulate matter
@@ -121977,7 +121931,6 @@ z	扁鍬形蟲	giant stag beetle
 z	扁食	chinese-style dumpling
 z	扁骨	flat bone
 z	扂	door latch
-z	扂楔	door latch
 z	扃	door
 z	扆	surname yi	screen
 z	扇	fan
@@ -122324,7 +122277,6 @@ z	打發時間	pass the time
 z	打的	take a taxi	go by taxi
 z	打盹	doze off
 z	打眼	attract attention	conspicuous
-z	打瞌睡	doze off
 z	打短兒	casual labor
 z	打碟師	dj
 z	打碼	pixelate an image
@@ -122773,7 +122725,6 @@ z	抓地力	traction
 z	抓娃娃機	claw machine
 z	抓小辮子	catch sb out
 z	抓工夫	maximize one's time	find enough time
-z	抓手	starting point	mechanical hand	gripper
 z	抓拍	capture	snap
 z	抓捕	seize	capture
 z	抓搔	scratch an itch
@@ -123396,6 +123347,7 @@ z	拔尖	top-notch
 z	拔掉	pluck	pull off	pull out	unplug
 z	拔染	discharge
 z	拔根	uproot
+z	拔槍	draw a gun
 z	拔毛	pull out hair	pluck	epilation
 z	拔河	tug-of-war
 z	拔海	elevation
@@ -123739,7 +123691,6 @@ z	持有人	holder
 z	持械	armed
 z	持槍	carry a gun
 z	持槍搶劫	armed robbery
-z	持續	continue	persist	last	sustainable	preservation
 z	持續性植物狀態	persistent vegetative state
 z	持續時間	duration
 z	持股	hold shares
@@ -124599,7 +124550,7 @@ z	推推搡搡	push and shove
 z	推搡	shove	jostle
 z	推搪	offer excuses	stall
 z	推敲	think over
-z	推文	tweet
+z	推文	post on x
 z	推斥力	repulsive force
 z	推斷	infer	deduce	predict	extrapolate
 z	推服	esteem	admire
@@ -125050,7 +125001,6 @@ z	搖粒絨	polar fleece
 z	搖臂	rocker arm
 z	搖船	scull	row a boat
 z	搖號	lottery
-z	搖身	refers to abrupt transformation
 z	搖醒	shake awake
 z	搖錢樹	source of easy money
 z	搖頭	shake one's head
@@ -125137,7 +125087,6 @@ z	搭乘	travel by
 z	搭伙	become partner
 z	搭伴	travel with another	accompany another
 z	搭便	at one's convenience	in passing
-z	搭便車	hitch a ride
 z	搭咕	connect	discuss
 z	搭嘴	answer
 z	搭坐	travel by	ride on
@@ -125202,7 +125151,6 @@ z	搶購	buy frenetically	snap up
 z	搶走	snatch
 z	搶跑	jump the gun
 z	搶通	rush through urgently
-z	搶鏡頭	grab the limelight
 z	搶險	emergency
 z	搶風	against the headwind
 z	搶風頭	steal the show	grab the limelight
@@ -125397,7 +125345,6 @@ z	撒哈拉以南	sub-saharan
 z	撒哈拉以南非洲	sub-saharan africa
 z	撒哈拉威	sahrawi
 z	撒哈拉沙漠	sahara desert
-z	撒嬌	throw a tantrum	act coquettishly
 z	撒嬌賣乖	behave ingratiatingly
 z	撒尿	pass water	piss	urinate	wee wee
 z	撒手	give up
@@ -125821,12 +125768,8 @@ z	擯棄	abandon	discard	cast away
 z	擯除	discard	get rid of	dispense with
 z	擰	pinch	wring	mistake	twist	stubborn
 z	擰開	unscrew	twist off	turn on	switch on	turn	wrench apart
-z	擱	place	put aside	shelve
 z	擱板	shelf
-z	擱淺	be stranded	run aground
-z	擱置	shelve	set aside
 z	擱腳板	footrest
-z	擱腳物	footrest
 z	擲	toss	throw dice
 z	擲地有聲	have substance
 z	擲色	throw the dice
@@ -126425,6 +126368,7 @@ z	政治機構	political organization
 z	政治正確	political correctness	politically correct
 z	政治氣候	political climate
 z	政治犯	political prisoner
+z	政治獻金	political donation
 z	政治生活	political life
 z	政治異議人士	political dissident
 z	政治立場	political position
@@ -126530,7 +126474,6 @@ z	救濟	emergency relief
 z	救濟糧	relief grain	emergency provisions
 z	救火	firefighting
 z	救災	relieve disaster	help disaster victims
-z	救災救濟司	emergency aid committee
 z	救災款	disaster relief funds
 z	救生	save a life	life-saving
 z	救生員	lifeguard
@@ -126804,7 +126747,6 @@ z	整域	integral domain
 z	整夜	whole night	all through the night
 z	整天	all day long	whole day
 z	整套	entire set
-z	整妝	get ready
 z	整容	plastic surgery
 z	整形	shaping	reshaping	plastic surgery or orthopedics
 z	整形外科	plastic surgery	orthopedics
@@ -127114,7 +127056,6 @@ z	文靜	gentle and quiet
 z	文面	tattoo the face	face tattoo	brand
 z	文革	cultural revolution
 z	文風	writing style	cultural activity
-z	文風不動	absolutely still
 z	文飾	polish a text	rhetoric	ornate language	gloss over
 z	文體	genre of writing	literary form	style
 z	文鬚雀	bearded reedling
@@ -127381,6 +127322,7 @@ z	新娘秘書	bridal stylist
 z	新婚	newly married
 z	新婚夫婦	newly married couple	newlyweds
 z	新婦	bride	daughter-in-law
+z	新媒體	new media
 z	新嫁娘	bride
 z	新居	new residence	new home
 z	新山	johor bahru
@@ -127606,7 +127548,6 @@ z	方頭螺帽	square headed nut
 z	於	than	by	surname yu
 z	於事無補	unhelpful	useless
 z	於心不忍	can't bear to
-z	於是乎	therefore
 z	施	surname shi	put into effect	distribute	apply
 z	施主	benefactor	donor
 z	施主能級	donor level
@@ -127867,7 +127808,6 @@ z	日神	sun god	apollo
 z	日程	schedule	itinerary
 z	日程表	daily schedule
 z	日系	of japanese origin
-z	日美	japan-us
 z	日耳曼	germanic
 z	日耳曼語	germanic language
 z	日至	solstice
@@ -128787,7 +128727,6 @@ z	暫停鍵	pause button
 z	暫定	temporary arrangement	provisional	tentative
 z	暫息	lull	brief break
 z	暫態	transient
-z	暫擱	temporarily stopped	in abeyance
 z	暫短	brief
 z	暫緩	postpone
 z	暫缺	currently in short supply	in deficit	currently vacant
@@ -129016,6 +128955,7 @@ z	書寫不能症	agraphia
 z	書寫符號	writing symbol
 z	書寫語言	written language
 z	書局	bookstore	publishing house
+z	書展	calligraphy exhibition
 z	書店	bookstore
 z	書房	study	studio
 z	書擋	bookend
@@ -129094,9 +129034,6 @@ z	曾外祖父	great-grandfather
 z	曾孫	great-grandson
 z	曾孫女	great-granddaughter
 z	曾幾何時	just a while before	not so long ago
-z	曾祖	great-grandfather
-z	曾祖母	father's father's mother	paternal great-grandmother
-z	曾祖父	father's father's father	paternal great-grandfather
 z	曾祖父母	great-grandparents
 z	曾經	once	already	former	previously	ever
 z	替	substitute for	replace	for	on behalf of	stand in for
@@ -129111,8 +129048,6 @@ z	替罪羊	scapegoat
 z	替補	replace	substitute	replacement
 z	替補隊員	substitute player	reserve player
 z	替角	understudy
-z	替身	stand-in	substitute	body double	stuntman	scapegoat	fall guy
-z	替身演員	substitute actor	stuntman
 z	替餐	meal replacement
 z	最低谷	lowest point	nadir
 z	最低音	lowest voice	lowest pitch	lowest note
@@ -129126,8 +129061,6 @@ z	最初	first	primary	initial	original	at first	initially	originally
 z	最喜愛	favorite
 z	最多	at most	maximum	greatest	maximal
 z	最大似然估計	maximum-likelihood estimation
-z	最大公因子	highest common factor hcf	greatest common divisor gcd
-z	最大公約數	highest common factor hcf	greatest common divisor gcd
 z	最大化	maximize
 z	最好	best
 z	最密堆積	close-packing of spheres
@@ -129187,7 +129120,6 @@ z	會意字	combined ideogram
 z	會戰	battle	large-scale concerted effort
 z	會所	office of an association	meeting place	clubhouse	club
 z	會攻	attack jointly
-z	會晤	meet	meeting	conference
 z	會期	session
 z	會眾	audience	participants	congregation
 z	會社	guild
@@ -129220,7 +129152,7 @@ z	會黨	anti-qing secret societies
 z	朅	leave	abandon
 z	朆	not yet
 z	月	moon	month	monthly
-z	月下老人	matchmaker	go-between
+z	月下老人	god of marriage	matchmaker
 z	月中	postpartum care center
 z	月事	menses	menstruation	woman's periods
 z	月亮	moon
@@ -129276,7 +129208,7 @@ z	月經	menstruation	woman's period
 z	月經墊	sanitary towel	menopad
 z	月經棉栓	tampon
 z	月缺	new moon
-z	月老	matchmaker	go-between
+z	月老	god of marriage	matchmaker
 z	月臺	railway platform
 z	月臺票	platform ticket
 z	月色	moonlight
@@ -129720,7 +129652,6 @@ z	木然	stupefied
 z	木片	flat piece of wood	wood chip
 z	木版	woodblock
 z	木犀	osmanthus
-z	木犀肉	pork and scrambled eggs
 z	木球	cricket
 z	木琴	xylophone
 z	木瓜	papaya	chinese flowering quince
@@ -130524,7 +130455,6 @@ z	染色質	chromatin
 z	染色體	chromosome
 z	染色體倍性	ploidy
 z	染風習俗	bad habits
-z	染髮	dye one's hair	rinse	tint
 z	染髮劑	hair dye	rinse	tint
 z	柔	soft	flexible	supple	yielding	rho
 z	柔佛	johor
@@ -130764,6 +130694,7 @@ z	校釋	collate and annotate	collated and annotated
 z	校長	president	headmaster
 z	校門	school gate
 z	校閱	check through	proofread	review
+z	校隊	school team
 z	校際	interschool	intercollegiate
 z	校霸	school bully
 z	校風	campus atmosphere
@@ -130844,8 +130775,8 @@ z	核潛艇	nuclear submarine
 z	核熱	nuclear heat
 z	核燃料	nuclear fuel
 z	核燃料後處理	nuclear fuel reprocessing
+z	核爆	nuclear explosion
 z	核爆炸	nuclear explosion
-z	核爆炸裝置	nuclear explosion device
 z	核物理	nuclear physics
 z	核球	core	pellet	central bulge	caryosphere
 z	核當量	nuclear yield
@@ -131212,7 +131143,6 @@ z	梭子魚	barracuda
 z	梭鏢	spear
 z	梭魚	barracuda
 z	梯也爾	adolphe thiers
-z	梯己	intimate
 z	梯度	gradient
 z	梯度回波	gradient echo
 z	梯式配股	laddering
@@ -131839,7 +131769,7 @@ z	槍閂	breech bolt
 z	槎	fell trees	hew
 z	槐	chinese scholar tree	japanese pagoda tree
 z	槐樹	locust tree
-z	槓	coffin-bearing pole	thick line	sharpen
+z	槓	coffin-bearing pole	sharpen
 z	槓刀	sharpen a knife
 z	槓夫	pole carrier	coffin-bearer
 z	槓子	thick bar	solid carrying pole
@@ -131940,6 +131870,7 @@ z	樓板	floor
 z	樓梯	stair	staircase
 z	樓梯臺	staircase balcony	landing
 z	樓梯間	staircase	flight of stairs
+z	樓棟	building
 z	樓櫓	watch tower	movable battlefield turret
 z	樓盤	building under construction	commercial property	real estate
 z	樓臺	balcony	terrace	high building	tower	stage for theatrical performance
@@ -132030,7 +131961,6 @@ z	樠	elm	gum
 z	模	imitate	model	norm	pattern	mold	die	matrix
 z	模仿	imitate	copy	emulate	mimic	model
 z	模似	simulate	emulate
-z	模具	mold	matrix	pattern or die
 z	模因	meme
 z	模型	model	mold	matrix	pattern
 z	模塊	module	functional unit	component part
@@ -132625,6 +132555,7 @@ z	次級抵押貸款	subprime mortgage
 z	次級貸款	subprime lending
 z	次經	non-canonical text	dubious classic text	apocrypha
 z	次聲波	infrasonic wave
+z	次臥	secondary bedroom
 z	次要	secondary
 z	次貨	inferior goods	substandard products
 z	次貸	subprime lending
@@ -132821,6 +132752,7 @@ z	歐豬	pigs	piigs
 z	歐車前	psyllium
 z	歐金斑鴴	european golden plover
 z	歐金翅雀	european greenfinch
+z	歐陸	continental europe
 z	歐陽	two-character surname ouyang
 z	歐鴿	stock dove
 z	歔	snort
@@ -134169,7 +134101,6 @@ z	水上運動	water sports	aquatic motion	movement over water
 z	水上飛板	flyboard
 z	水上飛機	seaplane
 z	水下	under the water	submarine
-z	水下核爆炸	nuclear underwater burst	underwater nuclear explosion
 z	水中撈月	hopeless endeavor
 z	水井	well
 z	水亮	moist and glossy	wet look
@@ -135295,6 +135226,7 @@ z	泡沫塑料	styrofoam
 z	泡沫經濟	bubble economy
 z	泡泡	bubbles
 z	泡泡口香糖	bubble-gum
+z	泡泡果	pawpaw
 z	泡泡浴	bubble bath
 z	泡泡浴露	bubble bath lotion
 z	泡泡糖	bubble gum
@@ -136152,7 +136084,6 @@ z	浴盆	bathtub
 z	浴簾	shower curtain
 z	浴缸	bathtub
 z	浴花	shower puff	shower sponge
-z	浴血	blood-soaked
 z	浴衣	bathrobe
 z	浴袍	bathrobe
 z	浴鹽	bath salts
@@ -136212,6 +136143,7 @@ z	海德保	heidelberg
 z	海德公園	hyde park
 z	海德堡	heidelberg
 z	海德爾堡	heidelberg
+z	海怪	sea monster
 z	海扁	beat sb up
 z	海拔	height above sea level	elevation
 z	海斯	hayes
@@ -136717,8 +136649,7 @@ z	淫亂	promiscuous
 z	淫威	abuse of authority	tyrannical abuse
 z	淫娃	dissolute girl	slut
 z	淫婦	loose woman	prostitute	jezebel
-z	淫媒	procurer	pimp
-z	淫媒罪	procuring	pimping
+z	淫媒罪	procuring
 z	淫念	lust
 z	淫慾	lust
 z	淫書	obscene book	pornography
@@ -137117,7 +137048,10 @@ z	渠溝	trench
 z	渠道	irrigation ditch
 z	渡	cross	pass through	ferry
 z	渡口	ferry crossing
+z	渡槽	aqueduct
+z	渡江	cross a river
 z	渡河	cross a river
+z	渡海	cross a sea
 z	渡渡鳥	dodo
 z	渡船	ferry
 z	渡輪	ferry boat
@@ -137408,6 +137342,7 @@ z	溜邊	avoid getting involved
 z	溜鬚拍馬	toady	boot-licking
 z	溝	ditch	gutter	groove	gully	ravine
 z	溝壑	gorge	gulch	ravine	deep ditch
+z	溝子	butt crack
 z	溝槽	groove	furrow	trench
 z	溝渠	channel	moat	irrigation canal
 z	溝澗	gully	ravine
@@ -137847,6 +137782,7 @@ z	漁陽	old place name
 z	漁雕	lesser fish eagle
 z	漁鷗	pallas's gull
 z	漂	float	drift	bleach
+z	漂亮話	fine-sounding but empty words
 z	漂搖	swaying	tottering	unstable
 z	漂染	bleach and dye
 z	漂洋	cross the ocean
@@ -138321,7 +138257,6 @@ z	激進化	radicalization	radicalize
 z	激進武裝	armed extremists
 z	激酶	kinase
 z	激靈	quiver
-z	濁	turbid	muddy	impure
 z	濁世	world in chaos	troubled times	mortal world
 z	濁塞音	voiced stop
 z	濁度	turbidity
@@ -138762,6 +138697,7 @@ z	灰蒙蒙	dusky	overcast
 z	灰藍姬鶲	slaty-blue flycatcher
 z	灰藍山雀	azure tit
 z	灰藍鵲	white-winged magpie
+z	灰質	gray matter
 z	灰赤楊	gray alder	speckled alder
 z	灰雁	greylag goose
 z	灰霾	dust haze	dust storm
@@ -138860,7 +138796,7 @@ z	炙熱	extremely hot	blazing	burning
 z	炟	explode	catch fire
 z	炣	fire	flame
 z	炤	surname zhao	shine	illuminate
-z	炫	dazzle	boast	show off	cool	awesome
+z	炫	dazzle	gobble down
 z	炫富	flaunt one's wealth
 z	炫目	dazzle	inspire awe
 z	炫耀	dazzling
@@ -138993,7 +138929,6 @@ z	烏漆墨黑	jet-black	pitch-dark
 z	烏灰銀鷗	lesser black-backed gull
 z	烏灰鶇	japanese thrush
 z	烏灰鷂	montagu's harrier
-z	烏煙瘴氣	billowing smoke	foul atmosphere	murky atmosphere	in a turmoil
 z	烏燕鷗	sooty tern
 z	烏爾	ur
 z	烏爾姆	ulm
@@ -139018,7 +138953,7 @@ z	烏骨雞	black-boned chicken	silky fowl	silkie	gallus gallus domesticus briss
 z	烏魚	gray mullet	snakehead fish
 z	烏魚子	mullet roe	bottarga
 z	烏鯧	black pomfret
-z	烏鱧	channa argus	snakehead fish
+z	烏鱧	northern snakehead
 z	烏鴉	crow	raven
 z	烏鴉嘴	crow's beak
 z	烏鴉座	corvus
@@ -139419,7 +139354,7 @@ z	無路可逃	no way out	nowhere to go	painted into a corner
 z	無蹤	without a trace
 z	無軌	trackless
 z	無軌電車	trolleybus
-z	無辜	innocent	innocence	not guilty
+z	無辜	innocent
 z	無農藥	without agricultural chemicals	pesticide-free
 z	無連接	connectionless
 z	無道	tyrannical	brutal
@@ -139938,6 +139873,7 @@ z	熱釋光	thermoluminescence
 z	熱量	heat	quantity of heat	calorific value
 z	熱量單位	thermal unit	unit of heat
 z	熱銷	sell well	hot-selling
+z	熱錢	hot money
 z	熱鍋上的螞蟻	anxious	agitated
 z	熱鍵	hotkey	keyboard shortcut
 z	熱門貨	goods in great demand
@@ -140126,7 +140062,7 @@ z	營業額	turnover
 z	營求	seek	strive for
 z	營火	campfire
 z	營生	earn a living	job	work
-z	營盤	yingpan township in yunnan	military camp	nomadic camp
+z	營盤	military camp
 z	營私	engage in graft	feather one's nest
 z	營謀	do business	manage	strive for
 z	營辦	handle	undertake	run	administer
@@ -140186,7 +140122,6 @@ z	爆出	burst out	appear unexpectedly	break
 z	爆吧	spam flooding
 z	爆彈	bomb
 z	爆改	dramatically modify
-z	爆料	make explosive allegations
 z	爆棚	full to bursting
 z	爆款	hot item
 z	爆滿	filled to capacity
@@ -140806,6 +140741,7 @@ z	牽涉到	involve	drag in
 z	牽牛	altair	morning glory
 z	牽牛星	altair
 z	牽牛花	white-edged morning glory
+z	牽紅線	play matchmaker
 z	牽累	weigh down	trouble	implicate	tied down
 z	牽絆	bind	yoke	impede
 z	牽線	pull strings	manipulate	mediate
@@ -141602,7 +141538,6 @@ z	珂	jade-like stone
 z	珂羅版	collotype
 z	珅	kind of jade
 z	珇	carving on jade
-z	珈	gamma	jewelry
 z	珉	jade-like stone
 z	珊	coral
 z	珊卓	sandra
@@ -141803,6 +141738,7 @@ z	球莖	corm
 z	球菌	coccus
 z	球蛋白	globulin
 z	球蟲	coccidia
+z	球衣	jersey
 z	球路	trajectory of the ball
 z	球迷	fan
 z	球道	fairway	lane
@@ -142093,6 +142029,7 @@ z	環線	ring road	circle line
 z	環繞	surround	circle	revolve around
 z	環肌	circular muscle
 z	環衛	public cleanliness	sanitation	environmental sanitation
+z	環衛工	sanitation worker
 z	環衛工人	sanitation worker
 z	環襯	endpaper
 z	環視	look around
@@ -142264,6 +142201,7 @@ z	甘藍型油菜	oilseed rape
 z	甘藍菜	cabbage
 z	甘迺迪	kennedy
 z	甘願	willingly
+z	甙	glycoside
 z	甚且	even	so much so that
 z	甚微	very small	very little	scant	minimal
 z	甚感詫異	amazed	astonished	deeply troubled
@@ -142380,6 +142318,7 @@ z	生擒	capture alive
 z	生日	birthday
 z	生日卡	birthday card
 z	生日快樂	happy birthday
+z	生日禮物	birthday gift
 z	生日賀卡	birthday card
 z	生有權	birthright
 z	生根	take root
@@ -142718,10 +142657,13 @@ z	甲氧西林	methicillin
 z	甲氨基	methyalamino group
 z	甲氰菊酯	fenpropathrin
 z	甲流	type a influenza
+z	甲減	hypothyroidism
 z	甲溝炎	paronychia
 z	甲狀旁腺	parathyroid gland
 z	甲狀腺	thyroid gland
 z	甲狀腺功能亢進	hyperthyroidism
+z	甲狀腺功能減退	hypothyroidism
+z	甲狀腺激素	thyroid hormone
 z	甲狀腺素	thyroid hormone	thyroxine
 z	甲狀腺腫	goiter
 z	甲狀軟骨	thyroid cartilage
@@ -142739,6 +142681,7 @@ z	甲苯	methylbenzene
 z	甲蟲	beetle
 z	甲蟲車	volkswagen beetle
 z	甲酚	cresol
+z	甲酰胺	formamide
 z	甲酸	formylic acid	formic acid	methanoic acid
 z	甲醇	methyl alcohol	wood alcohol	wood spirit
 z	甲醛	formaldehyde
@@ -143122,8 +143065,6 @@ z	當上	assume a position	assume	take on
 z	當下	immediately	at once	at that moment	at the moment
 z	當且僅當	if and only if
 z	當世	present age	in office	current office holder
-z	當世之冠	unequalled	leading light
-z	當世冠	unequalled	leading light
 z	當世無雙	unequalled in his time
 z	當中	among	in the middle	in the center
 z	當事	be in charge	be confronted	involved	be of importance
@@ -143582,8 +143523,9 @@ z	瘮得慌	frightening	frightened
 z	瘰癧	scrofula
 z	瘰螈	triton
 z	瘳	convalesce	recover	heal
-z	瘴	malaria	miasma
-z	瘴癘	malaria
+z	瘴	miasma
+z	瘴氣	miasma
+z	瘴癘	disease attributed to miasma
 z	瘵	disease
 z	瘸	lame
 z	瘸子	lame person
@@ -143647,7 +143589,7 @@ z	癪	spasms	convulsions	hysteria
 z	癬	ringworm
 z	癭	goiter	knob on tree
 z	癮	addiction	craving
-z	癮君子	opium eater	drug addict	chain smoker
+z	癮君子	addict
 z	癮頭	craving	addiction
 z	癯	thin	emaciated	worn	tired
 z	癯瘦	thin	emaciated
@@ -143719,7 +143661,7 @@ z	發件人	sender
 z	發佈會	news conference	briefing
 z	發作性嗜睡病	narcolepsy
 z	發信	post a letter
-z	發光二極管	light-emitting diode	led
+z	發光二極管	light-emitting diode
 z	發光二極體	light-emitting diode
 z	發光強度	luminous intensity
 z	發兵	dispatch an army	send troops
@@ -143862,7 +143804,7 @@ z	發覺	become aware	detect	realize	perceive
 z	發言	make a speech	statement	utterance
 z	發言人	spokesperson
 z	發誓	vow	pledge	swear
-z	發語詞	form word
+z	發語詞	introductory particle
 z	發財	get rich
 z	發財樹	money tree
 z	發財致富	become rich	enrichment
@@ -143898,7 +143840,7 @@ z	發飆	flip out	act out violently
 z	發騷	horny	lecherous
 z	發麵	leaven dough	make bread
 z	發麻	feel numb
-z	白	surname bai	bai ethnic group	white	snowy	pure	bright	empty	blank	plain	clear
+z	白	surname bai	bai ethnic group	white	in vain	free of charge	vernacular	spoken lines in opera
 z	白丁	temporary conscript
 z	白三烯	leukotriene
 z	白乳膠	white glue
@@ -143917,7 +143859,6 @@ z	白冠噪鶥	white-crested laughingthrush
 z	白冠攀雀	white-crowned penduline tit
 z	白冠燕尾	white-crowned forktail
 z	白冠長尾雉	reeves's pheasant
-z	白冰冰	pai ping-ping
 z	白刃	naked sword
 z	白刃戰	hand-to-hand fighting
 z	白化病	albinism
@@ -143975,6 +143916,7 @@ z	白巧克力	white chocolate
 z	白布	plain white cloth	calico
 z	白帶	leukorrhea
 z	白帶魚	largehead hairtail	beltfish	trichiurus lepturus
+z	白帽子	white hat hacker
 z	白平衡	white balance
 z	白廳	whitehall
 z	白手套	white glove
@@ -143995,7 +143937,6 @@ z	白日	daytime	sun	time
 z	白日做夢	daydream
 z	白日夢	daydream	reverie
 z	白晝	daytime
-z	白曉燕	pai hsiao-yen
 z	白木耳	white fungus	snow fungus
 z	白板	whiteboard	tabula rasa	blank slate
 z	白板筆	whiteboard marker	dry-erase marker
@@ -144172,6 +144113,7 @@ z	白話文	writings in the vernacular
 z	白豆蔻	cardamom
 z	白費	waste
 z	白費唇舌	waste one's breath
+z	白質	white matter
 z	白道	law-abiding citizenry
 z	白酒	white wine
 z	白醋	white vinegar	plain vinegar
@@ -144256,7 +144198,6 @@ z	白點噪鶥	white-speckled laughingthrush
 z	白鼻子	cunning or sly person
 z	白鼻心	masked palm civet
 z	百	surname bai	hundred	numerous	all kinds of
-z	百不咋	of no consequence
 z	百事可樂	pepsi
 z	百事無成	have accomplished nothing
 z	百事輕怡	diet pepsi	pepsi light
@@ -144854,6 +144795,7 @@ z	直升機	helicopter
 z	直升機坪	helipad
 z	直呼	say straightforwardly
 z	直奔	go straight to
+z	直射	fall directly on
 z	直尺	straight ruler
 z	直屬	directly subordinate
 z	直布羅陀	gibraltar
@@ -144901,6 +144843,7 @@ z	直系	directly related
 z	直系祖先	direct ancestor
 z	直系血親	direct descendant	blood relative
 z	直系親屬	next of kin	immediate dependant
+z	直給	direct
 z	直線	straight line	sharply
 z	直線加速器	linear accelerator
 z	直線性加速器	linear accelerator
@@ -144969,7 +144912,6 @@ z	相像	resemble one another	be alike	similar
 z	相公	lord	master	young gentleman	male prostitute	catamite	husband
 z	相冊	photo album
 z	相加	add up	put together
-z	相助	help one another
 z	相勸	persuade	exhort	advise
 z	相反	opposite	contrary
 z	相合	conform to	fit with	be compatible with
@@ -145047,7 +144989,6 @@ z	相親	blind date
 z	相角	photo corner	phase angle
 z	相認	know each other	recognize	identify	acknowledge
 z	相識	acquaintance
-z	相貌	appearance
 z	相距	distance apart
 z	相較	compare
 z	相輔相成	complement one another
@@ -145225,6 +145166,7 @@ z	真分數	proper fraction
 z	真切	vivid	distinct	clear	sincere	honest
 z	真否定句	true negative
 z	真命	receive heaven's command	ordained by heaven
+z	真品	authentic piece
 z	真如	tathata
 z	真姬菇	beech mushroom
 z	真子集	proper subset
@@ -145345,7 +145287,6 @@ z	眼珠子	eyeball
 z	眼球	eyeball	attention
 z	眼生	unfamiliar	strange-looking
 z	眼疾	eye disease
-z	眼疾手快	sharp-eyed and adroit
 z	眼病	eye disease
 z	眼白	white of the eye
 z	眼皮	eyelid
@@ -145583,14 +145524,9 @@ z	瞬發中子	prompt neutron
 z	瞬發輻射	prompt radiation
 z	瞬膜	nictitating membrane
 z	瞬間轉移	teleportation
-z	瞭	bright	clear-sighted	understand clearly
 z	瞭哨	stand guard
-z	瞭望	keep a lookout
 z	瞭望哨	lookout post
-z	瞭望塔	watchtower	observation tower
-z	瞭望臺	observation tower	lookout tower
 z	瞭然	understand clearly	evident
-z	瞭解	understand	realize	find out
 z	瞰	spy on sth
 z	瞰望	overlook	watch from above
 z	瞰臨	overlook	watch from above
@@ -145907,7 +145843,7 @@ z	矽	silicon
 z	矽利康	silicone
 z	矽晶片	silicon chip
 z	矽橡膠	silicone rubber
-z	矽片	silicon chip
+z	矽片	silicon wafer
 z	矽肺病	silicosis
 z	矽膠	silica gel	silicone rubber
 z	矽藻	diatom
@@ -146106,7 +146042,7 @@ z	硅晶片	silicon chip
 z	硅棒	silicon rod
 z	硅橡膠	silicone rubber
 z	硅沙	silicon sand
-z	硅片	silicon chip
+z	硅片	silicon wafer
 z	硅石	siliceous rock
 z	硅脂	silicone grease
 z	硅膠	silica gel	silicone rubber
@@ -146994,6 +146930,7 @@ z	禁毒	drug prohibition
 z	禁漁	ban on fishing
 z	禁演	ban
 z	禁煙	ban smoking	quit smoking	prohibit cooking	prohibition on opium
+z	禁片	banned movie
 z	禁用	withstand heavy use	durable	ban	disable
 z	禁絕	totally prohibit
 z	禁臠	exclusive property	forbidden domain
@@ -147369,6 +147306,7 @@ z	秘密活動	clandestine activities	covert operation
 z	秘密警察	secret police
 z	秘技	cheat code
 z	秘書	secretary
+z	秘書處	secretariat
 z	秘書長	secretary-general
 z	秘籍	rare book	cheat code
 z	秘訣	secret know-how	key	secret	recipe
@@ -148683,6 +148621,7 @@ z	算是	considered to be	at last
 z	算法	arithmetic	algorithm	method of calculation
 z	算準	calculate precisely
 z	算盤	abacus	plan	scheme
+z	算符	operator
 z	算術	arithmetic
 z	算術平均	arithmetic mean
 z	算術平均數	arithmetic mean
@@ -148783,6 +148722,7 @@ z	箸	chopsticks
 z	節	solar term	seasonal festival	knot
 z	節假日	public holiday
 z	節制	control	restrict	moderate	temper	moderation	sobriety	administer
+z	節哀	restrain one's grief
 z	節外生枝	new problems arise unexpectedly
 z	節奏	rhythm	tempo	musical pulse	cadence	beat
 z	節奏口技	beatboxing
@@ -149105,7 +149045,7 @@ z	米粒	grain of rice	granule
 z	米粒組織	granulation
 z	米粥	congee
 z	米精	rice cereal for infants
-z	米糠	bran
+z	米糠	rice bran
 z	米線	rice-flour noodles
 z	米老鼠	mickey mouse
 z	米色	beige
@@ -149411,11 +149351,12 @@ z	糖水	syrup	sweetened water	tong sui
 z	糖汁	syrup
 z	糖漿	syrup
 z	糖爹	sugar daddy
+z	糖甙	glycoside
 z	糖皮質激素	glucocorticosteroid
 z	糖稀	maltose syrup
 z	糖精	saccharin
 z	糖脂	glycolipid
-z	糖苷	glucoside
+z	糖苷	glycoside
 z	糖萼	glycocalyx
 z	糖葫蘆	tanghulu
 z	糖蛋白	glycoprotein
@@ -149536,7 +149477,6 @@ z	紀念碑	monument
 z	紀念章	memorial badge	souvenir badge
 z	紀念郵票	commemorative postage stamp
 z	紀念鈔	commemorative banknote
-z	紀念館	memorial hall	commemorative museum
 z	紀檢	disciplinary inspection	inspect another's discipline
 z	紀要	minutes
 z	紀錄片	newsreel	documentary
@@ -149888,6 +149828,7 @@ z	紓解	relieve	ease	alleviate	remove	get rid of
 z	純	pure	simple	unmixed	genuine
 z	純利	net profit
 z	純化	purify
+z	純合子	homozygote
 z	純品	sterling
 z	純屬	be purely	pure and simple	sheer	outright
 z	純度	purity
@@ -149942,6 +149883,7 @@ z	紙	paper
 z	紙上談兵	armchair strategist	idle theorizing
 z	紙包飲品	juice box	drink in a carton	tetra pak drink
 z	紙品	paper products	stationery
+z	紙團	crumpled paper ball
 z	紙堆	papers	stack of paper
 z	紙夾	paper clip
 z	紙婚	paper wedding
@@ -150175,7 +150117,6 @@ z	細微末節	tiny insignificant details	niceties
 z	細思極恐	scary to think about
 z	細挑	slender
 z	細支氣管炎	bronchiolitis
-z	細數	countdown	breakdown	list	enumerate	run through
 z	細明體	mincho narrow font
 z	細枝末節	minor details	trifles
 z	細毛	fuzz	fine fur
@@ -150282,7 +150223,7 @@ z	終點地址	destination address
 z	終點站	terminus
 z	終點線	finishing line
 z	絃	bow string	string of musical instrument	watch spring	chord	hypotenuse
-z	組	surname zu	form	organize	group	team
+z	組	form	organize	group	team
 z	組件	module	unit	component	assembly
 z	組分	components
 z	組合	combinatorial
@@ -150458,6 +150399,7 @@ z	絕症	incurable disease	terminal illness
 z	絕種	extinct	extinction
 z	絕筆	artist's final work	swansong
 z	絕糧	provisions are exhausted	out of food
+z	絕絕子	absolutely amazing
 z	絕經	menopause
 z	絕緣	insulate
 z	絕緣體	electrical insulation	heat insulation
@@ -150926,7 +150868,7 @@ z	網管接口	network management interface
 z	網箱	net cage
 z	網約車	app-based taxi
 z	網紅	popular on the internet
-z	網絡	internet	network
+z	網絡	network	internet
 z	網絡協議	network protocol
 z	網絡地址轉換	network address translation
 z	網絡安全	cybersecurity
@@ -151115,8 +151057,7 @@ z	線上	online
 z	線上查詢	online search
 z	線下	offline	below the line
 z	線人	spy	informer
-z	線圈	solenoid	coil
-z	線圈般	solenoid	coil
+z	線圈	coil
 z	線圖	line drawing	diagram	line graph
 z	線團	ball of string
 z	線報	tip-off
@@ -151488,7 +151429,7 @@ z	總諧波失真	total harmonic distortion
 z	總譜	musical score
 z	總述	overview	give an overview
 z	總運單	master air waybill
-z	總部	general headquarters
+z	總部	headquarters
 z	總醫院	general hospital
 z	總重	gross weight	total weight
 z	總量	total	overall amount
@@ -152029,6 +151970,7 @@ z	羊腸小徑	winding road
 z	羊膜	amnion
 z	羊膜穿刺	amniocentesis
 z	羊膜穿刺術	amniocentesis
+z	羊角	sheep's or goat's horn
 z	羊角包	croissant
 z	羊角村	giethoorn
 z	羊角芹	ground-elder
@@ -152127,7 +152069,6 @@ z	美德	usa and germany	virtue
 z	美心	maxine
 z	美感	sense of beauty	aesthetic perception
 z	美拉尼西亞	melanesia
-z	美日	us-japan
 z	美景	beautiful scenery
 z	美智子	empress michiko of japan
 z	美朝	us and north korea
@@ -152505,6 +152446,7 @@ z	翻過來	overturn	turn upside down
 z	翻開	open up
 z	翻閱	thumb through	flip through
 z	翻雲覆雨	tricky and inconstant	make love
+z	翻面	flip sth over
 z	翻領	turndown collar	lapel
 z	翼	surname yi	wing	assist
 z	翼側	flank
@@ -152629,7 +152571,7 @@ z	老父	father	old man	venerable sir
 z	老爹	father	old man	sir
 z	老爺	lord	master	maternal grandfather
 z	老爺子	my old father
-z	老爺爺	father's father's father	paternal great-grandfather
+z	老爺爺	elderly man
 z	老爺車	classic car
 z	老玉米	corn
 z	老生常談	old observation	truism	banal comments
@@ -152666,7 +152608,7 @@ z	老路	old road	familiar way	beaten track	conventional behavior
 z	老輩	older generation	ancestors
 z	老辣	shrewd and ruthless	efficient and unscrupulous
 z	老遠	very far away
-z	老闆	robam	boss	business proprietor
+z	老闆	robam
 z	老闆娘	female proprietor	lady boss	boss's wife
 z	老頭	old fellow	old man	father	husband
 z	老頭子	old man	my old man
@@ -152922,7 +152864,7 @@ z	耶魯	yale
 z	耶魯大學	yale university
 z	耷	big ears	droop
 z	耽	indulge in	delay
-z	耽擱	tarry	delay	stop over
+z	耽擱	put off
 z	耽溺	indulge in	wallow in
 z	耽誤	delay	hold up	waste time	interfere with
 z	耿	surname geng
@@ -153540,7 +153482,6 @@ z	股票投資	invest in stock	buy shares
 z	股票指數	stock market index	share price index
 z	股肱	trusted aide
 z	股長	head	chief	director
-z	股集資	share issue
 z	股骨	femur
 z	肢	limb
 z	肢解	dismember	break into parts
@@ -153580,11 +153521,13 @@ z	肥膩	fatty	greasy
 z	肩	shoulder
 z	肩周炎	adhesive capsulitis
 z	肩射導彈	shoulder-fired missile
+z	肩峰	acromion
 z	肩章	epaulet	shoulder loop	shoulder mark
 z	肩胛	shoulder	scapular region	scapula
 z	肩胛骨	scapula	shoulder blade
 z	肩膀	shoulder
 z	肩膊	shoulder
+z	肩袖	rotator cuff
 z	肩負	shoulder	bear	suffer
 z	肩起	bear	shoulder
 z	肩部	shoulder	shoulder area
@@ -153597,8 +153540,7 @@ z	肯定	affirmative
 z	肯定句	affirmative sentence
 z	肯尼亞	kenya
 z	肯尼迪	kennedy
-z	肯德基	kfc	kentucky fried chicken
-z	肯德基炸雞	kentucky fried chicken
+z	肯德基	kfc
 z	肯德拉	kendra
 z	肯普索恩	kempthorne
 z	肯特	kent
@@ -153722,6 +153664,7 @@ z	背部	back
 z	背闊肌	latissimus dorsi muscle
 z	背陰	in the shade	shady
 z	背離	depart from	deviate from	deviation
+z	背靠	be backed by
 z	背靠背	back to back
 z	背面	back	reverse side	wrong side
 z	背頭	swept-back hairstyle
@@ -153813,7 +153756,6 @@ z	胡瓜魚	smelt
 z	胡編	make things up	concoct
 z	胡編亂造	make things up
 z	胡纏	pester	involve sb unreasonably
-z	胡芫	coriander
 z	胡花	spend recklessly	squander money
 z	胡蘆巴	fenugreek
 z	胡蘿蔔	carrot
@@ -153883,6 +153825,7 @@ z	胸有成略	forewarned is forearmed
 z	胸有成算	forewarned is forearmed
 z	胸椎	thoracic vertebra
 z	胸槽	cleavage
+z	胸毛	chest hair
 z	胸無城府	ingenuous
 z	胸無大志	have no aspirations	unambitious
 z	胸無宿物	ingenuous
@@ -153903,6 +153846,7 @@ z	胸膜炎	pleurisy
 z	胸臆	inner feelings
 z	胸花	corsage
 z	胸襟	lapel of jacket	heart	aspiration	vision
+z	胸貼	adhesive breast covering
 z	胸透	chest fluoroscopy
 z	胸部	chest	bosom
 z	胸針	brooch
@@ -154135,6 +154079,7 @@ z	腎盂	renal pelvis
 z	腎盂炎	pyelitis
 z	腎結石	kidney stone
 z	腎臟	kidney
+z	腎虛	kidney deficiency
 z	腐	decay	rotten
 z	腐乳	fermented tofu
 z	腐刑	castration
@@ -154171,6 +154116,7 @@ z	腔調	tune	melody	accent	tone	elegance	refinement
 z	腔隙	lacuna	gap
 z	腕	wrist	arm
 z	腕子	wrist
+z	腕帶	wristband	wrist strap
 z	腕管綜合症	carpal tunnel syndrome
 z	腕級	celebrated	famous	a-list
 z	腕足	tentacle
@@ -154415,6 +154361,7 @@ z	腺體	gland
 z	腺鼠疫	bubonic plague
 z	腿	leg
 z	腿後腱	hamstring muscle
+z	腿毛	leg hair
 z	腿玩年	stunning legs	sexy legs
 z	腿肚子	calf
 z	腿腕	ankle
@@ -154685,7 +154632,7 @@ z	臥室	bedroom
 z	臥床	lie in bed	bedridden	bed
 z	臥底	hide	insider	mole
 z	臥式	performed lying down
-z	臥房	bedroom	sleeping compartment
+z	臥房	bedroom
 z	臥推	bench press
 z	臥果兒	poached egg
 z	臥榻	couch	narrow bed
@@ -155148,7 +155095,7 @@ z	臺上	on stage
 z	臺倭	jap lover
 z	臺地	tableland	mesa
 z	臺基	stylobate
-z	臺媒	taiwan media
+z	臺媒	taiwanese news media
 z	臺子	platform	stand
 z	臺式機	desktop computer
 z	臺扇	table fan	desk fan
@@ -155501,7 +155448,6 @@ z	般遊	amuse oneself
 z	般配	be well matched	suit
 z	般雀比拉多	pontius pilate
 z	舭	bilge
-z	舲	small boat with windows
 z	舳	poopdeck	stern of boat
 z	舴艋	small boat
 z	舵	helm	rudder
@@ -155600,7 +155546,6 @@ z	良善	good
 z	良圖	good plan	right strategy
 z	良多	considerably	much	quite a bit
 z	良好	good	favorable	well	fine
-z	良家女子	respectable woman
 z	良心	conscience
 z	良心喂狗	devoid of conscience
 z	良心未泯	not totally heartless
@@ -155634,7 +155579,6 @@ z	艱苦	difficult	hard	arduous
 z	艱苦奮鬥	struggle arduously
 z	艱辛	hardships	arduous	difficult
 z	艱險	difficult and dangerous	hardships and perils
-z	艱難	difficult	hard	challenging
 z	艱難險阻	untold dangers and difficulties
 z	色	color	look	appearance	sex
 z	色丁	satin
@@ -155819,6 +155763,7 @@ z	花	surname hua	flower	blossom	fancy pattern	florid	spend	lecherous	lustful
 z	花俏	fancy	gaudy
 z	花冠	corolla
 z	花冠皺盔犀鳥	wreathed hornbill
+z	花前月下	romantic surroundings
 z	花劍	foil
 z	花匠	gardener
 z	花卉	flowers and plants
@@ -156099,7 +156044,6 @@ z	苦思	think hard	bitter thoughts
 z	苦悶	depressed	dejected	feeling low
 z	苦情	wretched situation	plight	wretched	miserable
 z	苦惱	vexed	distressed
-z	苦戰	bitter struggle	hard battle	arduous effort
 z	苦於	suffer from
 z	苦日子	hard times
 z	苦杏仁苷	amygdalin
@@ -156509,6 +156453,7 @@ z	荼毒生靈	torment the people
 z	荽	coriander
 z	莊	surname zhuang	farmstead	village	manor	place of business	banker	grave or solemn	holdings of a landlord
 z	莊園	manor	feudal land	villa and park
+z	莊子	eponymous daoist classic
 z	莊客	farm hand
 z	莊家	farmhouse	banker
 z	莊稼	farm crop
@@ -156898,7 +156843,7 @@ z	萬戶	also translated as marquis
 z	萬戶侯	marquis	high nobles
 z	萬智牌	magic the gathering
 z	萬有	universal
-z	萬有引力	gravity
+z	萬有引力	universal gravitation
 z	萬歲	your majesty	his majesty
 z	萬民	all the people
 z	萬物	all things	all that exists
@@ -157029,8 +156974,6 @@ z	葉片狀	foliated	striated into thin leaves
 z	葉瑟	jesse
 z	葉綠素	chlorophyll
 z	葉綠體	chloroplast
-z	葉脈	venation
-z	葉脈序	leaf venation
 z	葉芽	leaf bud
 z	葉苔	liverwort
 z	葉輪	turbine wheel
@@ -157050,6 +156993,7 @@ z	著	move in chess	touch	feel	be affected by	catch fire	burn	fall asleep	hittin
 z	著三不著兩	scatter-brained	thoughtless
 z	著作	write	literary work	book	article	writings
 z	著作權	copyright
+z	著作等身	prolific
 z	著力	try really hard
 z	著勁	try really hard
 z	著勁兒	try really hard
@@ -158440,7 +158384,6 @@ z	蜇	sting	jellyfish
 z	蜈蚣	centipede
 z	蜉蝣	mayfly
 z	蜊	clam
-z	蜍	bufo vulgaris	toad
 z	蜎	surname yuan	larva of mosquito
 z	蜑	tanka people
 z	蜒	slug
@@ -158657,7 +158600,7 @@ z	螺絲起子	screwdriver
 z	螺絲釘	screw
 z	螺絲鑽	auger	gimlet	screwdriver
 z	螺線	spiral
-z	螺線管	solenoid	coil
+z	螺線管	solenoid
 z	螺號	conch
 z	螺螄	river snail
 z	螺螄粉	luosifen
@@ -159210,6 +159153,7 @@ z	衝浪板	surfboard	paddleboard
 z	衝破	breakthrough
 z	衝程	stroke
 z	衝突	conflict	clash of opposing forces	collision	contention
+z	衝要	strategically important	important post
 z	衝量	impulse
 z	衝鋒槍	submachine gun
 z	衝鋒舟	heavy-duty inflatable boat
@@ -160067,7 +160011,6 @@ z	要擊	intercept	ambush
 z	要旨	gist	main points
 z	要是	if
 z	要有	need	require	must have
-z	要樣兒	appearance	manner
 z	要死	extremely	awfully
 z	要死不活	half dead	more dead than alive
 z	要死要活	terribly	awfully	desperately
@@ -160300,7 +160243,7 @@ z	親自	personally	in person	oneself
 z	親舊	relatives and old friends
 z	親親	dear one	kiss	friendly
 z	親赴	travel to
-z	親身	personal	oneself
+z	親身	first-hand
 z	覬	covet	long for
 z	覯	complete	meet unexpectedly	see
 z	覲見	have an audience
@@ -160346,6 +160289,7 @@ z	觀測者	observer
 z	觀測衛星	observation satellite
 z	觀瀾湖	mission hills group
 z	觀火	penetrating
+z	觀眾席	audience seating area
 z	觀瞻	appearance	view	abiding impression
 z	觀禮	attend a ritual
 z	觀覽	view	look at	look sth over
@@ -161084,7 +161028,6 @@ z	詭祕	secretive	furtive	surreptitious
 z	詭笑	smirk	insincere smile
 z	詭計	trick	ruse	crafty scheme
 z	詭詐	sly	treacherous
-z	詭譎	weird	sly	treacherous
 z	詭辯	specious arguments	sophistry
 z	詭辯家	sophist
 z	詭辯術	specious arguments	sophistry
@@ -161284,6 +161227,7 @@ z	語言訓練	language training
 z	語言障礙	language barrier	speech impediment
 z	語詞	word	phrase	function word	predicate
 z	語調	intonation	tone of voice
+z	語速	speaking speed
 z	語鋒	thread of discussion	topic
 z	語錄	quotation
 z	語音	speech sounds	pronunciation	phonetic	audio	voice	voice chat	voice message
@@ -162217,7 +162161,7 @@ z	讓球	concede points
 z	讓路	make way
 z	讓開	step aside
 z	讕言	slander	calumny	accuse unjustly
-z	讕調	slander	calumny	accuse unjustly
+z	讕調	false rhetoric
 z	讘	talk a lot	talk nonsense
 z	讙	hubbub	clamor
 z	讚嘆	exclaim in admiration
@@ -162532,6 +162476,7 @@ z	負片	negative
 z	負疚	feel apologetic	feel guilty
 z	負相關	negative correlation
 z	負累	implicate	involve	burden
+z	負罪	feel guilty
 z	負翁	debtor
 z	負能量	negative energy	negativity
 z	負荷	load	burden	charge
@@ -162916,6 +162861,7 @@ z	資安	information security
 z	資政	senior minister	presidential senior advisor
 z	資敵	aid the enemy
 z	資料	material	resources	data	information	profile
+z	資料中心	data center
 z	資料介面	data interface
 z	資料倉儲	data warehouse
 z	資料傳輸	data transmission
@@ -163105,7 +163051,7 @@ z	質子	proton
 z	質子數	proton number in nucleus	atomic number
 z	質子轟擊	proton bombardment
 z	質庫	pawnshop
-z	質心	center of gravity	barycenter
+z	質心	center of mass
 z	質感	realism	sense of reality	texture	tactile quality
 z	質押	pledge
 z	質數	prime number
@@ -163936,7 +163882,6 @@ z	跨過	surmount	cross over
 z	跨院	lateral court
 z	跨領域	interdisciplinary
 z	跨鶴	die
-z	跨鶴揚州	die
 z	跨鶴西遊	die
 z	跩	waddle	swagger	strutting	self-satisfied
 z	跪	kneel
@@ -163963,6 +163908,7 @@ z	路堤	embankment
 z	路塹	cutting
 z	路子	method	way	approach
 z	路徑	path	route	method	ways and means
+z	路徑依賴	path dependence
 z	路得	ruth
 z	路得記	book of ruth
 z	路德	luther
@@ -163975,7 +163921,6 @@ z	路數	movement	social connections	background story
 z	路旁	roadside
 z	路易	louis
 z	路易威登	louis vuitton
-z	路易斯	louis or lewis
 z	路條	travel pass
 z	路樁	bollard
 z	路標	road sign
@@ -164099,6 +164044,7 @@ z	踧	carefully	level	smooth
 z	踩	step on	tread	stamp	press a pedal	pedal	downvote
 z	踩剎車	brake
 z	踩失腳	lose one's footing
+z	踩奶	knead
 z	踩水	tread water
 z	踩空	miss one's step
 z	踩踏	trample on
@@ -164542,7 +164488,6 @@ z	軟包	soft roll
 z	軟化	soften
 z	軟口蓋	soft palate	velum
 z	軟和	pleasantly soft	comfy	gentle	soothing
-z	軟坐	soft seat
 z	軟妹幣	renminbi
 z	軟實力	soft power
 z	軟尺	soft measuring tape
@@ -164678,7 +164623,7 @@ z	輔具	assistive device
 z	輔助語	auxiliary language
 z	輔助醫療	complementary medicine
 z	輔導人	tutor
-z	輔導員	coach
+z	輔導員	student counselor
 z	輔導班	tutorial class	remedial class	preparatory course
 z	輔導金	grant
 z	輔幣	fractional currency	token
@@ -165083,8 +165028,7 @@ z	辛辛苦苦	painstakingly	with great trouble
 z	辛辣	spicy hot
 z	辛迪加	syndicate
 z	辛酸	pungent	bitter	miserable
-z	辜	surname gu	crime	sin
-z	辜負	unworthy	let down	betray	disappoint
+z	辜	surname gu
 z	辟	avoid	repel	penal law
 z	辣	hot	pungent	sting	burn
 z	辣妹	hot chick	sexy girl
@@ -165099,7 +165043,6 @@ z	辣椒素	capsaicin
 z	辣椒醬	red pepper paste	chili sauce
 z	辣汁	hot sauce	chili sauce
 z	辣眼睛	unpleasant to look at	hard on the eyes
-z	辣胡椒	hot pepper
 z	辣豆醬	chili con carne
 z	辣醬油	worcestershire sauce
 z	辣雞	spicy chicken	garbage
@@ -165108,7 +165051,7 @@ z	辦事	handle	work
 z	辦公大樓	office building
 z	辦公廳	general office
 z	辦公時間	office hours
-z	辦公桌輪用	hot-desking
+z	辦公桌	office desk
 z	辦公樓	office building
 z	辦公自動化	office automation
 z	辦妥	arrange	settle	complete	carry through
@@ -165301,7 +165244,6 @@ z	近日點	lower apsis
 z	近景	close shot
 z	近期	near in time	in the near future	very soon	recent
 z	近東	near east
-z	近況	recent developments	current situation
 z	近海	coastal waters	offshore
 z	近照	recent photo
 z	近端	proximal
@@ -165999,6 +165941,7 @@ z	連	surname lian	link	join	connect	continuously	in succession	including	even	c
 z	連三併四	one after the other	in succession
 z	連串	one after the other	succession of	series of
 z	連任	continue in office
+z	連分數	continued fraction
 z	連動	link	peg	gang	continuously	serial verb construction
 z	連動債	structured note
 z	連合	combine	join	unite	alliance
@@ -166059,13 +166002,12 @@ z	連續	continuous	in a row	serial	consecutive
 z	連續不斷	continuous	unceasing
 z	連續介質力學	fluid mechanics
 z	連續函數	continuous function
-z	連續劇	serialized drama	dramatic series	show in parts
+z	連續劇	tv series
 z	連續性	continuity
 z	連續犯	successive offenses	serial crime
 z	連續監視	continuous monitoring
 z	連續統假設	continuum hypothesis
 z	連續變調	tone sandhi
-z	連續集	tv series
 z	連續體	continuum
 z	連署	cosign	countersign
 z	連翹	forsythia
@@ -166330,6 +166272,7 @@ z	運算	perform calculations	operation
 z	運算式	expression
 z	運算數	operand
 z	運算環境	operating environment
+z	運算符	operator
 z	運籌	plan	operations	logistics
 z	運籌學	operations research
 z	運維	operations and maintenance
@@ -166394,7 +166337,7 @@ z	過帳	posting
 z	過度	excessive	excess	going too far	extravagant	intemperate	overdue
 z	過度緊張	hypertension	excessive stress
 z	過度關懷	obsession	excessive concern
-z	過往	come and go	in the past	previous
+z	過往	come and go
 z	過後	after the event
 z	過得	tolerably well	not too bad
 z	過得去	tolerably well	not too bad
@@ -166736,7 +166679,6 @@ z	適應	adapt	fit	suit
 z	適應性	adaptability	flexibility
 z	適時	timely	apt to the occasion	in due course
 z	適格	be qualified
-z	適溫	thermophile	heat-loving
 z	適用	be applicable
 z	適者生存	survival of the fittest
 z	適航	be airworthy	be seaworthy
@@ -166951,7 +166893,7 @@ z	邀請	invite	invitation
 z	邀請函	invitation letter
 z	邀請賽	invitation tournament
 z	邀買人心	buy popular support	court favor
-z	邁	take a step	stride
+z	邁	mile
 z	邁克爾	michael
 z	邁凱伊	mckay or mackay
 z	邁凱輪	mclaren	maclaren
@@ -167263,7 +167205,6 @@ z	鄉村音樂	country music
 z	鄉民	villager
 z	鄉氣	rustic	uncouth	unsophisticated
 z	鄉紳	village gentleman	squire
-z	鄉親	fellow countryman	local people	villager	folks back home
 z	鄉談	local dialect
 z	鄉貫	one's native place	place of ancestry	registered birthplace
 z	鄉鄰	fellow villager
@@ -167387,7 +167328,6 @@ z	配樂	incidental music	soundtrack music
 z	配用	provide	installed
 z	配發	issue	distribute	publish along with
 z	配種	breed	mating
-z	配種季節	breeding season
 z	配稱	worthy
 z	配筋	rebar
 z	配給	ration	allocate
@@ -167506,7 +167446,6 @@ z	酚甲烷	bisphenol a
 z	酚酞	phenolphthalein
 z	酚醛	phenolic aldehyde	phenolic resin
 z	酚醛膠	phenolic resin
-z	酚類化合物	phenol
 z	酞	phthalein
 z	酡	flushed
 z	酢漿草	creeping oxalis	edelweiss
@@ -167556,7 +167495,7 @@ z	酯	ester
 z	酯化	esterification
 z	酯酶	esterase
 z	酰	acid radical
-z	酰胺	amide	acidamide
+z	酰胺	amide
 z	酲	inebriated	hungover
 z	酴	yeast
 z	酵	fermentation
@@ -167879,7 +167818,7 @@ z	重工	heavy industry
 z	重工業	heavy industry	manufacturing
 z	重度	serious	severe
 z	重影	overlapping images	double exposure of photo	double vision
-z	重心	center of gravity	central core	main part
+z	重心	center of gravity	centroid
 z	重慶	chongqing municipality
 z	重慶大學	chongqing university
 z	重慶市	chongqing municipality
@@ -168031,7 +167970,7 @@ z	野村	nomura
 z	野果	wild fruit
 z	野櫻莓	chokeberry
 z	野漢子	woman's lover
-z	野火	wildfire	bush fire	farm fire
+z	野火	wildfire
 z	野炊	cookout
 z	野炮	field artillery
 z	野營	camp	field lodgings
@@ -168134,6 +168073,7 @@ z	金剛石	diamond
 z	金剛砂	carborundum	emery
 z	金剛總持	vajradhara
 z	金剛薩埵	vajrasattva
+z	金剛鑽	diamond
 z	金剛鸚鵡	macaw
 z	金匠	goldsmith
 z	金匯兌本位制	gold exchange standard
@@ -168153,6 +168093,7 @@ z	金小蜂	parisitoid wasp
 z	金屬	metal
 z	金屬疲勞	metal fatigue
 z	金屬鍵	metallic bond
+z	金工	metalworking
 z	金帳汗國	golden horde
 z	金幣	gold coin
 z	金庫	treasury
@@ -168356,14 +168297,12 @@ z	針鼴	echidna
 z	釢	neodymium	neptunium
 z	釣具	fishing tackle
 z	釣客	angler
-z	釣桿	fishing rod
 z	釣竿	fishing rod
 z	釣針	fishhook
 z	釣鉤	fishhook
 z	釣魚	entrap
 z	釣魚執法	entrapment
 z	釣魚式攻擊	phishing attack
-z	釣魚杆	fishing rod
 z	釣魚竿	fishing rod
 z	釣魚者	angler
 z	釤	samarium	large sickle
@@ -168388,6 +168327,7 @@ z	鈇	fodder chopper	flerovium
 z	鈈	plutonium
 z	鈉	sodium
 z	鈍	blunt	stupid
+z	鈍化	passivate
 z	鈍器	blunt instrument
 z	鈍翅葦鶯	blunt-winged warbler
 z	鈍角	obtuse angle
@@ -169402,6 +169342,7 @@ z	長凳	pew	bench
 z	長出	sprout
 z	長勢	growth
 z	長印魚	shark sucker
+z	長命	long-lived
 z	長嘆	long sigh	deep sigh
 z	長嘴劍鴴	long-billed plover
 z	長嘴地鶇	dark-sided thrush
@@ -169702,6 +169643,7 @@ z	閉會祈禱	benediction
 z	閉殼肌	adductor muscle
 z	閉源	closed-source
 z	閉環	closed loop
+z	閉眼	close one's eyes
 z	閉經	amenorrhoea
 z	閉著	closed
 z	閉起	shut
@@ -169758,7 +169700,6 @@ z	開塞露	glycerin enema
 z	開士米	cashmere
 z	開外	over and above	beyond
 z	開大油門	open the throttle	accelerate	let her rip
-z	開始	begin	beginning	start	initial
 z	開學	start school	begin	found a school
 z	開封	open
 z	開小差	be absent-minded	desert	absent without leave
@@ -169899,6 +169840,7 @@ z	開蒙	begin schooling
 z	開藥	prescribe medicine
 z	開行	start off
 z	開衩	slit
+z	開衫	cardigan
 z	開裂	split open	dehisce
 z	開襟	buttoned chinese tunic	unbuttoned
 z	開襟衫	cardigan
@@ -169986,7 +169928,6 @@ z	閒暇	leisure
 z	閒書	light reading
 z	閒混	loiter
 z	閒空	idle	free time	leisure
-z	閒置	leave sth unused	lie idle
 z	閒聊	chat	casual conversation
 z	閒言閒語	idle gossip
 z	閒話	casual conversation	chat	gossip	talk about
@@ -170055,7 +169996,6 @@ z	閨房	lady's chamber	boudoir	harem
 z	閨秀	well-bred young lady
 z	閨窗	lady's chamber	boudoir
 z	閨範	lady's demeanor	norms expected of women
-z	閨蜜	close female friend	bestie
 z	閨閣	lady's chamber
 z	閨閫	women's quarters
 z	閩南	minnan
@@ -170309,7 +170249,6 @@ z	防護	defend	protect
 z	防護眼鏡	safety goggles
 z	防身	self-protection	defend oneself
 z	防避	protection
-z	防門	defensive gate
 z	防閑	guard
 z	防震	shockproof	guard against earthquakes
 z	防霉	inhibit mold	mold-proof	mildew-proof
@@ -170325,7 +170264,7 @@ z	阻尼	damping
 z	阻差辦公	obstructing government administration
 z	阻截	stop	obstruct	bar the way
 z	阻抑	impede	check	inhibit	neutralize
-z	阻抗	impedance
+z	阻抗	electrical impedance
 z	阻抗匹配	impedance matching
 z	阻抗變換器	impedance converter
 z	阻援	block reinforcements
@@ -170675,7 +170614,6 @@ z	陡變	change precipitously
 z	陡跌	precipitous drop
 z	院	courtyard	institution
 z	院壩	courtyard
-z	院士	scholar	academician	fellow
 z	院子	courtyard	garden	yard	patio	servant
 z	院本	script for opera
 z	院校	college	academy	educational institution
@@ -171093,7 +171031,7 @@ z	隱函數	implicit function
 z	隱匿	cover up	hide	conceal
 z	隱去	disappear	hide
 z	隱名埋姓	conceal one's identity	living incognito
-z	隱君子	recluse	hermit
+z	隱君子	hermit sage
 z	隱含	keep covered up	implicit
 z	隱喻	metaphor
 z	隱士	hermit
@@ -171427,6 +171365,7 @@ z	雙層公共汽車	double-decker bus
 z	雙層巴士	double-decker bus
 z	雙層床	bunk beds
 z	雙峰	boobies
+z	雙工	duplex
 z	雙床房	twin room
 z	雙引號	double quotes
 z	雙復磷	obidoxime chloride	toxogonin
@@ -171468,6 +171407,7 @@ z	雙球菌	diplococcus
 z	雙生	twin	twins
 z	雙生兄弟	twin brothers
 z	雙盲	double-blind
+z	雙相障礙	bipolar disorder
 z	雙眸	one's pair of eyes
 z	雙眼	two eyes
 z	雙眼皮	double eyelid
@@ -171551,6 +171491,7 @@ z	雜交	hybridize	crossbreed	promiscuity
 z	雜交植物	hybrid plant
 z	雜件	miscellaneous goods
 z	雜件兒	miscellaneous goods
+z	雜合子	heterozygote
 z	雜噪	clamor	din
 z	雜婚	mixed marriage
 z	雜居	cohabitation	coexist
@@ -171663,7 +171604,6 @@ z	離不開	inseparable	inevitably linked to
 z	離世	live in seclusion	pass away
 z	離乳	be weaned	weaning
 z	離任	leave office	leave one's post
-z	離休	retire
 z	離別	leave	part from sb
 z	離去	leave	exit
 z	離合	clutch	separation and reunion
@@ -172013,6 +171953,7 @@ z	電力	electrical power	electricity
 z	電力機車	electric locomotive
 z	電功率	electric power
 z	電動	electric-powered	video game
+z	電動力學	electrodynamics
 z	電動勢	electromotive force
 z	電動機	electric motor
 z	電動牙刷	electric toothbrush
@@ -172145,7 +172086,8 @@ z	電玩	video game
 z	電珠	light bulb
 z	電瓶車	battery-powered vehicle
 z	電療	electrotherapy
-z	電磁	electromagnetic
+z	電石	calcium carbide
+z	電磁	electromagnetism
 z	電磁兼容性	electromagnetic compatibility
 z	電磁力	electromagnetic force
 z	電磁噪聲	electromagnetic noise
@@ -172239,7 +172181,7 @@ z	電鑽	electric drill
 z	電門	electric switch
 z	電閃	lightning flashes
 z	電閘	electric switch	circuit breaker
-z	電阻	resistance	resistor
+z	電阻	electrical resistance	resistor
 z	電阻器	resistor
 z	電雞	e-bike
 z	電離	ion	ionized
@@ -172423,7 +172365,6 @@ z	霸凌	bullying
 z	霸權	hegemony	supremacy
 z	霸權主義	hegemonism
 z	霸王	hegemon	overlord	despot
-z	霸王之道	despotic rule
 z	霸王別姬	farewell my concubine
 z	霸王條款	unfair clause	unequal clause
 z	霸王樹	madagascar palm
@@ -172451,7 +172392,7 @@ z	靈動	be quick-witted
 z	靈命	will of heaven	will of god
 z	靈堂	mourning hall	funeral hall
 z	靈塔	memorial pagoda
-z	靈媒	spirit medium
+z	靈媒	medium
 z	靈巧	deft	nimble	ingenious
 z	靈床	bier
 z	靈快	agile	quick
@@ -172704,7 +172645,7 @@ z	非核地帶	nuclear-free zone
 z	非核武器國家	non-nuclear weapon states
 z	非條件反射	unconditioned reflex
 z	非槓桿化	deleveraging
-z	非標準	nonstandard	unconventional
+z	非標準	nonstandard
 z	非模態	modeless
 z	非機動車	non-motorized vehicle
 z	非歐幾何	non-euclidean geometry
@@ -172813,6 +172754,7 @@ z	面板	panel	faceplate
 z	面無人色	ashen-faced
 z	面熟	look familiar	familiar-looking
 z	面瓜	pumpkin	oaf
+z	面生	look unfamiliar
 z	面癱	facial nerve paralysis
 z	面皮	cheek	face	leather covering
 z	面皰	acne
@@ -172992,7 +172934,7 @@ z	韓國聯合通訊社	yonghap
 z	韓國街	koreatown
 z	韓國語	korean language
 z	韓國銀行	bank of korea
-z	韓媒	south korean media
+z	韓媒	south korean news media
 z	韓式	korean-style
 z	韓式泡菜	kimchi
 z	韓德爾	handel
@@ -173276,7 +173218,7 @@ z	預告	forecast	predict	advance notice
 z	預告片	trailer
 z	預售	sell in advance
 z	預報	forecast
-z	預定	schedule in advance
+z	預定	arrange in advance
 z	預定義	predefined
 z	預審	preliminary hearing	interrogation	preliminary examination
 z	預後	prognosis
@@ -173921,7 +173863,7 @@ z	颱風	typhoon
 z	颳	blow
 z	颳風	be windy
 z	颶風	hurricane
-z	颸	cool breeze of autumn
+z	颸	cool breeze
 z	颺	soar	fly	float	spread
 z	颻	floating in the air
 z	颼	blow	sound of wind	sough
@@ -173959,6 +173901,7 @@ z	飄香	waft about
 z	飆升	rise rapidly	soar
 z	飆口水	gossip	idle chat
 z	飆汗	sweat profusely
+z	飆淚	cry profusely
 z	飆風	fierce wind
 z	飛	fly
 z	飛也似的	very fast
@@ -174082,6 +174025,7 @@ z	食玩	diy candy kit
 z	食用	edible
 z	食用油	cooking oil
 z	食祿	draw government pay	salary of an official
+z	食管癌	esophageal cancer
 z	食糧	food cereals
 z	食肆	restaurant	eatery
 z	食肉	carnivorous
@@ -175248,6 +175192,7 @@ z	體刑	corporal punishment
 z	體制	system	organization
 z	體力	physical strength	physical power
 z	體力勞動	physical labor
+z	體力活	physical labor
 z	體勢	feature
 z	體協	sports association
 z	體味	body odor
@@ -175257,7 +175202,7 @@ z	體壁	integument
 z	體壇	sporting circles	world of sport
 z	體外受精	in vitro fertilization
 z	體察	experience	observe
-z	體己	intimate
+z	體己	personal savings
 z	體弱	debility
 z	體弱多病	prone to illness	sickly	in fragile health
 z	體形	figure	bodily form
@@ -175957,7 +175902,6 @@ z	魯棒性	robustness
 z	魯汶	leuven
 z	魯特啤酒	root beer
 z	魯特琴	lute
-z	魯畢克方塊	rubik's cube	magic cube
 z	魯米諾	luminol
 z	魯菜	shandong cuisine
 z	魯蛇	loser
@@ -176376,7 +176320,6 @@ z	鶡	crossbill	long-tailed pheasant
 z	鶥	babbler
 z	鶦	pelican
 z	鶩	duck
-z	鶩舲	small boat
 z	鶯歌燕舞	prosperity abounds
 z	鶯鳥	oriole	bird
 z	鶲	flycatcher
@@ -176403,7 +176346,6 @@ z	鷗	common gull
 z	鷗嘴噪鷗	gull-billed tern
 z	鷙	fierce	brutal	bird of prey
 z	鷚	pipit
-z	鷥	heron
 z	鷦	eastern wren
 z	鷦鷯	eurasian wren
 z	鷩	phasianus pictus
@@ -176684,7 +176626,7 @@ z	麻衣	hemp garment
 z	麻袋	sack	burlap bag
 z	麻豆	model
 z	麻辣	hot and numbing
-z	麻辣燙	hot spicy soup
+z	麻辣燙	malatang
 z	麻醉	anesthesia
 z	麻醉學	anesthesiology
 z	麻醉學者	anaesthesiologist
@@ -176996,6 +176938,7 @@ z	黑暗時代	dark ages
 z	黑暗面	dark side
 z	黑曜岩	obsidian
 z	黑曜石	obsidian
+z	黑松露	black truffle
 z	黑板	blackboard
 z	黑枕燕鷗	black-naped tern
 z	黑枕王鶲	black-naped monarch
@@ -177084,6 +177027,7 @@ z	黑臉噪鶥	masked laughingthrush
 z	黑臉琵鷺	black-faced spoonbill
 z	黑臉鶲鶯	black-faced warbler
 z	黑色	black
+z	黑色幽默	black humor
 z	黑色星期五	black friday
 z	黑色素	black pigment	melanin
 z	黑色金屬	ferrous metals
@@ -177134,6 +177078,7 @@ z	黑體輻射	black body radiation
 z	黑髮	black hair
 z	黑鬼	black devil
 z	黑魆魆	black
+z	黑魚	northern snakehead
 z	黑鯇	black carp
 z	黑鰻	short-finned eel
 z	黑鳶	black kite
@@ -177154,7 +177099,7 @@ z	默不作聲	keep silent
 z	默嘆	admire inwardly
 z	默坐	sit silently
 z	默多克	murdoch
-z	默契	tacit understanding	mutual understanding	rapport	well coordinated	tight
+z	默契	rapport
 z	默字	write from memory
 z	默寫	write from memory
 z	默念	read silently	mouth	say to oneself	contemplate inwardly
@@ -177520,7 +177465,6 @@ z	齒齦炎	gingivitis
 z	齙牙	bucktooth
 z	齜	bare
 z	齜牙	bare one's teeth
-z	齜牙咧嘴	grimace	show one's teeth	bare one's fangs
 z	齞	display the teeth
 z	齠	shed the milk teeth	young
 z	齡	age

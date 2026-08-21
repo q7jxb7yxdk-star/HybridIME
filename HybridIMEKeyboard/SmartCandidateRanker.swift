@@ -8,9 +8,15 @@ final class SmartCandidateRanker {
 
     static let shared = SmartCandidateRanker()
 
-    private let defaults = UserDefaults.standard
+    private let learningStore: KeyboardUserLearningStore
 
-    private init() {}
+    init() {
+        learningStore = .shared
+    }
+
+    init(learningStore: KeyboardUserLearningStore) {
+        self.learningStore = learningStore
+    }
 
     func record(
         code: String,
@@ -18,45 +24,10 @@ final class SmartCandidateRanker {
     ) {
         let normalizedCode = code.lowercased()
         guard !normalizedCode.isEmpty, !candidate.isEmpty else { return }
-
-        var candidates = defaults.stringArray(
-            forKey: key(
-                code: normalizedCode,
-                suffix: "candidates"
-            )
-        ) ?? []
-        let mostRecentTimestamp = candidates
-            .map {
-                defaults.double(
-                    forKey: key(
-                        code: normalizedCode,
-                        suffix: "recent.\($0)"
-                    )
-                )
-            }
-            .max() ?? 0
-        let timestamp = max(
-            Date().timeIntervalSince1970,
-            mostRecentTimestamp.nextUp
+        learningStore.recordSmartCandidate(
+            code: normalizedCode,
+            candidate: candidate
         )
-        defaults.set(
-            timestamp,
-            forKey: key(
-                code: normalizedCode,
-                suffix: "recent.\(candidate)"
-            )
-        )
-
-        if !candidates.contains(candidate) {
-            candidates.append(candidate)
-            defaults.set(
-                candidates,
-                forKey: key(
-                    code: normalizedCode,
-                    suffix: "candidates"
-                )
-            )
-        }
     }
 
     func prediction(
@@ -64,34 +35,13 @@ final class SmartCandidateRanker {
         availableCandidates: [String]
     ) -> Prediction? {
         let normalizedCode = code.lowercased()
-        let candidatesKey = key(
-            code: normalizedCode,
-            suffix: "candidates"
-        )
-        let learnedCandidates = defaults.stringArray(forKey: candidatesKey) ?? []
-
         let available = Set(availableCandidates)
-        let best = learnedCandidates
-            .filter { available.contains($0) }
-            .map { candidate in
-                (
-                    candidate,
-                    defaults.double(
-                        forKey: key(
-                            code: normalizedCode,
-                            suffix: "recent.\(candidate)"
-                        )
-                    )
-                )
-            }
-            .max {
-                if $0.1 != $1.1 {
-                    return $0.1 < $1.1
-                }
-                return $0.0 > $1.0
-            }
-        guard let best, best.1 > 0 else { return nil }
-        return Prediction(candidate: best.0)
+        guard let best = learningStore.smartCandidates(code: normalizedCode)
+            .first(where: {
+                $0.lastUsed > 0 && available.contains($0.candidate)
+            })
+        else { return nil }
+        return Prediction(candidate: best.candidate)
     }
 
     func replaceLearning(
@@ -100,45 +50,9 @@ final class SmartCandidateRanker {
     ) {
         let normalizedCode = code.lowercased()
         guard !normalizedCode.isEmpty, !candidate.isEmpty else { return }
-
-        let candidatesKey = key(
+        learningStore.replaceSmartCandidate(
             code: normalizedCode,
-            suffix: "candidates"
+            candidate: candidate
         )
-        let existingCandidates = defaults.stringArray(forKey: candidatesKey) ?? []
-        let mostRecentTimestamp = existingCandidates
-            .map {
-                defaults.double(
-                    forKey: key(
-                        code: normalizedCode,
-                        suffix: "recent.\($0)"
-                    )
-                )
-            }
-            .max() ?? 0
-
-        for existingCandidate in existingCandidates where existingCandidate != candidate {
-            defaults.removeObject(
-                forKey: key(
-                    code: normalizedCode,
-                    suffix: "recent.\(existingCandidate)"
-                )
-            )
-        }
-        defaults.set([candidate], forKey: candidatesKey)
-        defaults.set(
-            max(Date().timeIntervalSince1970, mostRecentTimestamp.nextUp),
-            forKey: key(
-                code: normalizedCode,
-                suffix: "recent.\(candidate)"
-            )
-        )
-    }
-
-    private func key(
-        code: String,
-        suffix: String
-    ) -> String {
-        "smartCandidate.v2.\(code).\(suffix)"
     }
 }

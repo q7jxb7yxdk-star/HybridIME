@@ -459,17 +459,24 @@ final class InputMethodController: IMKInputController {
         candidate: String
     ) -> (prefix: String, translations: [String]) {
         let characters = Array(precedingChinese)
-        for length in stride(from: characters.count, through: 0, by: -1) {
-            let prefix = String(characters.suffix(length))
-            let translations = bilingualDictionary?.englishCandidates(
-                for: prefix + candidate,
-                limit: 2
-            ) ?? []
-            if !translations.isEmpty {
-                return (prefix, translations)
-            }
+        let maximumPrefixLength = min(characters.count, 11)
+        let prefixes = stride(
+            from: maximumPrefixLength,
+            through: 0,
+            by: -1
+        ).map { length in
+            String(characters.suffix(length))
         }
-        return ("", [])
+        let keys = prefixes.map { $0 + candidate }
+        guard let match = bilingualDictionary?.longestEnglishMatch(
+            forChineseKeys: keys,
+            limit: 2
+        ) else { return ("", []) }
+        let prefixLength = max(0, match.key.count - candidate.count)
+        return (
+            String(match.key.prefix(prefixLength)),
+            match.candidates
+        )
     }
 
     private func chineseTextBeforeComposition(

@@ -1,95 +1,126 @@
 # HybridIME
 
-HybridIME 是一個 macOS 中英文混合倉頡五代輸入法。
+HybridIME 是一套以 Swift 開發的中英混合倉頡五代輸入工具，同一個 Xcode project 目前包含：
 
-輸入英文字母時，HybridIME 會同時把輸入內容視為英文及倉頡碼：
+- macOS InputMethodKit 輸入法 `HybridIME`。
+- iOS／iPadOS host app `HybridIMEiOS`。
+- 嵌入 host app 的 Custom Keyboard extension `HybridIMEKeyboard`。
 
-- 按 `Space`：輸出英文及一個空格；已學習的中文候選可自動選取。
-- 按 `Shift + Space`：輸出英文，不附加空格，並記住目前大小寫的原始英文為該字碼的最新選擇。
-- 按 `Return`：有候選時輸出第一候選；沒有候選時輸出英文。
-- 按 `1` 至 `9`：選擇對應的中文候選字。
-- 按 `0`：選擇第十個中文候選字。
-- 按 `Delete`：刪除最後一個輸入字母。
-- 按 `Esc`：英文輸入可直接確定且不加空格；中文候選、標點或聯想狀態則取消或關閉。
+輸入英文字母時，兩個輸入法都會同時把內容視為英文與倉頡碼，並提供倉頡字、雙向翻譯、聯想與本機智能候選。所有 runtime 詞典均隨 app 離線提供；source 中沒有網路 API、帳戶、telemetry 或 cloud sync 路徑。
 
-例如輸入 `hsp` 時，可以按 `Return` 或候選數字鍵輸出「怎」；若要輸出英文 `hsp`，則按 `Space`。
+> 狀態說明：本文件以目前 working tree 為準。`Implemented` 表示 source 已接入正常路徑，不等同已在本次任務完成實機驗證；實際驗證結果見[開發與驗證](#開發與驗證)。
 
-## 主要功能
+## 功能
 
-- 同一組按鍵同時支援英文及倉頡五代解碼。
-- 候選視窗顯示在文字插入點附近。
-- 輸入期間即時顯示每個鍵位對應的倉頡字母。
-- 最多顯示十個中文候選字。
-- 英文輸入不受五碼限制；超過五碼後不再查詢倉頡候選。
-- 根據游標前的文字自動選擇半形或全形標點。
-- 標點會立即顯示，同時保留半形及全形候選。
-- 支援 Unicode 擴展區漢字。
-- 自動略過 macOS 無法正常顯示、只能使用 `LastResort` 字體呈現的候選字。
-- 支援直接維護 HybridIME 專用倉頡碼表。
-- 輸入完整英文詞時顯示繁體中文翻譯候選。
-- 輸入倉頡時，在中文候選後顯示對應的英文翻譯。
-- Command、Control 及 Option 快捷鍵會交回目前應用程式。
-- 聽寫等系統按鍵會在組字或候選狀態下釋放輸入法狀態，讓 macOS 接管；Fn/Globe 類修飾鍵亦會透傳。
-- 提交中文或英文後顯示同語言的聯想候選。
-- 聯想候選會按本機使用次數逐步調整排序。
-- 同一字碼選擇中文字候選一次後，會啟用本機智能預測。
-- 英文句段中的單詞可由 Space 或標點直接提交；Return 優先選取候選。
-- 大型字典及聯想索引會在背景預載，避免切換輸入法時阻塞介面。
-- 左鍵按下、拖曳、放開及取消事件會完整交回目前應用程式。
-- 輸入法以背景程序啟動，不會在開機後首次選用時顯示 App 視窗。
+### 共同功能（Implemented）
 
-## 候選顯示
+- 倉頡五代單字解碼，最多五碼；超過五碼仍可輸入英文。
+- 以 Core Text 過濾目前系統字型無法正常顯示的候選字。
+- CC-CEDICT 英文至繁體中文候選，以及倉頡中文至英文翻譯。
+- 以游標前的連續中文做最長詞組翻譯查詢。
+- 中英文聯想候選與連續中文學習。
+- 依最近選擇提升智能候選；學習資料只寫入本機 SQLite。
+- 依中文／英文前文選擇全形或半形標點，並提供替代標點候選。
+- 以 bundled read-only SQLite lexicon 查詢雙語與聯想資料。
 
-候選視窗由上至下顯示：
+### macOS（Implemented）
 
-1. 完整字碼命中時的中文候選。
-2. 目前鍵位對應的倉頡字母。
-3. 實際輸入的英文字母碼。
+- classic InputMethodKit `.app`，以背景程序建立 `IMKServer`。
+- 在文字插入點附近顯示不搶焦點的候選視窗。
+- `Space` 輸出英文及空格；若第一項是已學習的中文候選則提交中文。
+- `Shift + Space` 輸出原始英文、不附加空格，並記錄該選擇。
+- `Return` 或 `1`–`0` 選取候選；`Delete`、`Esc`、標點及 app 快捷鍵有獨立狀態處理。
+- Command、Control、Option、滑鼠及系統輸入事件交回目前 app。
 
-例如輸入「碼」的完整字碼 `mrsqf`：
+### iOS／iPadOS（Implemented，runtime 未驗證）
 
-```text
-1 碼
-一口尸手火
-mrsqf
+- UIKit 自訂鍵盤，包含字母、數字、符號與內建 Emoji 頁面。
+- 候選列、倉頡字根提示、大小寫與 Caps Lock。
+- 點按已學習候選、翻譯、標點或聯想候選時替換已插入文字。
+- 長按 Space 後水平／垂直拖曳游標，並提供 selection feedback。
+- extension 宣告 `RequestsOpenAccess=false`，離線詞典及學習不需要「允許完整取用」。
+- SwiftUI host app 只提供加入與使用鍵盤的說明。
+
+## 系統需求
+
+| 項目 | Repository 宣告 |
+| --- | --- |
+| macOS deployment target | `26.0` |
+| iOS／iPadOS deployment target | `26.0` |
+| Swift language version | `5.0` build setting |
+| Xcode | 沒有 tool-version file 或 CI 明確宣告最低版本；project metadata 由 Xcode 26.5／26.6 建立或更新，需使用能讀取 object version 77 並提供 SDK 26 的 Xcode |
+| Python | 只供建立及驗證靜態 SQLite lexicon；版本未在 repository 鎖定 |
+| 第三方 package | 無 Swift Package、CocoaPods、Carthage、npm 或其他 package manifest／lockfile |
+
+App runtime 使用 Apple 平台 framework：AppKit、InputMethodKit、UIKit、SwiftUI、Foundation、CoreText 與系統 SQLite3。
+
+macOS 日常開發 build 可停用 code signing；要安裝並實際啟用輸入法，需有效的本機開發簽署。iOS 真機執行亦需使用自己的 Apple Development team。project 目前含有 owner-specific team 設定，其他開發者應在 Xcode 的 Signing & Capabilities 選擇自己的 team，不應沿用 repository 中的值作 credential。
+
+## 取得與開啟專案
+
+```sh
+git clone <repository-url>
+cd HybridIME
+open HybridIME.xcodeproj
 ```
 
-輸入中途即使尚未有完整字碼候選，倉頡字母仍會持續更新：
+Repository 不需要另外安裝 package dependencies，也沒有 environment file 或 runtime API key。
 
-```text
-m     → 一
-mr    → 一口
-mrs   → 一口尸
-mrsq  → 一口尸手
-mrsqf → 一口尸手火
+Xcode 中可使用以下 schemes：
+
+- `HybridIME`：macOS 輸入法。
+- `HybridIMEiOS`：iOS／iPadOS host app，會同時 build 並嵌入 keyboard extension。
+- `HybridIMEKeyboard`：獨立 build keyboard extension；通常由 host app scheme 驅動。
+
+## 建置與執行
+
+### macOS
+
+在 Xcode 選擇 `HybridIME` scheme 與 `My Mac`。不簽署的命令列 build：
+
+```sh
+xcodebuild \
+  -project HybridIME.xcodeproj \
+  -scheme HybridIME \
+  -configuration Debug \
+  -destination 'generic/platform=macOS' \
+  -derivedDataPath /tmp/HybridIME-macOS \
+  CODE_SIGNING_ALLOWED=NO \
+  build
 ```
 
-若中途字碼本身已有候選，例如 `mr`，候選列也會立即顯示。
+要使用輸入法，需把已適當簽署的 `HybridIME.app` 放入 `~/Library/Input Methods/`，再從「系統設定 > 鍵盤 > 文字輸入」加入「中英混合輸入法」。build 成功只證明產物可建立，不證明已安裝的 app、LaunchServices 註冊或 InputMethodKit endpoint 正常。
 
-倉頡候選會同時查詢 CC-CEDICT。每個中文候選後可顯示最多兩個較淡色的
-英文翻譯，例如「測」可顯示 `survey`、`measure`。英文動詞候選會使用
-詞典形式，不顯示開頭的 `to`。
+若已安裝版本出現「已選取但沒有輸入反應」，請參閱[技術文件的 InputMethodKit 診斷](TECHNICAL_DOCUMENTATION.md#macos-inputmethodkit-lifecycle)。
 
-若游標前已有中文，HybridIME 會優先用最長中文詞組查詢。例如先輸入
-「測」，再輸入「試」的倉頡碼時，會以「測試」查詢並顯示 `test`、
-`beta`。選擇英文候選會把游標前已組成的中文詞連同目前組字替換成英文。
+### iOS／iPadOS
 
-候選排序為：
+在 Xcode 選擇 `HybridIMEiOS` scheme 與 Simulator 或已簽署的 device。命令列 Simulator build：
 
-1. 精確倉頡中文候選。
-2. 該中文候選的英文翻譯。
-3. 已輸入英文的中文翻譯。
-
-例如輸入 `oh`：
-
-```text
-1 入   2 conform to   3 containing   4 噢
+```sh
+xcodebuild \
+  -project HybridIME.xcodeproj \
+  -scheme HybridIMEiOS \
+  -configuration Debug \
+  -destination 'generic/platform=iOS Simulator' \
+  -derivedDataPath /tmp/HybridIME-iOS \
+  CODE_SIGNING_ALLOWED=NO \
+  build
 ```
 
-其中「入」來自倉頡碼，「conform to」及「containing」是「入」的英文
-翻譯，「噢」則是英文 `oh` 的中文翻譯。
+安裝 host app 後，前往「設定 > 一般 > 鍵盤 > 鍵盤 > 新增鍵盤」，選擇 `HybridIMEKeyboard`。目前 source 尚未提供從 HybridIME 鍵盤切換到下一個輸入法的 globe control，見[已知限制](#已知限制)。
 
-標準鍵位對照：
+## 基本輸入方式
+
+macOS 輸入 `hsp` 後可用 `Return` 或候選數字鍵提交「怎」；按 `Space` 則輸出 `hsp `。iOS 會先透過 `UITextDocumentProxy` 把鍵入字母插入 host，點選候選後再刪除該字碼並插入候選。
+
+兩平台一般候選次序為：
+
+1. 倉頡中文候選。
+2. 每個倉頡候選最多兩項英文翻譯。
+3. 完整英文詞的繁體中文翻譯。
+
+標準倉頡鍵位：
 
 ```text
 a 日  b 月  c 金  d 木  e 水  f 火  g 土
@@ -98,349 +129,59 @@ o 人  p 心  q 手  r 口  s 尸  t 廿  u 山
 v 女  w 田  x 難  y 卜  z 重
 ```
 
-## 標點符號
-
-HybridIME 會根據游標前的字元自動選擇一般標點形式：
-
-- 文件開頭、英文或數字後：預設半形。
-- 中文字後：預設全形。
-- 正在輸入的 buffer 若已有中文倉頡候選，輸入標點會先提交中文候選，標點預設全形。
-- 正在輸入英文 buffer 時，輸入標點會先提交英文，標點預設半形。
-- HybridIME 剛提交的英文或中文會提供下一個標點的一次性半形或全形語境。
-- 聽寫或貼上文字後，HybridIME 會向前讀取游標前文字，找出最近的有效語境字元來判斷下一個標點的半形或全形。
-- 若目標 app 不提供游標前文字，HybridIME 會預設使用半形標點。
-
-預設標點會在按鍵後直接輸出，不需要按 `Space` 或 `Return`。候選窗會暫時保留，
-所有其他標點候選都使用 `Shift + 數字` 原位替換，例如按 `Shift + 2` 可改用
-第二候選。繼續輸入文字、數字、Space 或 Return 只會結束標點候選狀態並照常
-處理該按鍵；例如可連續輸入 `123-456`、`1.23`、`abc=123`。
-
-在 Google Sheets 等網頁文字客戶端中，若目前只選取了 cell、尚未建立有效的
-文字插入位置，HybridIME 會把第一個符號按鍵交回 app 處理，避免按鍵被消耗而
-沒有輸出。因此單擊 cell 後即可直接輸入符號；出現文字插入位置後，後續符號
-仍使用上述半形／全形候選流程。
-
-此規則適用於鍵盤可輸入的 ASCII 標點及符號。句號對應 `。`，其他一般字符使用相應的全形形式。
-
-部分符號提供固定次序的額外候選：
+## 專案結構
 
 ```text
-' → '  ＇
-" → "  ＂
-# → #  ＃
-& → &  ＆
-$ → $  ¥  £  €  ₹  ₺  ＄
-, → ,  ，  、
-* → *  ＊  ×
-/ → /  ／  ÷
-英文後 . → .  。  ⋯⋯
-中文後 . → 。  .  ⋯⋯
-中文後 [ → 「  [  〔  ［  【  〖
-中文後 ] → 」  ]  〕  ］  】  〗
-中文後 ( → （  (
-中文後 ) → ）  )
-中文後 ; → ；  ;
-中文後 ! → ！  !
-中文後 ? → ？  ?
-< → <  ＜  ←
-> → >  ＞  →
+HybridIME/                 macOS InputMethodKit target、倉頡資料及資料來源 TSV
+HybridIMEKeyboard/         iOS Custom Keyboard、bundled SQLite lexicon 及鍵盤資源
+HybridIMEiOS/              iOS／iPadOS host app 與設定說明 UI
+HybridIME.xcodeproj/       targets、build settings 與 schemes
+Scripts/                   資料生成、SQLite 驗證、standalone tests 及 release tooling
+README.md                  開發者入口與執行方式
+TECHNICAL_DOCUMENTATION.md 架構、資料流、設定、測試及維護細節
+Info.plist                 macOS InputMethodKit bundle 設定
 ```
 
-逗號會按英文或中文語境在 `,` 與 `，` 之間調整第一候選；星號、斜線、
-井號、引號、美元、小於及大於符號的次序不按語境調整。`"`、`'`、`#`、`&`、`` ` ``、`-`、`+`、`=` 任何
-語境均預設半形。較少使用的全形 `＄` 固定排在美元候選最後，小於及大於
-符號亦提供左右長箭頭。
-輸入標點後可直接接數字，不需要先按 `Space` 確認符號，例如 `$123`、
-`1.23`、`123-456`、`abc=123`。若要在標點狀態下選擇其他候選，使用
-`Shift + 數字`；例如 `$` 後 `Shift + 2` 選 `¥`，`.` 後 `Shift + 2` 選
-`。`，`-` 後 `Shift + 2` 選 `－`。候選窗會顯示 `Shift：1 ...` 作提示。
+## 開發與驗證
 
-以下容易混淆的半形/全形符號會在候選窗加上標籤，但實際輸出仍然只是符號。
-英文、數字、文件開頭或無法判斷語境時，半形排在全形之前：
+Repository 沒有 XCTest／UI test target、formatter、linter 或 CI。`Scripts/` 下的 tests 是以 `swiftc` 編譯執行的離線 harness；其存在只代表 test-covered，不代表任何 checkout 都已通過。
 
-```text
-` → 1 半 `   2 全 ｀
-~ → 1 半 ~   2 全 ～
-! → 1 半 !   2 全 ！
-% → 1 半 %   2 全 ％
-^ → 1 半 ^   2 全 ＾
-& → 1 半 &   2 全 ＆
-( → 1 半 (   2 全 （
-) → 1 半 )   2 全 ）
-- → 1 半 -   2 全 －
-+ → 1 半 +   2 全 ＋
-\ → 1 半 \   2 全 ＼
-| → 1 半 |   2 全 ｜
-; → 1 半 ;   2 全 ；
-: → 1 半 :   2 全 ：
-' → 1 半 '   2 全 ＇
-" → 1 半 "   2 全 ＂
-/ → 1 半 /   2 全 ／   3 ÷
-? → 1 半 ?   2 全 ？
-@ → 1 半 @   2 全 ＠
-# → 1 半 #   2 全 ＃
-```
-
-中文語境會交換其他符號的前兩個候選，顯示為「全」第一、「半」第二；
-`` ` ``、`@`、`#`、`%`、`^`、`&`、`-`、`+`、`|`、`'` 及 `"` 維持
-固定半形第一。`$`、`*` 同樣固定以半形為首選，但不使用上述「半／全」標籤。
-`/` 的第三候選 `÷` 保持不變。
-
-Space 會直接提交目前的藍色中文智能首選；原始英文（包括藍色智能預測）一律
-輸出英文並加入空格。輸入標點時，若目前首選是中文會先提交中文並使用全形標點，否則提交
-原始英文並使用半形標點。因此可直接連續輸入 `I love you!`，不需要在 `you`
-與 `!` 之間額外按 Space。Return 仍優先提交第一候選，只有沒有候選時才輸出原始英文。
-
-若英文位於句尾或不需要尾隨空格，可使用 `Shift + Space`：
-
-```text
-hello + Space         → "hello "
-hello + Shift + Space → "hello"
-hello + Esc           → "hello"
-```
-
-若目前字碼已有倉頡中文候選，`Esc` 仍會取消組字，不會輸出原始字碼。
-
-## 智能候選
-
-HybridIME 會在本機記錄每組輸入碼實際選擇的中文字候選，以及用 `Shift + Space`
-明確提交的原始英文。同一字碼選擇中文字候選一次後，或以 `Shift + Space`
-提交原始英文後，該選擇便會成為智能預測，並在候選視窗中以藍色文字顯示。
-
-第一候選若是已標示的中文智能預測候選，按 Space 會直接提交該候選。原始英文
-智能預測則仍輸出英文並附加空格。這項規則不計算百分比，
-也不依賴前文；只根據「同一字碼 + 同一候選」的選擇記錄。若同一字碼選過
-多個中文字候選或原始英文，最後一次明確選取的候選會立即成為首選；不會累計或比較
-選取次數。原始英文會保留大小寫，只有再次輸入完全相同大小寫的 buffer 時才會成為
-首選；此時按 `Space` 仍會提交原始英文並加上空格。
-
-英文字典翻譯、標點及聯想候選不參與這套智能學習。智能預測不判斷游標前文；
-無論位於中文或英文內容中，都只按當前輸入字碼、可用候選及最近選擇決定首選。
-
-智能學習資料只儲存在本機 `UserDefaults`，不會上傳。需要強制輸出原始
-英文時，可按 `Shift + Space`；這也會把該原始英文設為同一字碼的最新智能首選。
-
-## 系統需求
-
-- macOS 26.0 或以上
-- Xcode 26.3 或以上
-- Apple Development 開發憑證
-
-目前專案以 Apple Silicon Mac 為主要開發及測試環境。
-
-## 建置
-
-使用 Xcode 開啟：
-
-```text
-HybridIME.xcodeproj
-```
-
-選擇 `HybridIME` scheme 及 `My Mac` destination，然後執行 Build。
-
-也可以使用命令列：
+靜態 lexicon 的 source equality 驗證：
 
 ```sh
-xcodebuild \
-  -project HybridIME.xcodeproj \
-  -scheme HybridIME \
-  -configuration Debug \
-  -derivedDataPath /tmp/HybridIMETraditionalDerivedData \
-  -allowProvisioningUpdates \
-  build
+python3 Scripts/verify_static_lexicon.py
 ```
 
-建置成品位於：
-
-```text
-/tmp/HybridIMETraditionalDerivedData/Build/Products/Debug/HybridIME.app
-```
-
-## 安裝
-
-1. 將 `HybridIME.app` 放入：
-
-   ```text
-   ~/Library/Input Methods/
-   ```
-
-2. 重新開機。macOS 的 Text Input / LaunchServices cache 有時只會在重啟後刷新，特別是 bundle identifier 或 input mode identifier 曾經改動時。
-3. 前往「系統設定 > 鍵盤 > 文字輸入 > 編輯」。
-4. 按 `+`，在「繁體中文」分類加入「中英混合」。
-5. 從選單列的輸入法選單切換至「中英混合」。
-
-HybridIME 啟動時不會自行註冊或啟用輸入來源。安裝或更新後只需由 macOS 加入一次；日常由系統啟動輸入法時，不會再次要求允許「中英混合」啟用自己。開發測試時如 System Settings 找不到輸入法，先確認 `~/Library/Input Methods/HybridIME.app` 已更新，再重啟 macOS。
-
-HybridIME 直接建立 `NSApplication` 及 `IMKServer`，不建立一般 App 視窗。
-重新開機後首次選擇「中英混合」時，輸入法只會在背景啟動。
-
-若重新開機後已選擇「中英混合」但按鍵完全沒有反應，可強制刷新
-LaunchServices 註冊及 InputMethodKit 連線：
+重新建立 lexicon 會覆寫 checked-in SQLite 及複製 notices，只有更新資料時才應執行：
 
 ```sh
-/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister \
-  -f "$HOME/Library/Input Methods/HybridIME.app"
-killall HybridIME
-killall TextInputMenuAgent
-open "$HOME/Library/Input Methods/HybridIME.app"
+python3 Scripts/build_static_lexicon.py
 ```
 
-開發期間若要停止 HybridIME，應先切換至其他輸入法，再執行：
-
-```sh
-pkill -x HybridIME
-```
-
-若「中英混合」仍是目前使用中的輸入法，macOS 可能會自動重新啟動其程序。
-
-## 倉頡碼表
-
-HybridIME 運行時只載入：
-
-```text
-HybridIME/CangjieData/hybrid-cangjie5.dict.tsv
-```
-
-這是 HybridIME 自己使用的合併碼表，由：
-
-1. `cangjie5.base.dict.yaml`：一般及較常用的倉頡五代單字。
-2. `cangjie5.extended.dict.yaml`：罕用字、異體字、相容漢字及 Unicode CJK 擴展區漢字。
-
-生成而成。
-
-基礎碼表先載入，因此同一倉頡碼下的基礎候選通常優先顯示。重複候選會被移除。
-日常修正常用字碼時，可直接修改 `hybrid-cangjie5.dict.tsv`。
-曾經修改過的倉頡碼由 `cangjie-change-log.tsv` 手動記錄。
-
-## Rime 來源
-
-- [Rime 專案首頁](https://github.com/rime/home)：Rime 的介紹、文件及各子專案入口。
-- [Rime 倉頡方案](https://github.com/rime/rime-cangjie)：HybridIME 所使用的倉頡五代方案及 `.dict.yaml` 原始碼表。
-
-`rime/home` 並不直接存放上述倉頡碼表。查詢碼表內容、修改紀錄及最新版本時，應以 `rime/rime-cangjie` repository 為準。
-
-## macOS 相容規則
-
-Rime 倉頡五代與 macOS 內建倉頡在部分字碼及候選次序上可能不同。
-HybridIME 已把確認過的 macOS 差異直接寫入：
-
-```text
-HybridIME/CangjieData/hybrid-cangjie5.dict.tsv
-```
-
-輸入法運行時只讀此檔。`cangjie-change-log.tsv` 只作人工記錄用途，輸入法不會讀取。
-
-目前相容層亦把「面」由 Rime 的 `mwsl` 調整為 macOS 倉頡碼 `mwyl`，
-把「黃」由 `tmlc` 調整為 `tmwc`，把「盒」由 `orbt` 調整為 `omrt`，
-把「拿」由 `orq` 調整為 `omrq`，並把「樓」由 `dllv` 調整為 `dlwv`。
-
-## 中英雙向字典
-
-HybridIME 使用 [CC-CEDICT](https://cc-cedict.org/wiki/) 建立獨立的中英
-雙向索引。輸入完整英文詞時，中文翻譯會排在倉頡候選之前，例如輸入
-`test` 可選擇「測試」。按 Space 仍然輸出原本英文，不會自動翻譯。
-
-輸入倉頡碼時，每個中文候選後會加入其英文翻譯候選。系統亦會結合游標前
-的連續中文，優先查詢最長詞組；選擇英文候選時會以英文替換該中文詞組。
-
-`HybridIME/DictionaryData/dictionary-overrides.tsv` 可把已確認的翻譯候選
-移至最前，這些本地排序不會在重新生成 CC-CEDICT 索引時被覆蓋。
-覆寫亦可使用 `replace-e` 或 `replace-z` 完全取代指定方向的候選。
-
-## 應用程式快捷鍵
-
-包含 Command、Control 或 Option 的按鍵組合不由 HybridIME 處理，會直接
-交回目前應用程式。因此 `⌘C`、`⌘V`、`⌘X`、`⌘A`、`⌘Z`、`⌘S`、
-`⌘W` 等快捷鍵可正常使用。Shift 仍用於輸入英文大寫。
-
-HybridIME 亦會明確接收並透傳完整的左鍵按下、拖曳、放開及取消事件，
-避免 InputMethodKit 的預設 mouse down 組字處理干擾 Google Sheets 等
-網頁文字客戶端的 cell 點擊與拖曳選取。非鍵盤事件會直接交回系統，不會
-清理組字狀態，以避免影響 Safari URL 欄及聽寫 session。
-當 app 或文字輸入 session 切換時，HybridIME 會清理候選及 marked text，
-避免舊組字狀態阻礙聽寫接管。
-
-## 中英文聯想
-
-提交中文後，HybridIME 會根據最後的中文詞語顯示中文聯想。例如提交
-「測」後可顯示：
-
-```text
-1 試   2 量   3 評   4 定
-```
-
-選擇「試」後，會以「測試」繼續顯示：
-
-```text
-1 用例   2 人員   3 工程師   4 開發   5 結果
-```
-
-英文聯想在按 Space 提交英文後出現。例如輸入 `thank` 並按 Space，可顯示
-`you`、`god`、`for` 等候選。選擇英文聯想後會自動加入空格並繼續聯想。
-
-- 按 `Return` 或數字鍵選擇聯想。
-- 最近選過的聯想會在相同情境排第一並以藍色文字顯示；此時按 `Space` 可直接
-  提交第一個聯想字並繼續聯想。
-- 按 `Esc` 關閉聯想。
-- 開始輸入新字時，聯想視窗會收起並進入正常組字。
-- 標點、Delete、移動游標或應用程式快捷鍵會清除聯想上下文。
-- 中文聯想會同時記錄完整情境及最後一個中文字，令常見如「你」後選
-  「好」的排序更穩定。
-- HybridIME 會學習實際連續輸入的中文。例如輸入過「自動提交該聯想字」
-  後，再輸入「自」可先聯想「動」，提交後再聯想「提」。
-- 本機最多使用最近 8 個中文字作為一次情境鍵；這不是總記錄字數上限。
-  學習序列結束後，仍會繼續顯示 Rime 原有聯想。
-- 使用者選過的聯想及連續中文情境只會透過 `UserDefaults` 儲存在本機。
-- 輸入內容及學習資料不會上傳。
-
-中文聯想資料由
-[Rime Essay](https://github.com/rime/rime-essay) 的詞彙及權重生成。英文
-聯想只使用 [Tatoeba](https://tatoeba.org/en/downloads) 的英文 CC0
-句子子集生成相鄰詞統計。
-
-重新生成：
-
-```sh
-swift Scripts/build_chinese_associations.swift \
-  /path/to/essay.txt \
-  HybridIME/AssociationData/chinese-associations.tsv
-
-swift Scripts/build_english_associations.swift \
-  /path/to/eng_sentences_CC0.tsv \
-  HybridIME/AssociationData/english-associations.tsv
-```
-
-更新字典時，從
-[MDBG CC-CEDICT 下載頁](https://www.mdbg.net/chinese/dictionary?page=cc-cedict)
-取得最新資料，再執行：
-
-```sh
-swift Scripts/build_cedict_index.swift \
-  /path/to/cedict_ts.u8 \
-  HybridIME/DictionaryData/cedict-index.tsv
-```
-
-目前索引使用的 CC-CEDICT 來源版本記錄在
-`HybridIME/DictionaryData/NOTICE-CC-CEDICT.txt`。更新 `cedict-index.tsv`
-後，需同步更新該 notice 的 `Date` 及 `Entries`。
+本次文件任務的實際驗證結果記錄在[技術文件的 Testing](TECHNICAL_DOCUMENTATION.md#12-testing)。release、簽署、公證、安裝及外部 runtime 驗證不屬於一般開發 validation。
 
 ## 已知限制
 
-- Apple 沒有提供公開 API 讀取或調用 macOS 內建倉頡碼表。
-- HybridIME 不能保證所有字碼及候選次序均與 macOS 內建倉頡完全相同。
-- 候選相容性需要按已確認的差異逐步補充。
-
-詳細架構、資料格式及維護方法請參閱
-[TECHNICAL_DOCUMENTATION.md](TECHNICAL_DOCUMENTATION.md)。
+- 新 SQLite runtime 與 learning-store 變更存在於目前 working tree，但其 release／安裝後行為必須以本次 build 結果及後續實機測試分開判斷。
+- 舊版 `UserDefaults` learning keys 沒有遷移到 SQLite 的程式；現有學習可能不會延續。
+- macOS target 未啟用 App Sandbox；learning database 沒有額外加密，也沒有清除學習資料的設定 UI。
+- Apple 沒有公開 macOS 內建倉頡解碼 API，碼表與候選次序不能保證完全一致。
+- macOS 候選視窗最多顯示十項，沒有翻頁；候選位置與中文詞組替換依賴 host 正確實作 text-input API。
+- iOS 先插入英文字碼再刪除替換；若 host 不提供足夠 context、游標已移動或文字已改變，guard 會拒絕替換。
+- iOS source 沒有 `advanceToNextInputMode`／`handleInputModeList` control；使用者目前不能由鍵盤 UI 切換到下一個鍵盤。
+- 第三方鍵盤在 secure text fields、電話鍵盤或 host 禁用 extension 時可能由系統鍵盤取代；本次未做 device／多 app 相容性驗證。
+- `Scripts/release.sh` 目前固定 `1.1.2`，project targets 是 `1.2.0`；release preflight 會因版本不一致而停止。不要把該 script 視為目前可直接發布的流程。
+- repository 沒有自動測試 target、CI、效能量測或 memory-budget regression test。
 
 ## 授權
 
-應用程式程式碼及第三方碼表可能使用不同授權。Rime 倉頡碼表的授權及來源聲明請參閱：
+Repository 沒有找到 project-wide `LICENSE`，因此不能推斷 HybridIME source code 的再利用授權。
 
-- `HybridIME/CangjieData/LICENSE-Rime-Cangjie.txt`
-- `HybridIME/CangjieData/NOTICE.txt`
-- `HybridIME/DictionaryData/LICENSE-CC-CEDICT.txt`
-- `HybridIME/DictionaryData/NOTICE-CC-CEDICT.txt`
-- `HybridIME/AssociationData/LICENSE-Rime-Essay.txt`
-- `HybridIME/AssociationData/NOTICE-Rime-Essay.txt`
-- `HybridIME/AssociationData/NOTICE-Tatoeba-CC0.txt`
+第三方資料的授權與歸屬分別位於：
+
+- `HybridIME/CangjieData/LICENSE-Rime-Cangjie.txt` 與 `HybridIME/CangjieData/NOTICE.txt`。
+- `HybridIME/DictionaryData/LICENSE-CC-CEDICT.txt` 與 `HybridIME/DictionaryData/NOTICE-CC-CEDICT.txt`。
+- `HybridIME/AssociationData/LICENSE-Rime-Essay.txt`、`HybridIME/AssociationData/NOTICE-Rime-Essay.txt` 與 `HybridIME/AssociationData/NOTICE-Tatoeba-CC0.txt`。
+- `HybridIMEKeyboard/LexiconData/` 內隨 bundled SQLite 一併提供的對應 license／notice。
+
+詳細實作請參閱 [TECHNICAL_DOCUMENTATION.md](TECHNICAL_DOCUMENTATION.md)。

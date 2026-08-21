@@ -1,614 +1,161 @@
 # HybridIME 技術文件
 
-## 1. 架構概覽
+本文件描述目前 working tree 的實際 source、Xcode 設定與資料資產。它不以舊 release、檔名推測或先前實機結果代替本次證據。
 
-HybridIME 是以 Swift、AppKit 及 InputMethodKit 開發的 macOS 輸入法。
+狀態用語：
 
-主要元件：
+- **Implemented**：source 已存在並接入正常執行路徑。
+- **Test-covered**：repository 有相應 test harness，但不表示本次已執行。
+- **Verified in this task**：本次文件工作確實執行並成功的 validation。
+- **Externally unverified**：需要安裝、真實 text client、Simulator／device、憑證或外部系統才能確認。
+- **Experimental / Inactive**：存在但目前不能作正常保證路徑。
+- **Planned / Not implemented**：只有合理擴充點，尚未實作。
 
-| 元件 | 職責 |
+## 1. System Overview
+
+HybridIME 在一個 Xcode project 中提供兩套平台 adapter：
+
+- macOS `HybridIME`：classic InputMethodKit application，`IMKInputController` 接收事件並用 `IMKTextInput` 更新 host。
+- iOS／iPadOS `HybridIMEKeyboard`：`UIInputViewController` keyboard extension，以 `UITextDocumentProxy` 插入、刪除與移動游標；由 SwiftUI host app `HybridIMEiOS` 嵌入。
+
+兩平台各有自己的 controller、dictionary wrapper、association logic 與 learning store，沒有獨立的共享 Swift module。它們共用 checked-in 倉頡 TSV 和同一份生成後的 SQLite lexicon 資產，但 source 有重複實作。
+
+正常 runtime 完全離線：
+
+1. 載入 bundled 倉頡 TSV。
+2. 以 bundled read-only SQLite 查詢雙語與聯想資料。
+3. 由平台 controller 管理 composition state、候選及 host text replacement。
+4. 把使用者選擇寫入 target container 的本機 SQLite learning database。
+
+沒有 runtime backend、HTTP provider、登入、APNs、iCloud、Keychain 或 telemetry path。
+
+## 2. Architecture
+
+```mermaid
+flowchart LR
+    subgraph Static sources
+        C[倉頡 TSV]
+        T[CC-CEDICT / Rime Essay / Tatoeba TSV]
+        B[build_static_lexicon.py]
+        L[(hybridime-lexicon.sqlite3)]
+        T --> B --> L
+    end
+
+    subgraph macOS
+        IMK[IMKServer + InputMethodController]
+        MC[CangjieDecoder / StaticLexicon]
+        MW[(UserLearningStore SQLite)]
+        MP[CandidateWindowController]
+        C --> MC
+        L --> MC
+        MC --> IMK
+        MW <--> IMK
+        IMK --> MP
+        IMK -->|IMKTextInput| MH[Host app]
+    end
+
+    subgraph iOS
+        KVC[KeyboardViewController]
+        IC[CangjieDecoder / OfflineLexicon]
+        IW[(KeyboardUserLearningStore SQLite)]
+        C --> IC
+        L --> IC
+        IC --> KVC
+        IW <--> KVC
+        KVC -->|UITextDocumentProxy| IH[Host app]
+    end
+```
+
+### Dependency direction
+
+- Platform controllers own lifecycle and composition state.
+- Decoder／lexicon／association／ranker do not call UI code.
+- Candidate UI consumes controller-produced presentation data.
+- Learning stores own SQLite schema and persistence; callers receive empty results when the store is unavailable.
+- Build scripts consume source data and produce checked-in runtime assets; runtime never reads raw CC-CEDICT／association TSV.
+
+There is no dependency-injection framework. macOS `InputResources` and iOS controller properties act as composition roots. Production uses shared singleton learning stores; initializers accepting a database URL support standalone tests.
+
+## 3. Project Structure
+
+| Path | Responsibility |
 | --- | --- |
-| `HybridIMEApp.swift` | 啟動背景 `NSApplication` 並建立 `IMKServer` |
-| `InputMethodController.swift` | 接收按鍵事件、管理輸入緩衝區及提交文字 |
-| `CangjieDecoder.swift` | 載入 HybridIME 專用倉頡碼表及查詢候選 |
-| `BilingualDictionary.swift` | 載入 CC-CEDICT 中英雙向索引 |
-| `AssociationDictionary.swift` | 載入中英文聯想索引及管理本機排序 |
-| `SmartCandidateRanker.swift` | 記錄字碼的中文與原始英文候選選擇及提供智能預測 |
-| `CandidateWindowController.swift` | 建立及定位自訂候選視窗 |
-| `Info.plist` | 定義輸入法識別碼、語言、圖示及控制器類別 |
+| `HybridIME/HybridIMEApp.swift` | macOS `NSApplication` entry, `IMKServer`, shared resource preload |
+| `HybridIME/InputMethodController.swift` | macOS event state machine, candidates, commit, punctuation and associations |
+| `HybridIME/CandidateWindowController.swift` | Non-activating macOS candidate panel and caret positioning |
+| `HybridIME/CangjieDecoder.swift` | macOS Cangjie TSV parser and glyph filter |
+| `HybridIME/StaticLexicon.swift` | macOS read-only SQLite bilingual／association lookup |
+| `HybridIME/BilingualDictionary.swift` | macOS domain wrapper around bilingual lexicon queries |
+| `HybridIME/AssociationDictionary.swift` | macOS static and learned association merge／ranking |
+| `HybridIME/SmartCandidateRanker.swift` | macOS most-recent smart candidate selection |
+| `HybridIME/UserLearningStore.swift` | macOS writable SQLite learning schema |
+| `HybridIMEKeyboard/KeyboardViewController.swift` | iOS keyboard UI, text proxy operations and composition state |
+| `HybridIMEKeyboard/OfflineLexicon.swift` | iOS read-only SQLite lookup with bounded cache |
+| `HybridIMEKeyboard/KeyboardAssociationDictionary.swift` | iOS association merge／ranking |
+| `HybridIMEKeyboard/KeyboardUserLearningStore.swift` | iOS writable SQLite learning schema |
+| `HybridIMEKeyboard/PunctuationStrategy.swift` | iOS punctuation definitions, context and display labels |
+| `HybridIMEiOS/ContentView.swift` | Host app setup instructions |
+| `HybridIME/CangjieData/` | Runtime Cangjie table, upstream snapshots, change log and notices |
+| `HybridIME/DictionaryData/` | CC-CEDICT source index、overrides、license and notice used to generate SQLite |
+| `HybridIME/AssociationData/` | Chinese／English association source indexes、licenses and notices |
+| `HybridIMEKeyboard/CangjieData/` | iOS runtime Cangjie table |
+| `HybridIMEKeyboard/LexiconData/` | Bundled SQLite lexicon and copied notices for the keyboard extension |
+| `Scripts/` | Dataset builders, validators, standalone tests and release tooling |
 
-## 2. InputMethodKit 啟動流程
+The project uses Xcode filesystem-synchronized groups. The macOS target explicitly excludes raw dictionary／association TSV resources and explicitly includes `HybridIMEKeyboard/LexiconData/hybridime-lexicon.sqlite3`; both platform targets therefore use the same generated lexicon file in the repository.
 
-`HybridIMEApp.main()` 不使用 SwiftUI `WindowGroup`。啟動流程直接取得
-`NSApplication.shared`、設定 `AppDelegate`、把 activation policy 設為
-`.accessory`，然後呼叫 `run()`。因此 macOS 在開機後首次選用輸入法時，
-只會啟動背景輸入法服務，不會自動建立說明視窗或顯示 Dock 圖示。
+## 4. Data Flow
 
-`AppDelegate.applicationDidFinishLaunching` 會：
+### Static data generation
 
-1. 從 `Info.plist` 讀取 `InputMethodConnectionName`。
-2. 使用 bundle identifier 建立 `IMKServer`。
-3. 由 `InputResources` 在 detached task 背景預載倉頡、CC-CEDICT 及聯想
-   索引，完成後把不可變查詢快照發佈到 MainActor。
+`Scripts/build_cedict_index.swift`, `Scripts/build_chinese_associations.swift` and `Scripts/build_english_associations.swift` generate source TSV indexes. `Scripts/build_static_lexicon.py` then:
 
-應用程式啟動時不會呼叫 `TISRegisterInputSource` 或 `TISEnableInputSource`。輸入來源的註冊及啟用只屬於安裝流程，避免 macOS 每次重新啟動輸入法程序時顯示「允許中英混合啟用中英混合」的提示。
+1. Creates `bilingual(direction, key, candidates)` and `association(language, key, candidates)` WITHOUT ROWID tables.
+2. Normalizes English keys to lowercase and preserves tab-delimited candidate ordering.
+3. Applies `HybridIME/DictionaryData/dictionary-overrides.tsv` operations `add-e`, `add-z`, `replace-e`, `replace-z`.
+4. Sets `PRAGMA user_version=1`, vacuums the database and copies third-party notices into `LexiconData/`.
 
-當 HybridIME 是目前選用的輸入法時，其程序由 macOS 管理。直接終止程序後，系統可能自動重新啟動；若要停止程序，應先切換至其他輸入法。
+The checked-in database currently reports 177,594 bilingual rows and 244,887 association rows. These counts are a repository snapshot, not a service status.
 
-HybridIME 使用 classic InputMethodKit `.app` 結構，而不是 `com.apple.textinputmethod-services` app extension。`LSBackgroundOnly` 必須保持 `false`，並配合 `LSUIElement=true`，否則 macOS 可能只把 bundle 當成背景 app，而不在「系統設定 > 鍵盤 > 文字輸入」列出。
+### macOS input flow
 
-大型 TSV 合共超過 50 萬行。解碼器的檔案解析 initializer 及 loader 標記
-為 `nonisolated`，避免在切換輸入法期間同步堵塞主執行緒及輸入法選單的
-mouse tracking。載入完成前英文仍可提交，中文、翻譯及聯想候選暫時為空。
+1. `HybridIMEApp` creates `IMKServer`; `InputResources` creates `StaticLexicon`, dictionary wrappers and association dictionary, then loads Cangjie in a detached task.
+2. `InputMethodController.handle` accepts `keyDown`; Command／Control／Option and unsupported system events are returned to the host.
+3. ASCII letters append to an in-memory buffer and update marked text.
+4. Up to five letters query Cangjie. The complete buffer also queries English-to-Chinese SQLite entries.
+5. Each Cangjie candidate may add up to two Chinese-to-English results, using the longest suffix of preceding Chinese plus the current candidate.
+6. Results are deduplicated, capped at ten and optionally reordered by the latest learned candidate.
+7. Commit inserts text through `IMKTextInput`, clears composition and may start association lookup.
 
-主要識別碼：
+Before Cangjie preload completes, raw English still works; Cangjie results are empty. SQLite wrappers are created synchronously, so available dictionary results do not wait for the detached Cangjie task.
 
-```text
-Bundle ID: com.sunny.inputmethod.hybridime
-Input source ID: com.sunny.inputmethod.hybridime
-Input mode ID: com.sunny.inputmethod.hybridime.input
-Language: zh-Hant
-Keyboard layout: com.apple.keylayout.US
-```
+### iOS keyboard flow
 
-## 3. 按鍵處理
+iOS cannot use marked text through the implemented path. `enterLetter` immediately calls `textDocumentProxy.insertText`, appends the same character to `buffer`, then derives candidates. Selecting a candidate succeeds only if `documentContextBeforeInput` still ends with the buffer; the controller deletes those characters and inserts the replacement.
 
-`InputMethodController.handle(_:client:)` 只處理 `keyDown` 事件。
+This fail-closed suffix check also protects translation and punctuation replacement. If the host withholds context or text changes between insertion and selection, replacement is refused instead of deleting unrelated content.
 
-### 英文字母
+### Association flow
 
-ASCII 英文字母會轉為小寫並加入 `buffer`。每次更新後：
+- Chinese lookup tries the longest static suffix and the longest learned suffix, then selects the longer key; equal length prefers the static lookup key before merging learned candidates.
+- English lookup uses the last whitespace-separated lowercase word.
+- Ranking order is most recent selection, learned count, static weight, then lexical order.
+- A Chinese committed sequence stores one-character continuations for up to eight characters of recent context and retains at most ten learned candidates per context.
+- English association commits add a trailing space; Chinese commits do not.
 
-1. 呼叫 `updateComposition()` 更新組字內容。
-2. 當長度不超過五碼時，查詢最多十個倉頡候選。
-3. 把每個鍵位轉換成對應的倉頡字母。
-4. 在文字插入點附近顯示倉頡字母、英文碼及已有的候選。
+## 5. Core Components
 
-輸入超過五個字母後仍可繼續輸入英文，但不再執行倉頡查詢。
+### macOS lifecycle and UI
 
-候選由 `CandidateAction` 表示：
+`HybridIMEApp` runs `NSApplication` with `.accessory` activation policy and no normal window. It reads `InputMethodConnectionName` and bundle identifier from `Info.plist`; missing values trigger `assertionFailure` and prevent server creation.
 
-- `commit`：提交倉頡中文或一般候選。
-- `rawCommit`：提交由 `Shift + Space` 學習的原始英文。
-- `dictionaryCommit`：提交英文字典的中文翻譯，不參與倉頡智能學習。
-- `translate`：提交英文翻譯，並可替換游標前已組成的中文前綴。
+`CandidateWindowController` uses a borderless, non-key, non-main `NSPanel` at `.statusBar` level. It ignores mouse events, joins all Spaces and positions above the caret when possible, otherwise below or near screen center. Candidate width is bounded and there is no paging beyond ten items.
 
-每個倉頡中文候選後最多加入兩個英文翻譯。`chineseTextBeforeComposition`
-讀取 marked range 前最多 24 個 UTF-16 code units，保留末端連續中文；
-`longestTranslationLookup` 由最長前綴開始查詢「前綴 + 當前中文候選」，
-找不到詞組時才逐步縮短至單字。
+### macOS InputMethodKit lifecycle
 
-### 提交及控制鍵
+The bundle is a classic InputMethodKit app, not a text-input app extension. `LSUIElement=true` and `LSBackgroundOnly=false` are intentional. Startup does not call `TISRegisterInputSource` or enable itself.
 
-| 按鍵 | 行為 |
-| --- | --- |
-| `Space` | 第一候選若是藍色中文智能預測則提交該候選；原始英文（包括智能預測）一律附加空格 |
-| `Shift + Space` | 提交緩衝區內的英文，不附加空格，並記錄為原始英文智能選擇 |
-| `Return` / 數字鍵盤 `Enter` | 提交第一個候選；沒有候選時提交英文 |
-| `1` 至 `9` | 提交第一至第九個候選；字元判斷失敗時會 fallback 至主鍵盤及數字鍵盤 keyCode |
-| `0` | 提交第十個候選；支援主鍵盤及數字鍵盤 keyCode fallback |
-| `Delete` | 刪除緩衝區最後一個字母 |
-| `Esc` | 英文 buffer 無倉頡中文候選時提交英文且不加空格；否則清除 marked text 或關閉候選 |
-| `Command`、`Control` 或 `Option` 組合鍵 | 不處理事件，直接交回目標應用程式 |
-
-修飾鍵檢查在其他按鍵處理之前執行。包含 Command、Control 或 Option 的
-`keyDown` 會立即回傳 `false`，且不會同步提交、清除或修改 marked text，
-避免 InputMethodKit 中斷 `⌘C`、`⌘V`、`⌘A`、`⌘Z` 等應用程式快捷鍵。
-Shift 不在此透傳集合內，因此仍可保留英文大小寫。
-
-### 智能首選與邊界提交
-
-智能首選不讀取 marked range 前文，也不區分中文或英文語境。Space 會直接提交
-當前藍色中文智能首選；原始英文（包括藍色智能預測）一律附加空格。Return 仍以當前
-候選為優先，只有完全沒有候選時才提交英文。輸入 ASCII 標點時，`commitBeforePunctuation`
-會先檢查緩衝區第一個候選；若是純中文 `.commit` 候選，先提交該中文並令標點
-預設全形，否則提交緩衝區英文並令標點預設半形。因此 `I love you!` 的
-`you` 不需要額外按 Space，而倉頡候選後接標點亦可直接得到中文標點。句首第一個
-英文詞仍使用一般混合輸入規則；`Shift + Space` 在任何語境均可強制提交
-英文且不加入空格。
-
-`Esc` 在沒有純中文 `.commit` 倉頡候選時可作為英文確定鍵，提交 buffer
-且不加入空格、不顯示聯想；若目前仍有倉頡中文候選，`Esc` 維持取消組字，
-避免想取消中文候選時意外輸出原始字碼。
-
-### 智能候選學習
-
-`SmartCandidateRanker` 以正規化小寫字碼及候選文字為鍵，把每次實際選取
-的純中文字 `.commit` 候選，以及 `Shift + Space` 或 raw 候選提交的原始英文記錄到 `UserDefaults`。資料使用
-`smartCandidate.v2.<code>.*` key namespace，保存最近選擇時間及該字碼的
-候選清單；舊版本的累計次數資料不再讀取或更新。
-
-同一字碼與同一中文或原始英文候選選取一次後即可成為預測，不使用百分比或前文
-情境；以最近選擇時間決定最佳候選。原始英文保留大小寫，只會在當前 buffer
-完全相同時列為可用候選。純中文 `.commit` 候選不會因游標前文而被排除；
-`.dictionaryCommit` 中文翻譯與 `.translate` 英文翻譯不會交給排序器，也不會取得
-`smartPredictionIndex`。
-
-候選視窗會把預測候選顯示為藍色文字。若第一候選是中文預測，Space 會直接
-提交該候選；raw 英文預測仍附加空格。`Shift + Space` 則始終強制提交英文並將其
-設為最新 raw 選擇。標點及聯想
-候選亦不會寫入這套智能候選記錄。
-
-### 滑鼠事件透傳
-
-`recognizedEvents(_:)` 明確宣告 `keyDown`、`flagsChanged`、
-`leftMouseDown`、`leftMouseUp`、`leftMouseDragged` 及 `mouseCancelled`。
-事件處理器主要處理 `keyDown`；若 InputMethodKit 傳入 `nil` event，會清理狀態並回傳
-`false`。所有非 `keyDown` 事件直接回傳 `false`，不再同步清理組字或候選，
-避免干擾 Safari URL 欄及聽寫等文字輸入 session。
-
-若有組字、標點候選或聯想候選，而 `keyDown` 同時沒有 `characters` 及
-`charactersIgnoringModifiers`，HybridIME 會清理 marked text 及候選視窗並
-回傳 `false`。這類按鍵通常是聽寫或其他系統層輸入觸發；先釋放組字狀態可
-避免輸入法佔住文字 session，讓 macOS 接管。
-
-`flagsChanged` 只用於偵測 Fn/Globe 類聽寫觸發鍵。當 `.function` modifier
-出現且目前有 active composition 時，HybridIME 會清理 marked text 及候選視窗，
-再回傳 `false` 交回系統。
-
-這會停用 InputMethodKit 在輸入法只接收 `keyDown` 時套用的預設 mouse
-down 組字處理，確保 Google Sheets 等網頁文字客戶端收到完整左鍵序列。
-
-`commitComposition(_:)` 若由系統要求結束組字，只提交現有內容並清除
-狀態，不顯示聯想候選。`deactivateServer(_:)` 亦會隱藏候選視窗及清除
-組字、標點和聯想狀態。
-
-每個 controller 亦會觀察 `NSWorkspace.didDeactivateApplicationNotification`。
-app 或文字輸入 session 切換時若仍有 active composition，會清理 marked text
-及候選視窗，避免舊輸入狀態阻礙聽寫接管。
-
-### 聯想候選狀態
-
-聯想候選不建立 marked text。提交中文或英文後，
-`showAssociations(context:language:client:)` 查詢同語言的後續候選，並以
-`CandidateAction.associate` 保存候選文字、查詢鍵及語言。
-
-| 按鍵 | 聯想狀態行為 |
-| --- | --- |
-| `Return`、`1` 至 `0` | 提交所選聯想並繼續查詢 |
-| `Space` | 第一候選是藍色最近選擇聯想時提交並繼續聯想；否則關閉聯想並交回應用程式 |
-| `Esc` | 關閉聯想並清除上下文 |
-| 英文字母 | 收起聯想視窗，開始新的正常組字 |
-| 標點、Delete、其他非文字鍵 | 關閉聯想並清除上下文 |
-| Command、Control、Option 快捷鍵 | 清除聯想後透傳至應用程式 |
-
-中文聯想直接附加候選；英文聯想附加候選及一個空格。選取後會呼叫
-`AssociationDictionary.recordSelection`，把使用次數及最近選擇寫入目前
-使用者的 `UserDefaults`。最近選擇會立即排在相同情境的第一位，並以
-`isMostRecentSelection` 標記供候選視窗顯示藍色文字。中文聯想另會把同一選擇
-寫入最後一個中文字的 fallback key，避免完整情境鍵不同時令最近選擇排序
-失效。資料只在本機使用。
-
-### 標點符號
-
-鍵盤可輸入的 ASCII 標點及符號會進入獨立的標點候選狀態。`punctuationPair(for:)` 定義半形與全形對照；逗號使用 `,`／`，`，句號使用 `.`／`。`，其他字符使用相應的全形字符。
-
-部分特殊候選使用固定次序：
-
-```text
-' → '  ＇
-" → "  ＂
-# → #  ＃
-& → &  ＆
-$ → $  ¥  £  €  ₹  ₺  ＄
-, → ,  ，  、
-* → *  ＊  ×
-/ → /  ／  ÷
-. → .  。  ⋯⋯
-` → `  ｀
-- → -  －
-+ → +  ＋
-= → =  ＝
-< → <  ＜  ←
-> → >  ＞  →
-```
-
-`$` 固定以半形美元符號為首選，全形 `＄` 固定最後。`,` 會按中英文語境
-在 `,` 與 `，` 之間調換第一候選；`"`、`'`、`#`、`%`、`^`、`&`、`*`、
-`` ` ``、`-`、`+`、`=`、`@`、`|`、`<` 與 `>` 不按中英文語境調換，固定
-以半形為首選。`.` 仍按游標前文字在 `.` 與 `。`
-之間切換第一候選，`⋯⋯` 固定排在其後。
-
-`defaultPunctuationCandidate(for:useFullWidth:)` 負責選出第一候選。中文語境
-會優先使用 `chineseDefault`，例如 `[` 使用 `「`、`]` 使用 `」`；沒有
-`chineseDefault` 時使用一般全形符號，例如 `(` 使用 `（`、`;` 使用 `；`、
-`!` 使用 `！`、`?` 使用 `？`。若 `chineseDefault` 等於半形符號本身，則表示
-該符號固定以半形為首選。
-
-`` ` ``、`~`、`!`、`%`、`^`、`&`、`(`、`)`、`-`、`+`、`\`、`|`、`;`、
-`:`、`'`、`"`、`/`、`?`、`@` 及 `#` 容易混淆半形與全形，因此
-`showPunctuation(candidates:displayCandidates:client:)` 可接收獨立顯示文字。這些
-符號在英文、數字、文件開頭或無法判斷語境時顯示半形第一、全形第二；中文
-語境則顯示全形第一、半形第二，但 `` ` ``、`@`、`#`、`%`、`^`、`&`、`-`、
-`+`、`|`、`'` 及 `"` 固定顯示半形第一。`/` 的第三候選 `÷` 不參與交換。
-`currentCandidateActions` 仍保存真正輸出的符號，例如候選窗顯示 `半 '`，
-實際提交仍只是 `'`。
-
-`punctuationFullWidthPreferenceForCurrentComposition()` 會先根據未提交的
-buffer 判斷標點語境：第一個候選若是純中文 `.commit` 候選則強制全形，
-否則強制半形。buffer 為空時，`punctuationUsesFullWidthBeforeCursor(in:)`
-會透過
-`IMKTextInput.selectedRange()` 及
-`attributedSubstring(from:)` 讀取游標前最多 64 個
-UTF-16 單位，並由後往前尋找最近的有效語境字元。空白及換行會略過；
-中文字會令標點預設全形，ASCII 英文字母及數字會令標點預設半形，遇到
-句末或標點分隔符則停止掃描。因此聽寫或貼上文字後再輸入標點亦可跟隨
-目標文字框內容。
-
-HybridIME 自己提交文字時，`setNextPunctuationContext(from:)` 會設定一次性的
-`nextPunctuationUsesFullWidth`。中文提交會令下一個標點偏全形，ASCII 英文或
-數字提交會令下一個標點偏半形；`beginPunctuationSelection` 讀取後立即清除，
-避免舊語境影響之後的聽寫輸入。
-
-若目標應用程式不支援讀取游標前文字，標點預設使用半形；文件開頭沒有前文時
-亦使用半形。直接鍵入數字時，HybridIME 會在 pass-through 前透過
-`punctuationUsesFullWidthForPassthroughInput(_:)` 設定
-`lastPassthroughPunctuationUsesFullWidth = false`，讓下一個標點即使讀不到
-目標文字框內容仍使用半形；字母輸入會進入 HybridIME buffer，不使用這個
-pass-through fallback，避免倉頡碼被誤記為英文語境。此狀態會在建立標點
-候選或開始新的字母 buffer 後立即清除。
-
-`isChinese(_:)` 檢查 CJK Unified Ideographs、Extension A 至 H、Compatibility Ideographs 及 `〇`：
-
-- 游標前為中文字：一般第一候選為全形，第二候選為半形；設有半形 `chineseDefault` 的符號（包括 `&`）維持半形首選。
-- 其他情況：第一候選為半形，第二候選為全形。
-
-第一候選會立即透過 `insertText` 寫入目標 app，不建立 InputMethodKit marked text，
-因此使用者不需要按 `Space` 或 `Return`：
-
-```text
-英文後：1 ,   2 ，
-中文後：1 ，   2 ,
-```
-
-上述直接插入只會在目標文字 client 已提供有效插入位置時執行。標點分支在
-`buffer` 為空時先檢查 sender 可轉為 `IMKTextInput`，且
-`selectedRange().location != NSNotFound`；若任一條件不成立，會在改變標點、
-聯想或語境狀態前直接回傳 `false`，把原始按鍵交回目標 app。這讓 Google Sheets
-等網頁文字 client 在只有 cell selection、尚未進入文字編輯模式時，可用第一個
-符號按鍵建立編輯 session，而不會被 HybridIME 提前消耗。已有組字 `buffer` 時
-不套用此 guard，仍會先提交現有組字，再按原有流程輸出標點。
-
-`beginPunctuationSelection` 會透過 InputMethodKit 傳入的 `IMKTextInput` client
-讀取插入前的 `selectedRange()`，保存已輸出標點的文件範圍。選取其他候選時，
-`replacePendingPunctuation(with:to:)` 會使用同一個 `IMKTextInput` 驗證目前游標及
-原有文字，再以 `insertText(_:replacementRange:)` 原位替換。此流程不能假設
-sender 同時符合 `NSTextInputClient`，否則無法建立待替換範圍，`Shift + 數字`
-便只會關閉候選而不會更改已輸出的標點。
-
-標點候選狀態的按鍵行為：
-
-| 按鍵 | 行為 |
-| --- | --- |
-| 繼續輸入文字、數字或另一標點 | 關閉舊候選，再處理新按鍵 |
-| `Return` 或 `Space` | 關閉候選，並讓目標 app 照常處理按鍵 |
-| `Shift + 1` 至 `Shift + 0` | 將已輸出的標點原位替換成第一至第十個候選 |
-| `Delete` | 關閉候選，並讓目標 app 刪除已輸出的標點 |
-| `Esc` | 關閉候選，保留已輸出的標點 |
-
-標點狀態下，普通數字永遠視為後續輸入，不作候選快捷鍵。輸入數字時會關閉
-候選，再讓該數字以普通文字輸入，因此 `$123`、`1.23`、
-`123-456` 及 `abc=123` 都不需要在標點後額外按 Space。若要選擇標點候選，
-必須使用 `Shift + 數字`，例如 `$` 後按 `Shift + 2` 會提交 `¥`，`.` 後
-按 `Shift + 2` 會提交 `。`，`-` 後按 `Shift + 2` 會提交 `－`。候選窗會以
-`shiftKeyCandidateText` 顯示 `Shift：1 ...` 提示，避免與普通數字輸入混淆。
-
-## 4. 候選視窗
-
-`CandidateWindowController` 使用無邊框、不可成為 key/main window 的
-`CandidatePanel`。這避免候選窗在顯示或按 `Esc` 關閉時搶走目標輸入框焦點。
-
-視窗特性：
-
-- 層級為 `.statusBar`。
-- 可顯示於所有 Spaces 及全螢幕應用程式。
-- 不接收滑鼠事件。
-- 使用 `NSVisualEffectView` 的 `.menu` 材質。
-- 第一列在完整字碼命中時顯示最多十個帶數字的候選。
-- 英文翻譯候選使用次要文字顏色，與中文候選區分。
-- 智能預測候選及最近選擇的第一個聯想候選會以藍色文字顯示。
-- 第二列顯示每個鍵位對應的倉頡字母。
-- 第三列顯示實際輸入的英文字母碼。
-- 標點模式只顯示半形及全形候選列；部分易混淆符號可使用「半/全」顯示標籤。
-- 聯想模式只顯示帶數字的聯想候選列，不顯示倉頡字根及輸入碼。
-
-當完整字碼尚未命中時，候選列會隱藏，但倉頡字母及英文碼會持續顯示。例如：
-
-```text
-m     → 一
-mr    → 一口
-mrs   → 一口尸
-mrsq  → 一口尸手
-mrsqf → 一口尸手火
-```
-
-`mrsqf` 命中「碼」後，視窗內容為：
-
-```text
-1 碼
-一口尸手火
-mrsqf
-```
-
-鍵位對照由 `CandidateWindowController.cangjieRoots(for:)` 定義：
-
-```text
-a 日  b 月  c 金  d 木  e 水  f 火  g 土
-h 竹  i 戈  j 十  k 大  l 中  m 一  n 弓
-o 人  p 心  q 手  r 口  s 尸  t 廿  u 山
-v 女  w 田  x 難  y 卜  z 重
-```
-
-位置由目標應用程式的 `IMKTextInput.attributes` 提供。正常情況下，視窗位於插入點上方；空間不足時改為顯示於下方。若無法取得插入點位置，則顯示於主螢幕中央附近。
-
-## 5. 倉頡碼表
-
-### 5.1 上游來源
-
-Rime 相關 repository 分工如下：
-
-- [https://github.com/rime/home](https://github.com/rime/home)
-  - Rime 專案首頁。
-  - 提供專案介紹、文件及其他 repository 的入口。
-  - 不直接存放 HybridIME 使用的倉頡字碼表。
-
-- [https://github.com/rime/rime-cangjie](https://github.com/rime/rime-cangjie)
-  - Rime 倉頡輸入方案 repository。
-  - 存放 `cangjie5.base.dict.yaml`、`cangjie5.extended.dict.yaml` 等方案及碼表。
-  - 查詢碼表內容、版本及 Git 修改歷史時，應以此 repository 為準。
-
-GitHub repository 的最近更新日期不一定等於個別碼表的最後修改日期。查詢指定檔案的最後 commit 可使用：
-
-```text
-https://api.github.com/repos/rime/rime-cangjie/commits?path=cangjie5.base.dict.yaml&per_page=1
-https://api.github.com/repos/rime/rime-cangjie/commits?path=cangjie5.extended.dict.yaml&per_page=1
-```
-
-### 5.2 基礎與擴展碼表
-
-`CangjieDecoder.resourceName` 指向運行時碼表：
-
-```swift
-"hybrid-cangjie5.dict"
-```
-
-實際載入檔案：
-
-```text
-HybridIME/CangjieData/hybrid-cangjie5.dict.tsv
-```
-
-此檔由 `Scripts/build_hybrid_cangjie_dict.swift` 生成，來源包括：
-
-- `cangjie5.base.dict.yaml`：一般及較常用的倉頡五代單字。
-- `cangjie5.extended.dict.yaml`：罕用字、異體字及 Unicode CJK 擴展區漢字。
-
-生成時先載入 base，再載入 extended，因此同碼候選通常保留 base 的優先次序。
-重複候選會被移除，並保留第一次出現的位置。
-
-`hybrid-cangjie5.dict.tsv` 格式：
-
-```text
-code	candidate...
-```
-
-解析器只接受：
-
-- 單一 Swift `Character`
-- 非空白倉頡碼
-- 完全由 ASCII 小寫字母組成的倉頡碼
-
-原始 Rime `.dict.yaml` 仍保留於專案內，作為重新生成合併碼表時的來源；輸入法運行時不再直接讀取它們。
-
-## 6. 本地改碼記錄
-
-Apple 沒有公開 macOS 內建倉頡碼表或解碼 API。因此已確認的 macOS 差異直接寫入：
-
-```text
-HybridIME/CangjieData/hybrid-cangjie5.dict.tsv
-```
-
-曾經修改過的倉頡碼由以下檔案手動記錄：
-
-```text
-HybridIME/CangjieData/cangjie-change-log.tsv
-```
-
-`cangjie-change-log.tsv` 只作記錄用途，輸入法運行時不會讀取。格式為：
-
-```text
-character	old_code	new_code
-```
-
-## 7. 缺字過濾
-
-擴展碼表可能包含本機 macOS 字型無法顯示的 Unicode 字元。這些字元通常由 Core Text 的 `LastResort` 字體顯示為中間帶問號的方框。
-
-`CangjieDecoder` 在候選即將顯示時：
-
-1. 使用 `CTFontCreateForString` 尋找可顯示該字元的替代字體。
-2. 排除 PostScript 名稱為 `LastResort` 的字體。
-3. 使用 `CTFontGetGlyphsForCharacters` 確認至少存在有效 glyph。
-4. 使用 `NSCache` 快取每個字元的結果。
-5. 略過沒有可用字形的候選，繼續尋找下一個候選，直至取得指定數量。
-
-檢查採用延遲執行，並不在載入約 79,000 行碼表時逐字處理，因此不會大幅增加輸入法啟動時間。
-
-## 8. 碼表更新流程
-
-建議更新步驟：
-
-1. 查看 `rime/rime-cangjie` 中兩個碼表的最新 commit。
-2. 閱讀上游授權及變更內容。
-3. 取代本地 `base` 及 `extended` 檔案。
-4. 重新生成合併碼表：
-
-```sh
-swift Scripts/build_hybrid_cangjie_dict.swift \
-  HybridIME/CangjieData/cangjie5.base.dict.yaml \
-  HybridIME/CangjieData/cangjie5.extended.dict.yaml \
-  HybridIME/CangjieData/hybrid-cangjie5.dict.tsv
-```
-
-5. 按 `cangjie-change-log.tsv` 重新套用本地改碼。
-6. 建置 HybridIME。
-7. 驗證常用倉頡碼、超過五碼的英文輸入及數字候選選擇。
-8. 驗證缺字候選不會顯示為方框問號。
-9. 驗證英文後預設半形標點、中文後預設全形標點，以及第二候選切換。
-10. 重新安裝、註冊及啟用輸入來源。
-
-日常已確認的 macOS 字碼修正可直接修改 `hybrid-cangjie5.dict.tsv`。
-不建議直接修改上游 `.dict.yaml`，因為重新下載 Rime 檔案時會覆蓋本地修改。
-
-## 9. 中英雙向字典
-
-`BilingualDictionary` 載入：
-
-```text
-HybridIME/DictionaryData/cedict-index.tsv
-```
-
-索引由 CC-CEDICT 生成，格式為：
-
-```text
-e	English key	繁體候選...
-z	繁體詞語	English candidate...
-```
-
-`e` 是英文至繁體中文索引，`z` 是繁體中文至英文索引。產生器會：
-
-1. 使用 CC-CEDICT 的繁體詞頭。
-2. 把英文釋義轉為小寫並移除括號內補充說明。
-3. 排除過長、含非英文符號或超過四個單詞的釋義。
-4. 英文至中文索引同時保留原詞組及移除 `to`、`a`、`an`、`the`
-   後的常用查詢鍵。
-5. 中文至英文候選只保留移除上述前綴後的詞典形式，例如使用 `survey`
-   而不是 `to survey`，並排除重複。
-6. 每個查詢鍵最多保留十個不重複候選。
-
-本地候選排序放在：
-
-```text
-HybridIME/DictionaryData/dictionary-overrides.tsv
-```
-
-支援 `add-e` 及 `add-z`，把候選依欄位次序移至指定英文或中文查詢鍵的
-最前方。`replace-e` 及 `replace-z` 則完全取代指定方向的候選。此檔案
-不由生成器改寫。
-
-重新生成：
-
-```sh
-curl -L https://www.mdbg.net/chinese/export/cedict/cedict_1_0_ts_utf-8_mdbg.txt.gz \
-  -o /tmp/cedict_1_0_ts_utf-8_mdbg.txt.gz
-gunzip -c /tmp/cedict_1_0_ts_utf-8_mdbg.txt.gz > /tmp/cedict_ts.u8
-swift Scripts/build_cedict_index.swift \
-  /tmp/cedict_ts.u8 \
-  HybridIME/DictionaryData/cedict-index.tsv
-```
-
-重新生成後，必須根據 `/tmp/cedict_ts.u8` header 同步更新
-`HybridIME/DictionaryData/NOTICE-CC-CEDICT.txt` 的 `Date` 及 `Entries`，
-再 build、安裝到 `~/Library/Input Methods/HybridIME.app` 並終止
-`HybridIME` process。
-
-完整英文鍵的中文翻譯候選排在倉頡候選之前，Space 維持輸出原英文。
-中文至英文方向會在倉頡中文候選後顯示英文翻譯；若翻譯來自游標前中文
-與當前候選組成的詞語，選取英文時會透過 `replacementRange` 一併替換
-該中文前綴及目前 marked text。
-
-當同一組字母同時命中倉頡碼與英文詞典時，完整排序是：
-
-1. 倉頡中文候選。
-2. 每個倉頡候選的英文翻譯。
-3. 英文查中文候選。
-
-例如 `oh` 先命中倉頡「入」，再顯示「入」的英文翻譯，最後顯示本地
-`replace-e` 規則指定的「噢」。
-
-## 10. 中英文聯想資料
-
-### 10.1 中文聯想
-
-中文資料來源為 [Rime Essay](https://github.com/rime/rime-essay)，即 Rime
-的共享詞彙表及語言模型。生成器讀取詞語及權重，把每個純中文字詞拆成：
-
-```text
-context	completion	weight...
-```
-
-例如「測試」生成 `測 → 試`，「測試結果」可生成
-`測試 → 結果`。每個上下文最多保留十個候選，按累計權重排序；詞語最長
-八字，接續內容最長四字。
-
-```sh
-swift Scripts/build_chinese_associations.swift \
-  /path/to/essay.txt \
-  HybridIME/AssociationData/chinese-associations.tsv
-```
-
-### 10.2 英文聯想
-
-英文資料只使用 Tatoeba 英文 CC0 句子匯出。生成器把句子正規化為小寫
-英文單詞，統計相鄰單詞 bigram：
-
-```text
-context	completion	count...
-```
-
-每個英文詞最多保留十個下一詞候選，按出現次數排序。
-
-```sh
-swift Scripts/build_english_associations.swift \
-  /path/to/eng_sentences_CC0.tsv \
-  HybridIME/AssociationData/english-associations.tsv
-```
-
-### 10.3 查詢與學習
-
-靜態中文查詢由完整上下文開始逐字縮短，使用最長可命中的 Rime 後綴；
-英文查詢使用最後一個英文單詞。每次實際選擇聯想後，
-`recordSelection` 會保存次數及最近選擇。最近選擇透過記憶體快取立即
-排到第一，並持久化至 `UserDefaults`，下次相同情境仍會優先顯示。
-
-連續中文學習會記錄每個實際提交中文字的前文，最多取最近 8 個中文字作為
-情境鍵。本機學習只查找目前完整的情境後綴，不逐級退回較短的已學習情境，
-避免過度泛化；學習候選可與 Rime 靜態聯想合併。學習序列沒有下一字時，
-仍會使用 Rime 的最長後綴聯想。英文、標點、`Esc`、重設及 Command、
-Control、Option 快捷鍵會中斷連續中文情境。
-
-App 只載入生成後的索引，不打包 Rime Essay 或 Tatoeba 原始語料。
-
-## 11. 建置及安裝
-
-命令列建置：
-
-```sh
-xcodebuild \
-  -project HybridIME.xcodeproj \
-  -scheme HybridIME \
-  -configuration Debug \
-  -derivedDataPath /tmp/HybridIMETraditionalDerivedData \
-  -allowProvisioningUpdates \
-  build
-```
-
-安裝位置：
-
-```text
-~/Library/Input Methods/HybridIME.app
-```
-
-開發測試時，`xcodebuild` 只會產生 DerivedData 內的 `HybridIME.app`；macOS 實際載入的是 `~/Library/Input Methods/HybridIME.app`。每次測試新版都要先覆蓋此安裝位置，再終止 `HybridIME` process，否則會繼續測到舊版。
-
-安裝後可透過「系統設定 > 鍵盤 > 文字輸入」加入及啟用「中英混合」。開發時如需以 Carbon Text Input Source API 重新註冊，應由外部安裝命令執行一次，不應放在應用程式啟動流程。
-
-若曾修改 bundle identifier、input source ID 或 input mode ID，即使 `lsregister`、`killall TextInputMenuAgent`、`killall TextInputSwitcher` 及 `killall imklaunchagent` 已執行，System Settings 仍可能看不到輸入法。實測需要重新開機後，macOS 才會刷新 Text Input / LaunchServices cache 並列出「中英混合」。
-
-重新開機後亦可能出現輸入來源已選中、HybridIME process 存在，但按鍵完全
-沒有反應的狀態。若 unified log 顯示 `unrecognized
-'InputMethodConnectionName' value` 或 `NO Endpoint`，表示 InputMethodKit 未能
-取得輸入法 XPC endpoint。先強制註冊正式安裝位置，再重啟輸入法及選單代理：
+Build output alone does not validate the installed input source. For an installed signed app that is selected but unresponsive, inspect unified logs for `NO Endpoint` or an unrecognized `InputMethodConnectionName`. A development recovery sequence is:
 
 ```sh
 /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister \
@@ -618,47 +165,252 @@ killall TextInputMenuAgent
 open "$HOME/Library/Input Methods/HybridIME.app"
 ```
 
-修復後應在 log 看到 `Received setIMKXPCEndpoint` 及 `Activate Server`。僅確認
-HybridIME process 正在執行並不足以證明輸入事件連線正常。
+Successful recovery still requires a real text client check; process existence is insufficient. These commands change local runtime state and are not part of ordinary unsigned build validation.
 
-建置需要可用的 Apple Development 憑證。這不代表必須加入付費 Apple Developer Program；免費 Apple ID 亦可由 Xcode 建立個人開發憑證，但憑證及簽署限制可能不同。
+### Lexicon wrappers
 
-## 12. 已知限制
+macOS `StaticLexicon` opens the database read-only with `SQLITE_OPEN_FULLMUTEX`, enables `query_only`, batches up to 32 keys and keeps a 256-entry FIFO cache. iOS `OfflineLexicon` uses read-only `SQLITE_OPEN_NOMUTEX` on the main actor and a 128-entry FIFO cache.
 
-- 無法直接讀取或調用 Apple 的系統倉頡解碼器。
-- 與 macOS 倉頡的一致性取決於 `hybrid-cangjie5.dict.tsv` 已收錄的差異。
-- 候選視窗目前只顯示單頁最多十個候選，沒有翻頁功能。
-- 字形可用性取決於目前 macOS 版本及已安裝字體。
-- 目標應用程式若未提供正確插入點位置，候選視窗只能使用備用位置。
-- 英文翻譯使用精確完整詞匹配，暫不支援模糊搜尋、詞形還原或句子翻譯。
-- 中文至英文翻譯依賴目標應用程式正確提供 marked range、selection 及
-  `attributedSubstring`；不完整支援 `NSTextInputClient` 的應用程式可能
-  只能使用當前單字翻譯。
-- 英文聯想資料來自較小的 CC0 子集，罕見詞的候選可能不足。
-- 聯想目前沒有設定介面或清除個人學習資料的按鈕。
+All table and column names passed into SQL helpers are internal constants. User-derived keys are bound parameters.
 
-## 13. 授權與歸屬
+### Platform controllers
 
-Rime 倉頡資料的來源及授權聲明位於：
+`InputMethodController` is the macOS composition and event owner. `KeyboardViewController` is both the iOS UI and state-machine owner, including key layout, Emoji catalog, candidates, punctuation, association context, cursor gestures, colors and return-key labels. The large iOS controller is a current coupling point.
 
-```text
-HybridIME/CangjieData/LICENSE-Rime-Cangjie.txt
-HybridIME/CangjieData/NOTICE.txt
+## 6. Data Models and State Management
+
+Important transient state includes buffer text, candidate action arrays, selected association context, punctuation replacement metadata and most-recent prediction. Both controllers confine UI state to the main actor／platform main thread.
+
+Candidate actions preserve behavior boundaries:
+
+- Cangjie commit: eligible for smart learning.
+- Raw English commit: preserves typed case and may replace learning for that code.
+- Dictionary commit: English-to-Chinese result, not smart-learned as a Cangjie choice.
+- Translation: Chinese-to-English result and optional preceding-prefix replacement.
+- Association: records association selection and continues the chain.
+
+### Static database
+
+`hybridime-lexicon.sqlite3` schema version is `1`. It is bundled and opened read-only. It contains no user data.
+
+### User learning databases
+
+macOS and iOS stores independently create:
+
+- `smart_candidate(code, candidate, last_used)`.
+- `association_selection(language, context, candidate, selection_count, last_selected)`.
+- `learned_chinese(context, candidate, position)`.
+
+They use WAL, `synchronous=NORMAL`, `SQLITE_OPEN_FULLMUTEX` and schema version `1`. Files are named `hybridime-user-learning.sqlite3` under the target container's user-domain Application Support `HybridIME/` directory.
+
+There is no migration from legacy `UserDefaults` smart／association keys and no cross-target App Group. macOS and keyboard learning therefore remain separate. There is no cache invalidation because the static lexicon is immutable for the lifetime of the process.
+
+## 7. Important Logic and Algorithms
+
+### Cangjie
+
+The runtime table maps lowercase ASCII codes to ordered single-character candidates. Duplicate values are removed per code. Base and extended Rime source files can be combined using `Scripts/build_hybrid_cangjie_dict.swift`; local corrections live in the generated runtime TSV and are manually recorded in `HybridIME/CangjieData/cangjie-change-log.tsv`.
+
+Both decoders use Core Text to reject candidates whose replacement font is `LastResort` or has no nonzero glyph. Availability is cached by character. Results depend on OS fonts and are not a universal Unicode support guarantee.
+
+### Smart candidate ranking
+
+The normalized lowercase code maps to timestamped candidate selections. Prediction scans newest records and selects the first value still present in the current allowed candidates. This is recency-based, not a probability, percentage or contextual language model.
+
+Choosing raw English via macOS `Shift + Space` or iOS non-lowercase Shift state plus Space replaces all learned candidates for that code with the exact-case raw string.
+
+### Punctuation
+
+Both platforms determine context from recent non-whitespace characters, stopping at sentence punctuation. Chinese characters cover common CJK Unified, Compatibility and Extension scalar ranges. Certain characters intentionally remain half-width first in Chinese context; currency, slash, bracket and arrow alternatives have fixed candidate lists.
+
+macOS inserts a default punctuation candidate as marked text and validates client selection／range before replacing it. iOS inserts immediately and validates the exact preceding suffix before delete-and-replace.
+
+### Cursor movement on iOS
+
+Long-press Space enters a trackpad overlay. Horizontal distance is divided by a 5-point threshold and passed to `adjustTextPosition`. Vertical movement first uses actual newline context and a preferred column; when no logical newline is visible, it estimates ten characters per line. The fallback is intentionally approximate.
+
+## 8. External Dependencies
+
+| Dependency | Purpose | Version source | Required |
+| --- | --- | --- | --- |
+| AppKit + InputMethodKit | macOS service, events and candidate window | Platform SDK | macOS only |
+| UIKit | Custom keyboard and text proxy | Platform SDK | iOS keyboard |
+| SwiftUI | iOS host instructions | Platform SDK | iOS host |
+| Foundation | Files, strings, bundle and lifecycle helpers | Platform SDK | All targets |
+| CoreText | Glyph availability checks | Platform SDK | Both input targets |
+| SQLite3 | Bundled lexicon and learning stores | System library; no package version pinned | Both input targets |
+| Rime Cangjie data | Cangjie code table | Commit recorded in notice | Runtime data |
+| CC-CEDICT | Bilingual index | Date／entry count recorded in notice | Runtime data |
+| Rime Essay | Chinese association weights | Notice, no package dependency | Generated data |
+| Tatoeba English CC0 export | English bigrams | Notice, no package dependency | Generated data |
+
+No unofficial runtime endpoint is called. External URLs in notices identify dataset sources only and do not prove current availability.
+
+## 9. Configuration
+
+### Targets
+
+| Target | Product | Bundle ID | Deployment | Version |
+| --- | --- | --- | --- | --- |
+| `HybridIME` | macOS app / input method | `com.sunny.inputmethod.hybridime` | macOS 26.0 | 1.2.0 (build 20260821) |
+| `HybridIMEiOS` | iOS／iPadOS app | `com.sunny.inputmethod.hybridime.ios` | iOS 26.0 | 1.2.0 (build 20260821) |
+| `HybridIMEKeyboard` | keyboard extension | `com.sunny.inputmethod.hybridime.ios.keyboard` | iOS 26.0 | 1.2.0 (build 20260821) |
+
+All targets set Swift language version 5.0. The project has no `.xcconfig`, `.swift-version`, `.xcode-version`, CI matrix or package lockfile. Metadata records Xcode 26.5／26.6 creation or upgrade, but that is not a formal minimum-Xcode declaration.
+
+### macOS Info.plist and entitlements
+
+Important names are `InputMethodConnectionName=com.sunny.inputmethod.hybridime_Connection`, input mode ID `com.sunny.inputmethod.hybridime.input`, `zh-Hant` language and US keyboard layout. Debug uses `HybridIME/HybridIMEDebug.entitlements` with `get-task-allow`; Release has no entitlement file. Both configurations disable App Sandbox and enable hardened runtime.
+
+### Keyboard Info.plist
+
+The extension point is `com.apple.keyboard-service`, principal class is `KeyboardViewController`, primary language is `zh-Hant`, `IsASCIICapable=true` and `RequestsOpenAccess=false`.
+
+### Environment variables
+
+Runtime source reads no environment variables. `Scripts/release.sh` recognizes `HYBRIDIME_NOTARY_PROFILE`, `HYBRIDIME_RESUME_AFTER_APP_NOTARIZATION` and `HYBRIDIME_RELEASE_ROOT_OVERRIDE`; these are release-only controls. The notary profile names a Keychain item and must not be documented as a secret value.
+
+The release script is currently **Inactive** for version 1.2.0 because its fixed `HYBRIDIME_VERSION=1.1.2` conflicts with project settings; preflight is designed to fail on that mismatch.
+
+## 10. Error Handling and Logging
+
+- Missing Cangjie or static lexicon resources are logged with `NSLog`; lookups degrade to empty results and raw English remains available.
+- Failure to create or open the learning database is logged and learning operations become no-ops／empty queries.
+- Invalid TSV rows are skipped without per-row logging.
+- Most SQLite prepare, bind and step failures return empty values silently; there is no typed public error model, retry or backoff.
+- macOS missing server identifiers asserts in Debug and does not create `IMKServer`.
+- Candidate replacement checks current host range／suffix and fails closed when text state is stale.
+- There is no user-facing error banner, diagnostics screen, log redaction layer or automatic recovery UI.
+
+Logged errors contain resource names or local error descriptions; source does not intentionally log typed text, candidates or credentials.
+
+## 11. Security and Privacy
+
+- Runtime is offline and has no authentication, token, Keychain, TLS, WebView, cloud or analytics code.
+- iOS requests no open access and has no App Group entitlement; extension storage stays in its own container.
+- Static SQLite is read-only; learning SQLite is local but not application-level encrypted.
+- macOS App Sandbox is disabled as part of the current InputMethodKit target configuration. Hardened runtime is enabled, but this task does not equate the setting with a verified signed release.
+- SQL lookup values use prepared bindings. Dataset table／column selectors are internal fixed strings.
+- Host text is read only as needed for candidate context and replacement guards; source has no upload path.
+- There is no UI to inspect or clear learning data, and no documented retention limit for distinct codes／contexts. Only candidates per learned Chinese context are capped.
+- Release signing, notarization, stapling and Gatekeeper checks exist in `Scripts/release.sh`, but current version mismatch prevents claiming a release-ready path and none of those external validations are run as part of ordinary development.
+
+## 12. Testing
+
+The Xcode project has no test target. Test coverage is provided by standalone scripts:
+
+| Harness | Coverage | External service |
+| --- | --- | --- |
+| `Scripts/test_static_lexicon.swift` | Bilingual lookup, batched longest match, Chinese／English association fixtures | None |
+| `Scripts/test_user_learning_store.swift` | macOS learning schema and read/write behavior | None; temporary SQLite |
+| `Scripts/test_mac_dictionary.swift` | macOS lexicon + association integration and learning reorder | None; temporary SQLite |
+| `Scripts/test_keyboard_user_learning_store.swift` | iOS learning schema, replacement and integrity | None; temporary SQLite |
+| `Scripts/verify_static_lexicon.py` | Integrity and complete source-to-database equality | None; opens bundled DB read-only |
+
+Representative commands use only `/tmp` outputs:
+
+```sh
+python3 Scripts/verify_static_lexicon.py
+
+swiftc -module-cache-path /tmp/hybridime-module-cache-static \
+  HybridIME/StaticLexicon.swift Scripts/test_static_lexicon.swift \
+  -lsqlite3 -o /tmp/hybridime-test-static
+/tmp/hybridime-test-static HybridIMEKeyboard/LexiconData/hybridime-lexicon.sqlite3
+
+swiftc -module-cache-path /tmp/hybridime-module-cache-learning \
+  HybridIME/UserLearningStore.swift Scripts/test_user_learning_store.swift \
+  -lsqlite3 -o /tmp/hybridime-test-learning
+/tmp/hybridime-test-learning
+
+swiftc \
+  -module-cache-path /tmp/hybridime-module-cache-mac \
+  HybridIME/StaticLexicon.swift \
+  HybridIME/UserLearningStore.swift \
+  HybridIME/BilingualDictionary.swift \
+  HybridIME/AssociationDictionary.swift \
+  Scripts/test_mac_dictionary.swift \
+  -lsqlite3 -o /tmp/hybridime-test-mac-dictionary
+/tmp/hybridime-test-mac-dictionary \
+  HybridIMEKeyboard/LexiconData/hybridime-lexicon.sqlite3
+
+swiftc -module-cache-path /tmp/hybridime-module-cache-keyboard \
+  HybridIMEKeyboard/KeyboardUserLearningStore.swift \
+  Scripts/test_keyboard_user_learning_store.swift \
+  -lsqlite3 -o /tmp/hybridime-test-keyboard-learning
+/tmp/hybridime-test-keyboard-learning
 ```
 
-更新或重新發佈碼表時，必須保留適用的第三方授權及歸屬聲明。
+### Verified in this task
 
-CC-CEDICT 衍生索引的來源及 CC BY-SA 4.0 授權聲明位於：
+This section is updated from commands actually executed during the current documentation task; build and test presence alone is not treated as success.
 
-```text
-HybridIME/DictionaryData/LICENSE-CC-CEDICT.txt
-HybridIME/DictionaryData/NOTICE-CC-CEDICT.txt
-```
+- `xcodebuild -list` found all three targets and schemes. The sandboxed invocation also reported unavailable CoreSimulator services; scheme discovery still completed.
+- SQLite read-only inspection returned `integrity_check=ok`, `user_version=1`, 177,594 bilingual rows and 244,887 association rows.
+- `python3 Scripts/verify_static_lexicon.py` passed complete bilingual and association source equality checks.
+- All four standalone harnesses passed: `StaticLexicon`, `UserLearningStore`, macOS dictionary integration and `KeyboardUserLearningStore`. Their binaries and temporary databases were created under `/tmp`; the restricted environment required the compiler module cache to be redirected to `/tmp`.
+- The unsigned macOS Debug build passed for arm64 and x86_64. The built app reports version 1.2.0 (build 20260821), contains schema-version-1 SQLite with `integrity_check=ok`, and packages the expected generated lexicon instead of the excluded raw bilingual／association TSV files.
+- The unsigned generic iOS Simulator Debug build passed for `HybridIMEiOS` and its `HybridIMEKeyboard` dependency. Both products report version 1.2.0; the embedded extension contains the Cangjie TSV, notices and schema-version-1 SQLite with `integrity_check=ok`.
+- `git diff --check`, plist／entitlement lint and Markdown code-fence checks passed after the documentation edits.
 
-聯想資料的來源及授權聲明位於：
+### Externally unverified
 
-```text
-HybridIME/AssociationData/LICENSE-Rime-Essay.txt
-HybridIME/AssociationData/NOTICE-Rime-Essay.txt
-HybridIME/AssociationData/NOTICE-Tatoeba-CC0.txt
-```
+- Installed macOS InputMethodKit registration, endpoint and real text entry.
+- Candidate positioning and replacement across third-party macOS clients.
+- iOS Simulator／physical-device keyboard activation, memory usage and host compatibility.
+- Signing, archive, notarization, DMG, GitHub release or App Store behavior.
+
+## 13. Known Limitations and Technical Debt
+
+- `HybridIME/StaticLexicon.swift`, both SQLite learning-store changes and their harnesses are currently uncommitted／untracked working-tree work; verification must be tied to the current checkout.
+- There is no migration from old `UserDefaults` learning data to schema version 1 SQLite.
+- macOS and iOS duplicate decoder, dictionary, association, ranking and punctuation concepts rather than importing a shared core.
+- `HybridIME/InputMethodController.swift` and especially `HybridIMEKeyboard/KeyboardViewController.swift` centralize many state-machine and UI responsibilities.
+- Static lexicon cache eviction is FIFO, not LRU, and there is no memory-pressure response.
+- Cangjie TSV is still parsed into memory; the SQLite migration covers bilingual and association data only.
+- macOS resource preload has no readiness state, progress UI or retry.
+- iOS replacement depends on host context and immediate insert/delete behavior rather than marked-text composition.
+- iOS has no implemented next-keyboard control (`advanceToNextInputMode`／`handleInputModeList`).
+- iOS vertical cursor fallback estimates ten characters per line and cannot know visual wrapping.
+- No settings UI clears learning data; record cardinality has no global bound or pruning policy.
+- SQLite execution errors are mostly silent and there are no migrations beyond initial schema creation.
+- No XCTest, UI tests, CI, lint, formatter, performance tests or extension memory-budget tests are configured.
+- `Scripts/release.sh` version 1.1.2 conflicts with project 1.2.0 and is intentionally fail-fast rather than usable as-is.
+- Project signing contains an owner-specific development team, reducing checkout portability until another developer selects their team.
+- Repository has no project-wide source-code license.
+
+## 14. Design Decisions
+
+- **Offline first:** bundled data and local learning avoid network dependency and allow the iOS keyboard to operate without full access.
+- **SQLite for large indexes:** bilingual and association payloads remain compact, queryable and bounded by small caches instead of eager TSV-to-object loading.
+- **Raw Cangjie TSV retained:** preserves ordered table maintenance and existing upstream／local correction workflow at the cost of startup parsing.
+- **Fail-closed text replacement:** range／suffix guards prefer refusing a replacement over deleting host content after stale state.
+- **Platform adapters remain separate:** InputMethodKit and `UITextDocumentProxy` have different lifecycle and text-edit contracts; current duplication keeps those differences explicit but increases maintenance cost.
+- **Recency-based learning:** predictable latest-choice behavior is simpler than an opaque statistical model, but it does not use surrounding language context.
+- **No automatic macOS registration on startup:** installation and Text Input registration remain external so every launch does not attempt to enable the input source.
+- **Release preflight stops on drift:** version, identifier, resource, signature and notarization checks are designed to fail rather than publish inconsistent artifacts.
+
+## 15. Future Development
+
+The following are **Planned / Not implemented** recommendations derived from current extension points, not a committed roadmap:
+
+- Extract platform-neutral decoding, lexicon, association, ranking and punctuation policies into a shared Swift module while retaining separate IMK and keyboard adapters.
+- Add explicit schema migration from legacy `UserDefaults` and future SQLite versions before changing `PRAGMA user_version`.
+- Add a next-input-mode key using `needsInputModeSwitchKey` and supported `UIInputViewController` switching APIs.
+- Split `KeyboardViewController` into composition, persistence, candidate presentation and key-layout components.
+- Add XCTest targets and fixture bundles around current standalone cases, plus iOS extension memory／startup and host-context tests.
+- Add user controls to clear learning data and a bounded retention／pruning policy.
+- Expose resource readiness and diagnostic state without logging typed text.
+- Synchronize release metadata only as a separately approved release-preparation change; preserve current fail-fast signature, notarization and resource boundaries.
+
+Any refactor must preserve offline operation, parameterized SQLite values, platform container separation, fail-closed host replacement and third-party attribution files.
+
+## License and Attribution
+
+No project-wide `LICENSE` was found, so this document makes no claim about source-code redistribution rights.
+
+Bundled datasets retain separate terms:
+
+- Rime Cangjie: see `HybridIME/CangjieData/LICENSE-Rime-Cangjie.txt` and `HybridIME/CangjieData/NOTICE.txt`.
+- CC-CEDICT: see `HybridIME/DictionaryData/LICENSE-CC-CEDICT.txt` and `HybridIME/DictionaryData/NOTICE-CC-CEDICT.txt`.
+- Rime Essay and Tatoeba: see `HybridIME/AssociationData/` notices and licenses.
+- The iOS bundled lexicon includes corresponding copies under `HybridIMEKeyboard/LexiconData/`.

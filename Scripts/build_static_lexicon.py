@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build the compact read-only lexicon used by the iOS keyboard extension."""
+"""Build the compact read-only lexicon shared by HybridIME targets."""
 
 from __future__ import annotations
 

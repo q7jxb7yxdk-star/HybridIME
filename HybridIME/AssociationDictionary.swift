@@ -13,26 +13,22 @@ final class AssociationDictionary: @unchecked Sendable {
         let isMostRecentSelection: Bool
     }
 
-    private struct WeightedCandidate {
-        let text: String
-        let weight: Int
+    private typealias WeightedCandidate = StaticLexicon.WeightedCandidate
+
+    private let lexicon: StaticLexicon
+    private let learningStore: UserLearningStore
+
+    init(bundle: Bundle = .main) {
+        lexicon = StaticLexicon(bundle: bundle)
+        learningStore = .shared
     }
 
-    private let chinese: [String: [WeightedCandidate]]
-    private let english: [String: [WeightedCandidate]]
-    private let defaults = UserDefaults.standard
-    private var recentSelections: [String: String] = [:]
-    private var learnedChineseCandidates: [String: [String]] = [:]
-
-    nonisolated init(bundle: Bundle = .main) {
-        chinese = Self.loadTable(
-            named: "chinese-associations",
-            from: bundle
-        )
-        english = Self.loadTable(
-            named: "english-associations",
-            from: bundle
-        )
+    init(
+        lexicon: StaticLexicon,
+        learningStore: UserLearningStore = .shared
+    ) {
+        self.lexicon = lexicon
+        self.learningStore = learningStore
     }
 
     func suggestions(
@@ -42,22 +38,26 @@ final class AssociationDictionary: @unchecked Sendable {
     ) -> [Suggestion] {
         guard limit > 0 else { return [] }
 
-        let lookup: (key: String, candidates: [WeightedCandidate])?
+        let staticLookup: (key: String, candidates: [WeightedCandidate])?
         switch language {
         case .chinese:
-            lookup = longestChineseMatch(for: context)
+            staticLookup = longestChineseMatch(for: context)
         case .english:
             let key = context.lowercased()
                 .split(whereSeparator: \.isWhitespace)
                 .last
                 .map(String.init) ?? ""
-            lookup = english[key].map { (key, $0) }
+            let candidates = lexicon.associationCandidates(
+                language: .english,
+                key: key
+            )
+            staticLookup = candidates.isEmpty ? nil : (key, candidates)
         }
         let learnedLookup = language == .chinese
             ? longestLearnedChineseMatch(for: context)
             : nil
         guard let lookup = preferredLookup(
-            staticLookup: lookup,
+            staticLookup: staticLookup,
             learnedLookup: learnedLookup
         ) else {
             return []
@@ -114,84 +114,71 @@ final class AssociationDictionary: @unchecked Sendable {
     }
 
     func recordSelection(_ suggestion: Suggestion) {
-        let key = learningKey(
-            language: suggestion.language,
+        learningStore.recordAssociationSelection(
+            language: suggestion.language.rawValue,
             key: suggestion.key,
-            candidate: suggestion.text
+            candidate: suggestion.text,
+            incrementingCount: true
         )
-        defaults.set(defaults.integer(forKey: key) + 1, forKey: key)
-        let recentKey = recentSelectionKey(
-            language: suggestion.language,
-            key: suggestion.key
-        )
-        recentSelections[recentKey] = suggestion.text
-        defaults.set(suggestion.text, forKey: recentKey)
 
-        if
-            suggestion.language == .chinese,
-            let lastCharacter = suggestion.key.last
+        if suggestion.language == .chinese,
+           let lastCharacter = suggestion.key.last
         {
-            let fallbackKey = recentSelectionKey(
-                language: .chinese,
-                key: String(lastCharacter)
+            learningStore.recordAssociationSelection(
+                language: Language.chinese.rawValue,
+                key: String(lastCharacter),
+                candidate: suggestion.text,
+                incrementingCount: false
             )
-            recentSelections[fallbackKey] = suggestion.text
-            defaults.set(suggestion.text, forKey: fallbackKey)
         }
     }
 
     func recordChineseSequence(context: String, continuation: String) {
-        guard
-            !context.isEmpty,
-            continuation.count == 1
-        else {
-            return
-        }
-
-        var candidates = learnedCandidates(for: context)
-        candidates.removeAll { $0 == continuation }
-        candidates.insert(continuation, at: 0)
-        if candidates.count > 10 {
-            candidates.removeLast(candidates.count - 10)
-        }
-        learnedChineseCandidates[context] = candidates
-        defaults.set(candidates, forKey: learnedCandidatesKey(context))
-
-        let recentKey = recentSelectionKey(
-            language: .chinese,
-            key: context
+        guard !context.isEmpty, continuation.count == 1 else { return }
+        learningStore.recordLearnedChinese(
+            context: context,
+            candidate: continuation
         )
-        recentSelections[recentKey] = continuation
-        defaults.set(continuation, forKey: recentKey)
+        learningStore.recordAssociationSelection(
+            language: Language.chinese.rawValue,
+            key: context,
+            candidate: continuation,
+            incrementingCount: false
+        )
     }
 
     private func longestChineseMatch(
         for context: String
     ) -> (key: String, candidates: [WeightedCandidate])? {
-        let characters = Array(context)
-        for length in stride(from: characters.count, through: 1, by: -1) {
-            let key = String(characters.suffix(length))
-            if let candidates = chinese[key] {
-                return (key, candidates)
-            }
+        let characters = Array(context.suffix(7))
+        let keys = stride(
+            from: characters.count,
+            through: 1,
+            by: -1
+        ).map { length in
+            String(characters.suffix(length))
         }
-        return nil
+        return lexicon.longestAssociationMatch(
+            language: .chinese,
+            keys: keys
+        )
     }
 
     private func longestLearnedChineseMatch(
         for context: String
     ) -> (key: String, candidates: [WeightedCandidate])? {
-        let key = String(context.suffix(8))
-        let candidates = learnedCandidates(for: key)
-        guard !candidates.isEmpty else {
-            return nil
-        }
-        return (
-            key,
-            candidates.map {
-                WeightedCandidate(text: $0, weight: 0)
+        let characters = Array(context.suffix(8))
+        for length in stride(from: characters.count, through: 1, by: -1) {
+            let key = String(characters.suffix(length))
+            let candidates = learnedCandidates(for: key)
+            if !candidates.isEmpty {
+                return (
+                    key,
+                    candidates.map { WeightedCandidate(text: $0, weight: 0) }
+                )
             }
-        )
+        }
+        return nil
     }
 
     private func preferredLookup(
@@ -199,10 +186,8 @@ final class AssociationDictionary: @unchecked Sendable {
         learnedLookup: (key: String, candidates: [WeightedCandidate])?
     ) -> (key: String, candidates: [WeightedCandidate])? {
         switch (staticLookup, learnedLookup) {
-        case (nil, nil):
-            nil
-        case (let lookup?, nil), (nil, let lookup?):
-            lookup
+        case (nil, nil): nil
+        case (let lookup?, nil), (nil, let lookup?): lookup
         case (let staticLookup?, let learnedLookup?):
             staticLookup.key.count >= learnedLookup.key.count
                 ? staticLookup
@@ -211,14 +196,7 @@ final class AssociationDictionary: @unchecked Sendable {
     }
 
     private func learnedCandidates(for key: String) -> [String] {
-        if let cached = learnedChineseCandidates[key] {
-            return cached
-        }
-        let candidates = defaults.stringArray(
-            forKey: learnedCandidatesKey(key)
-        ) ?? []
-        learnedChineseCandidates[key] = candidates
-        return candidates
+        learningStore.learnedChineseCandidates(for: key)
     }
 
     private func learnedCount(
@@ -226,102 +204,27 @@ final class AssociationDictionary: @unchecked Sendable {
         key: String,
         candidate: String
     ) -> Int {
-        defaults.integer(
-            forKey: learningKey(
-                language: language,
-                key: key,
-                candidate: candidate
-            )
+        learningStore.associationCount(
+            language: language.rawValue,
+            key: key,
+            candidate: candidate
         )
     }
 
-    private func mostRecentSelection(
-        language: Language,
-        key: String
-    ) -> String? {
-        let recentKey = recentSelectionKey(
-            language: language,
+    private func mostRecentSelection(language: Language, key: String) -> String? {
+        if let selection = learningStore.mostRecentAssociation(
+            language: language.rawValue,
             key: key
-        )
-        if let selection = recentSelections[recentKey]
-            ?? defaults.string(forKey: recentKey)
-        {
+        ) {
             return selection
         }
 
         guard language == .chinese, let lastCharacter = key.last else {
             return nil
         }
-        let fallbackRecentKey = recentSelectionKey(
-            language: .chinese,
+        return learningStore.mostRecentAssociation(
+            language: Language.chinese.rawValue,
             key: String(lastCharacter)
         )
-        return recentSelections[fallbackRecentKey]
-            ?? defaults.string(forKey: fallbackRecentKey)
-    }
-
-    private func learningKey(
-        language: Language,
-        key: String,
-        candidate: String
-    ) -> String {
-        "association.\(language.rawValue).\(key).\(candidate)"
-    }
-
-    private func recentSelectionKey(
-        language: Language,
-        key: String
-    ) -> String {
-        "association.\(language.rawValue).\(key).recent"
-    }
-
-    private func learnedCandidatesKey(_ key: String) -> String {
-        "association.chinese.\(key).learnedCandidates"
-    }
-
-    nonisolated private static func loadTable(
-        named name: String,
-        from bundle: Bundle
-    ) -> [String: [WeightedCandidate]] {
-        guard
-            let url = bundle.url(
-                forResource: name,
-                withExtension: "tsv",
-                subdirectory: "AssociationData"
-            ) ?? bundle.url(forResource: name, withExtension: "tsv"),
-            let contents = try? String(contentsOf: url, encoding: .utf8)
-        else {
-            NSLog("HybridIME could not load \(name).tsv")
-            return [:]
-        }
-
-        var table: [String: [WeightedCandidate]] = [:]
-        for line in contents.split(whereSeparator: \.isNewline) {
-            guard line.first != "#" else { continue }
-            let fields = line.split(
-                separator: "\t",
-                omittingEmptySubsequences: false
-            )
-            guard fields.count >= 3, fields.count % 2 == 1 else { continue }
-
-            let key = String(fields[0])
-            var candidates: [WeightedCandidate] = []
-            var index = 1
-            while index + 1 < fields.count {
-                if let weight = Int(fields[index + 1]) {
-                    candidates.append(
-                        WeightedCandidate(
-                            text: String(fields[index]),
-                            weight: weight
-                        )
-                    )
-                }
-                index += 2
-            }
-            if !candidates.isEmpty {
-                table[key] = candidates
-            }
-        }
-        return table
     }
 }

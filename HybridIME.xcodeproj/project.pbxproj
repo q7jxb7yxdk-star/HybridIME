@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		9655A7F73037E00D0045C799 /* HybridIMEKeyboard.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 9655A7F03037E00D0045C799 /* HybridIMEKeyboard.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		96DB00013037F0000045C799 /* HybridIMEKeyboard/LexiconData/hybridime-lexicon.sqlite3 in Resources */ = {isa = PBXBuildFile; fileRef = 96DB00003037F0000045C799 /* HybridIMEKeyboard/LexiconData/hybridime-lexicon.sqlite3 */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -38,6 +39,7 @@
 		9655A7E13037DFDA0045C799 /* HybridIMEiOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HybridIMEiOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9655A7F03037E00D0045C799 /* HybridIMEKeyboard.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = HybridIMEKeyboard.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		96BFC17F2FDBF84200364389 /* HybridIME.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HybridIME.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		96DB00003037F0000045C799 /* HybridIMEKeyboard/LexiconData/hybridime-lexicon.sqlite3 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "HybridIMEKeyboard/LexiconData/hybridime-lexicon.sqlite3"; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -47,6 +49,16 @@
 				Info.plist,
 			);
 			target = 9655A7EF3037E00D0045C799 /* HybridIMEKeyboard */;
+		};
+		96DB00023037F0000045C799 /* Exceptions for "HybridIME" folder in "HybridIME" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"AssociationData/chinese-associations.tsv",
+				"AssociationData/english-associations.tsv",
+				"DictionaryData/cedict-index.tsv",
+				"DictionaryData/dictionary-overrides.tsv",
+			);
+			target = 96BFC17E2FDBF84200364389 /* HybridIME */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
@@ -66,6 +78,9 @@
 		};
 		96BFC1812FDBF84200364389 /* HybridIME */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				96DB00023037F0000045C799 /* Exceptions for "HybridIME" folder in "HybridIME" target */,
+			);
 			path = HybridIME;
 			sourceTree = "<group>";
 		};
@@ -102,6 +117,7 @@
 				96BFC1812FDBF84200364389 /* HybridIME */,
 				9655A7E23037DFDA0045C799 /* HybridIMEiOS */,
 				9655A7F13037E00D0045C799 /* HybridIMEKeyboard */,
+				96DB00003037F0000045C799 /* HybridIMEKeyboard/LexiconData/hybridime-lexicon.sqlite3 */,
 				96BFC1802FDBF84200364389 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -249,6 +265,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				96DB00013037F0000045C799 /* HybridIMEKeyboard/LexiconData/hybridime-lexicon.sqlite3 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -308,7 +325,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1.1;
+				MARKETING_VERSION = 1.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.sunny.inputmethod.hybridime.ios;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
@@ -343,7 +360,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1.1;
+				MARKETING_VERSION = 1.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.sunny.inputmethod.hybridime.ios;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
@@ -374,7 +391,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.1.1;
+				MARKETING_VERSION = 1.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.sunny.inputmethod.hybridime.ios.keyboard;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
@@ -404,7 +421,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.1.1;
+				MARKETING_VERSION = 1.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.sunny.inputmethod.hybridime.ios.keyboard;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
@@ -570,7 +587,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 26.0;
-				MARKETING_VERSION = 1.1.2;
+				MARKETING_VERSION = 1.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.sunny.inputmethod.hybridime;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -606,7 +623,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 26.0;
-				MARKETING_VERSION = 1.1.2;
+				MARKETING_VERSION = 1.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.sunny.inputmethod.hybridime;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;

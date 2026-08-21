@@ -67,6 +67,11 @@ require_resource() {
     [[ -f "${HYBRIDIME_APP}/Contents/Resources/${resource}" ]] || fail "missing packaged resource: ${resource}"
 }
 
+require_absent_resource() {
+    local resource="$1"
+    [[ ! -e "${HYBRIDIME_APP}/Contents/Resources/${resource}" ]] || fail "obsolete packaged resource: ${resource}"
+}
+
 require_accepted_notarization() {
     local result_plist="$1"
     local artifact_name="$2"
@@ -181,13 +186,24 @@ for resource in \
     cangjie-change-log.tsv \
     cangjie5.base.dict.yaml \
     cangjie5.extended.dict.yaml \
-    cedict-index.tsv \
-    chinese-associations.tsv \
-    dictionary-overrides.tsv \
-    english-associations.tsv \
+    hybridime-lexicon.sqlite3 \
     hybrid-cangjie5.dict.tsv
 do
     require_resource "${resource}"
+done
+
+readonly HYBRIDIME_STATIC_LEXICON="${HYBRIDIME_APP}/Contents/Resources/hybridime-lexicon.sqlite3"
+[[ "$(sqlite3 "${HYBRIDIME_STATIC_LEXICON}" "PRAGMA integrity_check;")" == "ok" ]] || \
+    fail "packaged static lexicon failed SQLite integrity check"
+require_equal "$(sqlite3 "${HYBRIDIME_STATIC_LEXICON}" "PRAGMA user_version;")" "1" "static lexicon schema version"
+
+for obsolete_resource in \
+    cedict-index.tsv \
+    chinese-associations.tsv \
+    dictionary-overrides.tsv \
+    english-associations.tsv
+do
+    require_absent_resource "${obsolete_resource}"
 done
 
 codesign --verify --deep --strict --verbose=2 "${HYBRIDIME_APP}"

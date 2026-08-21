@@ -23,16 +23,16 @@ final class InputResources {
         guard !isLoading, cangjieDecoder == nil else { return }
         isLoading = true
 
+        let lexicon = StaticLexicon()
+        bilingualDictionary = BilingualDictionary(lexicon: lexicon)
+        associationDictionary = AssociationDictionary(lexicon: lexicon)
+
         Task.detached(priority: .userInitiated) {
             let cangjieDecoder = CangjieDecoder()
-            let bilingualDictionary = BilingualDictionary()
-            let associationDictionary = AssociationDictionary()
 
             await MainActor.run {
                 let resources = InputResources.shared
                 resources.cangjieDecoder = cangjieDecoder
-                resources.bilingualDictionary = bilingualDictionary
-                resources.associationDictionary = associationDictionary
                 resources.isLoading = false
             }
         }

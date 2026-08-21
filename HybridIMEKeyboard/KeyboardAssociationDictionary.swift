@@ -22,12 +22,16 @@ final class KeyboardAssociationDictionary {
     }
 
     private let lexicon: OfflineLexicon
-    private let defaults = UserDefaults.standard
-    private var recentSelections: [String: String] = [:]
-    private var learnedChineseCandidates: [String: [String]] = [:]
+    private let learningStore: KeyboardUserLearningStore
 
     init(lexicon: OfflineLexicon) {
         self.lexicon = lexicon
+        learningStore = .shared
+    }
+
+    init(lexicon: OfflineLexicon, learningStore: KeyboardUserLearningStore) {
+        self.lexicon = lexicon
+        self.learningStore = learningStore
     }
 
     func suggestions(
@@ -115,41 +119,37 @@ final class KeyboardAssociationDictionary {
     }
 
     func recordSelection(_ suggestion: Suggestion) {
-        let key = learningKey(
-            language: suggestion.language,
+        learningStore.recordAssociationSelection(
+            language: suggestion.language.rawValue,
             key: suggestion.key,
-            candidate: suggestion.text
-        )
-        defaults.set(defaults.integer(forKey: key) + 1, forKey: key)
-        storeMostRecent(
-            suggestion.text,
-            language: suggestion.language,
-            key: suggestion.key
+            candidate: suggestion.text,
+            incrementingCount: true
         )
 
         if suggestion.language == .chinese,
            let lastCharacter = suggestion.key.last
         {
-            storeMostRecent(
-                suggestion.text,
-                language: .chinese,
-                key: String(lastCharacter)
+            learningStore.recordAssociationSelection(
+                language: Language.chinese.rawValue,
+                key: String(lastCharacter),
+                candidate: suggestion.text,
+                incrementingCount: false
             )
         }
     }
 
     func recordChineseSequence(context: String, continuation: String) {
         guard !context.isEmpty, continuation.count == 1 else { return }
-
-        var candidates = learnedCandidates(for: context)
-        candidates.removeAll { $0 == continuation }
-        candidates.insert(continuation, at: 0)
-        if candidates.count > 10 {
-            candidates.removeLast(candidates.count - 10)
-        }
-        learnedChineseCandidates[context] = candidates
-        defaults.set(candidates, forKey: learnedCandidatesKey(context))
-        storeMostRecent(continuation, language: .chinese, key: context)
+        learningStore.recordLearnedChinese(
+            context: context,
+            candidate: continuation
+        )
+        learningStore.recordAssociationSelection(
+            language: Language.chinese.rawValue,
+            key: context,
+            candidate: continuation,
+            incrementingCount: false
+        )
     }
 
     private func longestStaticChineseMatch(
@@ -203,14 +203,7 @@ final class KeyboardAssociationDictionary {
     }
 
     private func learnedCandidates(for key: String) -> [String] {
-        if let cached = learnedChineseCandidates[key] {
-            return cached
-        }
-        let candidates = defaults.stringArray(
-            forKey: learnedCandidatesKey(key)
-        ) ?? []
-        learnedChineseCandidates[key] = candidates
-        return candidates
+        learningStore.learnedChineseCandidates(for: key)
     }
 
     private func learnedCount(
@@ -218,52 +211,26 @@ final class KeyboardAssociationDictionary {
         key: String,
         candidate: String
     ) -> Int {
-        defaults.integer(
-            forKey: learningKey(
-                language: language,
-                key: key,
-                candidate: candidate
-            )
+        learningStore.associationCount(
+            language: language.rawValue,
+            key: key,
+            candidate: candidate
         )
     }
 
     private func mostRecentSelection(language: Language, key: String) -> String? {
-        let recentKey = recentSelectionKey(language: language, key: key)
-        if let selection = recentSelections[recentKey]
-            ?? defaults.string(forKey: recentKey)
-        {
+        if let selection = learningStore.mostRecentAssociation(
+            language: language.rawValue,
+            key: key
+        ) {
             return selection
         }
         guard language == .chinese, let lastCharacter = key.last else {
             return nil
         }
-        let fallbackKey = recentSelectionKey(
-            language: .chinese,
+        return learningStore.mostRecentAssociation(
+            language: Language.chinese.rawValue,
             key: String(lastCharacter)
         )
-        return recentSelections[fallbackKey]
-            ?? defaults.string(forKey: fallbackKey)
-    }
-
-    private func storeMostRecent(_ candidate: String, language: Language, key: String) {
-        let recentKey = recentSelectionKey(language: language, key: key)
-        recentSelections[recentKey] = candidate
-        defaults.set(candidate, forKey: recentKey)
-    }
-
-    private func learningKey(
-        language: Language,
-        key: String,
-        candidate: String
-    ) -> String {
-        "association.\(language.rawValue).\(key).\(candidate)"
-    }
-
-    private func recentSelectionKey(language: Language, key: String) -> String {
-        "association.\(language.rawValue).\(key).recent"
-    }
-
-    private func learnedCandidatesKey(_ key: String) -> String {
-        "association.chinese.\(key).learnedCandidates"
     }
 }

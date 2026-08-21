@@ -34,12 +34,14 @@ HybridIME 是一套以 Swift 開發的中英混合倉頡五代輸入工具，同
 
 ### iOS／iPadOS（Implemented，runtime 未驗證）
 
-- UIKit 自訂鍵盤，包含字母、數字、符號與內建 Emoji 頁面。
+- UIKit 自訂鍵盤，包含字母、數字與符號頁面。
 - 候選列、倉頡字根提示、大小寫與 Caps Lock。
 - 點按已學習候選、翻譯、標點或聯想候選時替換已插入文字。
 - 長按 Space 後水平／垂直拖曳游標，並提供 selection feedback。
 - extension 宣告 `RequestsOpenAccess=false`，離線詞典及學習不需要「允許完整取用」。
-- SwiftUI host app 只提供加入與使用鍵盤的說明。
+- 當 `needsInputModeSwitchKey` 為真時，顯示 Globe 鍵並使用 `handleInputModeList(from:with:)` 切換或長按選擇已啟用鍵盤。
+- SwiftUI host app 提供加入與使用鍵盤、離線本機學習及第三方鍵盤系統限制的說明。
+- `HybridIMEKeyboard/PrivacyInfo.xcprivacy` 宣告不追蹤、不收集資料，以及 Shift 雙擊計時所需的 `SystemBootTime` 原因 `35F9.1`。
 
 ## 系統需求
 
@@ -108,7 +110,7 @@ xcodebuild \
   build
 ```
 
-安裝 host app 後，前往「設定 > 一般 > 鍵盤 > 鍵盤 > 新增鍵盤」，選擇 `HybridIMEKeyboard`。目前 source 尚未提供從 HybridIME 鍵盤切換到下一個輸入法的 globe control，見[已知限制](#已知限制)。
+安裝 host app 後，前往「設定 > 一般 > 鍵盤 > 鍵盤 > 新增鍵盤」，選擇 `HybridIMEKeyboard`。當系統需要鍵盤切換控制時，HybridIME 底列會顯示 Globe 鍵；點按可切換鍵盤，長按可選擇已啟用的鍵盤。
 
 ## 基本輸入方式
 
@@ -168,8 +170,8 @@ python3 Scripts/build_static_lexicon.py
 - Apple 沒有公開 macOS 內建倉頡解碼 API，碼表與候選次序不能保證完全一致。
 - macOS 候選視窗最多顯示十項，沒有翻頁；候選位置與中文詞組替換依賴 host 正確實作 text-input API。
 - iOS 先插入英文字碼再刪除替換；若 host 不提供足夠 context、游標已移動或文字已改變，guard 會拒絕替換。
-- iOS source 沒有 `advanceToNextInputMode`／`handleInputModeList` control；使用者目前不能由鍵盤 UI 切換到下一個鍵盤。
-- 第三方鍵盤在 secure text fields、電話鍵盤或 host 禁用 extension 時可能由系統鍵盤取代；本次未做 device／多 app 相容性驗證。
+- iOS 會在 `needsInputModeSwitchKey` 為真時提供 Globe 鍵；其在各種 device、方向與多鍵盤組合下的行為仍需實機驗證。
+- 第三方鍵盤在安全文字欄位、電話／姓名電話鍵盤或 host 禁用 extension 時會由系統鍵盤取代；本次未做 device／多 app 相容性驗證。
 - `Scripts/release.sh` 的 preflight 會讀取 `HybridIME` macOS scheme 的 Debug／Release resolved build settings，並硬性要求版本 `1.2.0`、build `20260821` 與 deployment target `26.0`。這只準備 release 流程，並不代表簽署、公證或發佈已完成。
 - repository 沒有自動測試 target、CI、效能量測或 memory-budget regression test。
 
@@ -180,6 +182,7 @@ Repository 沒有找到 project-wide `LICENSE`，因此不能推斷 HybridIME so
 第三方資料的授權與歸屬分別位於：
 
 - `HybridIME/CangjieData/LICENSE-Rime-Cangjie.txt` 與 `HybridIME/CangjieData/NOTICE.txt`。
+- `HybridIMEKeyboard/CangjieData/LICENSE-Rime-Cangjie.txt` 與 `HybridIMEKeyboard/CangjieData/NOTICE-Rime-Cangjie.txt`，隨 iOS runtime Cangjie table 提供。
 - `HybridIME/DictionaryData/LICENSE-CC-CEDICT.txt` 與 `HybridIME/DictionaryData/NOTICE-CC-CEDICT.txt`。
 - `HybridIME/AssociationData/LICENSE-Rime-Essay.txt`、`HybridIME/AssociationData/NOTICE-Rime-Essay.txt` 與 `HybridIME/AssociationData/NOTICE-Tatoeba-CC0.txt`。
 - `HybridIMEKeyboard/LexiconData/` 內隨 bundled SQLite 一併提供的對應 license／notice。

@@ -94,11 +94,12 @@ There is no dependency-injection framework. macOS `InputResources` and iOS contr
 | `HybridIMEKeyboard/KeyboardAssociationDictionary.swift` | iOS association merge／ranking |
 | `HybridIMEKeyboard/KeyboardUserLearningStore.swift` | iOS writable SQLite learning schema |
 | `HybridIMEKeyboard/PunctuationStrategy.swift` | iOS punctuation definitions, context and display labels |
-| `HybridIMEiOS/ContentView.swift` | Host app setup instructions |
+| `HybridIMEKeyboard/PrivacyInfo.xcprivacy` | Keyboard extension privacy manifest: no tracking／collected data and SystemBootTime reason `35F9.1` |
+| `HybridIMEiOS/ContentView.swift` | Host app setup、離線本機學習與第三方鍵盤系統限制說明 |
 | `HybridIME/CangjieData/` | Runtime Cangjie table, upstream snapshots, change log and notices |
 | `HybridIME/DictionaryData/` | CC-CEDICT source index、overrides、license and notice used to generate SQLite |
 | `HybridIME/AssociationData/` | Chinese／English association source indexes、licenses and notices |
-| `HybridIMEKeyboard/CangjieData/` | iOS runtime Cangjie table |
+| `HybridIMEKeyboard/CangjieData/` | iOS runtime Cangjie table and Rime Cangjie license／notice |
 | `HybridIMEKeyboard/LexiconData/` | Bundled SQLite lexicon and copied notices for the keyboard extension |
 | `Scripts/` | Dataset builders, validators, standalone tests and release tooling |
 
@@ -175,7 +176,9 @@ All table and column names passed into SQL helpers are internal constants. User-
 
 ### Platform controllers
 
-`InputMethodController` is the macOS composition and event owner. `KeyboardViewController` is both the iOS UI and state-machine owner, including key layout, Emoji catalog, candidates, punctuation, association context, cursor gestures, colors and return-key labels. The large iOS controller is a current coupling point.
+`InputMethodController` is the macOS composition and event owner. `KeyboardViewController` is both the iOS UI and state-machine owner, including key layout, candidates, punctuation, association context, cursor gestures, keyboard switching, colors and return-key labels. The large iOS controller is a current coupling point.
+
+The iOS controller reads `needsInputModeSwitchKey` when loaded and as text／layout state changes. When true, it builds a Globe button targeted at `handleInputModeList(from:with:)` for all touch events; this lets iOS handle both advancing and the long-press list of enabled keyboards. The Emoji catalog, search placeholder and Emoji page are not part of the current keyboard UI.
 
 ## 6. Data Models and State Management
 
@@ -266,6 +269,12 @@ Important names are `InputMethodConnectionName=com.sunny.inputmethod.hybridime_C
 
 The extension point is `com.apple.keyboard-service`, principal class is `KeyboardViewController`, primary language is `zh-Hant`, `IsASCIICapable=true` and `RequestsOpenAccess=false`.
 
+### Keyboard privacy manifest and attribution
+
+`HybridIMEKeyboard/PrivacyInfo.xcprivacy` declares `NSPrivacyTracking=false`, an empty collected-data list and `NSPrivacyAccessedAPICategorySystemBootTime` reason `35F9.1`. This matches `KeyboardViewController` using `ProcessInfo.systemUptime` only to distinguish a Shift double tap; no derived value is transmitted. The filesystem-synchronized `HybridIMEKeyboard` target includes this manifest with the extension resources.
+
+The extension's `CangjieData/` contains the generated Rime Cangjie table together with `NOTICE-Rime-Cangjie.txt` and `LICENSE-Rime-Cangjie.txt`. `LexiconData/` separately retains the CC-CEDICT, Rime Essay and Tatoeba notices／licenses used by the bundled SQLite lexicon.
+
 ### Environment variables
 
 Runtime source reads no environment variables. `Scripts/release.sh` recognizes `HYBRIDIME_NOTARY_PROFILE`, `HYBRIDIME_RESUME_AFTER_APP_NOTARIZATION` and `HYBRIDIME_RELEASE_ROOT_OVERRIDE`; these are release-only controls. The notary profile names a Keychain item and must not be documented as a secret value.
@@ -289,6 +298,8 @@ Logged errors contain resource names or local error descriptions; source does no
 - Runtime is offline and has no authentication, token, Keychain, TLS, WebView, cloud or analytics code.
 - iOS requests no open access and has no App Group entitlement; extension storage stays in its own container.
 - Static SQLite is read-only; learning SQLite is local but not application-level encrypted.
+- The keyboard's privacy manifest declares no tracking or collected data, and records the local Shift double-tap timing use of `systemUptime` under SystemBootTime reason `35F9.1`.
+- The host app explains that learning data remains in the keyboard extension's local container, is not transmitted, and is removed when the App (and its extension) is deleted. It also explains that iOS uses the system keyboard for secure, phone／name-phone, or host-disabled third-party keyboard fields.
 - macOS App Sandbox is disabled as part of the current InputMethodKit target configuration. Hardened runtime is enabled, but this task does not equate the setting with a verified signed release.
 - SQL lookup values use prepared bindings. Dataset table／column selectors are internal fixed strings.
 - Host text is read only as needed for candidate context and replacement guards; source has no upload path.
@@ -342,7 +353,7 @@ swiftc -module-cache-path /tmp/hybridime-module-cache-keyboard \
 
 ### Verified in this task
 
-This section is updated from commands actually executed during the current documentation task; build and test presence alone is not treated as success.
+This section records commands actually executed during the documentation task that produced these historical results. It is not evidence that later working-tree changes have been built or tested.
 
 - `xcodebuild -list` found all three targets and schemes. The sandboxed invocation also reported unavailable CoreSimulator services; scheme discovery still completed.
 - SQLite read-only inspection returned `integrity_check=ok`, `user_version=1`, 177,594 bilingual rows and 244,887 association rows.
@@ -369,7 +380,7 @@ This section is updated from commands actually executed during the current docum
 - Cangjie TSV is still parsed into memory; the SQLite migration covers bilingual and association data only.
 - macOS resource preload has no readiness state, progress UI or retry.
 - iOS replacement depends on host context and immediate insert/delete behavior rather than marked-text composition.
-- iOS has no implemented next-keyboard control (`advanceToNextInputMode`／`handleInputModeList`).
+- iOS conditionally builds its Globe key from `needsInputModeSwitchKey` and delegates switching／long-press selection to `handleInputModeList(from:with:)`; device behavior across widths, orientations and enabled-keyboard combinations remains unverified.
 - iOS vertical cursor fallback estimates ten characters per line and cannot know visual wrapping.
 - No settings UI clears learning data; record cardinality has no global bound or pruning policy.
 - SQLite execution errors are mostly silent and there are no migrations beyond initial schema creation.
@@ -395,7 +406,6 @@ The following are **Planned / Not implemented** recommendations derived from cur
 
 - Extract platform-neutral decoding, lexicon, association, ranking and punctuation policies into a shared Swift module while retaining separate IMK and keyboard adapters.
 - Add explicit schema migration from legacy `UserDefaults` and future SQLite versions before changing `PRAGMA user_version`.
-- Add a next-input-mode key using `needsInputModeSwitchKey` and supported `UIInputViewController` switching APIs.
 - Split `KeyboardViewController` into composition, persistence, candidate presentation and key-layout components.
 - Add XCTest targets and fixture bundles around current standalone cases, plus iOS extension memory／startup and host-context tests.
 - Add user controls to clear learning data and a bounded retention／pruning policy.
@@ -411,6 +421,7 @@ No project-wide `LICENSE` was found, so this document makes no claim about sourc
 Bundled datasets retain separate terms:
 
 - Rime Cangjie: see `HybridIME/CangjieData/LICENSE-Rime-Cangjie.txt` and `HybridIME/CangjieData/NOTICE.txt`.
+- iOS Rime Cangjie runtime table: see `HybridIMEKeyboard/CangjieData/LICENSE-Rime-Cangjie.txt` and `HybridIMEKeyboard/CangjieData/NOTICE-Rime-Cangjie.txt`.
 - CC-CEDICT: see `HybridIME/DictionaryData/LICENSE-CC-CEDICT.txt` and `HybridIME/DictionaryData/NOTICE-CC-CEDICT.txt`.
 - Rime Essay and Tatoeba: see `HybridIME/AssociationData/` notices and licenses.
 - The iOS bundled lexicon includes corresponding copies under `HybridIMEKeyboard/LexiconData/`.

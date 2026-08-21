@@ -26,6 +26,16 @@ struct ContentView: View {
                         title: "輸出英文字",
                         detail: "Shift-Space：輸出英文字，不輸出對應倉頡字。"
                     )
+                    instruction(
+                        number: 5,
+                        title: "私隱與離線學習",
+                        detail: "鍵盤以離線詞典運作，不連線且不要求「允許完整取用」。為改善候選排序而記錄的倉頡碼、已選候選及有限前文，只儲存在此裝置的鍵盤 extension 本機容器，不會傳送給開發者或第三方。刪除本 App（連同鍵盤 extension）會移除這些本機學習資料。"
+                    )
+                    instruction(
+                        number: 6,
+                        title: "系統限制",
+                        detail: "密碼等安全文字欄位、電話／姓名電話鍵盤，以及停用第三方鍵盤的 App，會由 iOS 顯示系統鍵盤；這些情況無法使用 HybridIME。"
+                    )
 
                 }
                 .padding(24)
@@ -41,7 +51,7 @@ struct ContentView: View {
                 .foregroundStyle(.tint)
             Text("中英混合倉頡鍵盤")
                 .font(.title2.bold())
-            Text("HybridIME 是支援智能候選、英文直接輸入及 Emoji 的 iOS 倉頡鍵盤。")
+            Text("HybridIME 是支援智能候選及英文直接輸入的 iOS 倉頡鍵盤。")
                 .foregroundStyle(.secondary)
         }
     }

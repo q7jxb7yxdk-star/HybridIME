@@ -19,6 +19,16 @@ final class KeyboardViewController: UIInputViewController {
         case control
     }
 
+    private enum KeyboardLayoutMode: Equatable {
+        case compact
+        case wideIPad
+    }
+
+    private struct WideSymbolKey {
+        let primary: String
+        let alternate: String
+    }
+
     private struct PendingPunctuationSelection {
         let insertedText: String
         let definition: PunctuationDefinition
@@ -60,6 +70,8 @@ final class KeyboardViewController: UIInputViewController {
     private var returnButton: UIButton?
     private weak var spaceButton: UIButton?
     private var keyboardHeightConstraint: NSLayoutConstraint?
+    private var layoutMode = KeyboardLayoutMode.compact
+    private var hasBuiltKeyboard = false
     private var buffer = ""
     private var currentCandidates: [String] = []
     private var currentCandidateActions: [CandidateAction] = []
@@ -103,17 +115,47 @@ final class KeyboardViewController: UIInputViewController {
 
     private let punctuationKeys = [".", ",", "?", "!", "'"]
 
+    private let wideIPadNumberSecondRow: [WideSymbolKey] = [
+        .init(primary: "@", alternate: "¥"),
+        .init(primary: "#", alternate: "€"),
+        .init(primary: "$", alternate: "£"),
+        .init(primary: "&", alternate: "_"),
+        .init(primary: "*", alternate: "^"),
+        .init(primary: "(", alternate: "["),
+        .init(primary: ")", alternate: "]"),
+        .init(primary: "'", alternate: "{"),
+        .init(primary: "\"", alternate: "}"),
+    ]
+
+    private let wideIPadNumberThirdRow: [WideSymbolKey] = [
+        .init(primary: "%", alternate: "§"),
+        .init(primary: "-", alternate: "|"),
+        .init(primary: "+", alternate: "~"),
+        .init(primary: "=", alternate: "…"),
+        .init(primary: "/", alternate: "\\"),
+        .init(primary: ";", alternate: "<"),
+        .init(primary: ":", alternate: ">"),
+        .init(primary: ",", alternate: "!"),
+        .init(primary: ".", alternate: "?"),
+    ]
+
     override func viewDidLoad() {
         super.viewDidLoad()
+        layoutMode = traitCollection.userInterfaceIdiom == .pad
+            && traitCollection.horizontalSizeClass != .compact
+            ? .wideIPad
+            : .compact
         configureInterface()
         requiresInputModeSwitchKey = needsInputModeSwitchKey
         rebuildKeyboard()
+        hasBuiltKeyboard = true
         refreshComposition()
         updateAppearance()
     }
 
     override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
+        updateLayoutModeIfNeeded()
         updateInputModeSwitchKeyVisibility()
     }
 
@@ -158,6 +200,7 @@ final class KeyboardViewController: UIInputViewController {
         candidateArea.spacing = 1
 
         keyboardStackView.axis = .vertical
+        keyboardStackView.distribution = .fill
         keyboardStackView.spacing = 7
 
         rootStack.addArrangedSubview(candidateArea)
@@ -173,8 +216,11 @@ final class KeyboardViewController: UIInputViewController {
         cursorTrackpadOverlay.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(cursorTrackpadOverlay)
 
-        let heightConstraint = view.heightAnchor.constraint(equalToConstant: 260)
+        let heightConstraint = view.heightAnchor.constraint(
+            equalToConstant: layoutMode == .wideIPad ? 353 : 260
+        )
         heightConstraint.priority = .defaultHigh
+        heightConstraint.isActive = true
         keyboardHeightConstraint = heightConstraint
 
         NSLayoutConstraint.activate([
@@ -186,7 +232,6 @@ final class KeyboardViewController: UIInputViewController {
             cursorTrackpadOverlay.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             cursorTrackpadOverlay.topAnchor.constraint(equalTo: view.topAnchor),
             cursorTrackpadOverlay.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            heightConstraint,
         ])
     }
 
@@ -197,41 +242,428 @@ final class KeyboardViewController: UIInputViewController {
         }
 
         candidateArea.isHidden = false
-        keyboardHeightConstraint?.constant = 260
-        compositionLabel.isHidden = currentPage == .letters
-        keyboardStackView.spacing = currentPage == .letters ? 5 : 7
-        rootStack.spacing = currentPage == .letters ? 5 : 7
+        keyboardHeightConstraint?.constant = layoutMode == .wideIPad ? 353 : 260
+        keyboardStackView.distribution = layoutMode == .wideIPad ? .fillEqually : .fill
+        if layoutMode == .wideIPad {
+            compositionLabel.isHidden = true
+            keyboardStackView.spacing = 5
+            rootStack.spacing = 5
+        } else {
+            compositionLabel.isHidden = currentPage == .letters
+            keyboardStackView.spacing = currentPage == .letters ? 5 : 7
+            rootStack.spacing = currentPage == .letters ? 5 : 7
+        }
 
         switch currentPage {
         case .letters:
-            keyboardStackView.addArrangedSubview(
-                makeCharacterRow(letterRows[0], horizontalInset: 0, usesShift: true)
-            )
-            keyboardStackView.addArrangedSubview(
-                makeCharacterRow(letterRows[1], horizontalInset: 17, usesShift: true)
-            )
-            keyboardStackView.addArrangedSubview(makeLetterControlRow())
+            if layoutMode == .wideIPad {
+                buildWideIPadLetterRows()
+            } else {
+                keyboardStackView.addArrangedSubview(
+                    makeCharacterRow(letterRows[0], horizontalInset: 0, usesShift: true)
+                )
+                keyboardStackView.addArrangedSubview(
+                    makeCharacterRow(letterRows[1], horizontalInset: 17, usesShift: true)
+                )
+                keyboardStackView.addArrangedSubview(makeLetterControlRow())
+            }
         case .numbers:
-            numberRows.forEach {
+            if layoutMode == .wideIPad {
+                buildWideIPadNumberRows()
+            } else {
+                numberRows.forEach {
+                    keyboardStackView.addArrangedSubview(
+                        makeCharacterRow($0, horizontalInset: 0, usesShift: false)
+                    )
+                }
                 keyboardStackView.addArrangedSubview(
-                    makeCharacterRow($0, horizontalInset: 0, usesShift: false)
+                    makePunctuationRow(pageTitle: "#+=", destination: .symbols)
                 )
             }
-            keyboardStackView.addArrangedSubview(
-                makePunctuationRow(pageTitle: "#+=", destination: .symbols)
-            )
         case .symbols:
-            symbolRows.forEach {
+            if layoutMode == .wideIPad {
+                buildWideIPadNumberAlternateRows()
+            } else {
+                symbolRows.forEach {
+                    keyboardStackView.addArrangedSubview(
+                        makeCharacterRow($0, horizontalInset: 0, usesShift: false)
+                    )
+                }
                 keyboardStackView.addArrangedSubview(
-                    makeCharacterRow($0, horizontalInset: 0, usesShift: false)
+                    makePunctuationRow(pageTitle: "123", destination: .numbers)
                 )
             }
-            keyboardStackView.addArrangedSubview(
-                makePunctuationRow(pageTitle: "123", destination: .numbers)
-            )
         }
 
         keyboardStackView.addArrangedSubview(makeBottomRow())
+    }
+
+    private func updateLayoutModeIfNeeded() {
+        let nextMode: KeyboardLayoutMode
+        if traitCollection.userInterfaceIdiom == .pad,
+           traitCollection.horizontalSizeClass == .regular,
+           view.bounds.width >= 700
+        {
+            nextMode = .wideIPad
+        } else {
+            nextMode = .compact
+        }
+
+        guard layoutMode != nextMode else { return }
+        layoutMode = nextMode
+        guard hasBuiltKeyboard else { return }
+        rebuildKeyboard()
+    }
+
+    private func buildWideIPadLetterRows() {
+        let deleteButton = makeDeleteButton(height: 50)
+        keyboardStackView.addArrangedSubview(
+            makeWideIPadLetterRow(letterRows[0], trailingControls: [deleteButton])
+        )
+
+        let returnButton = makeReturnButton()
+        keyboardStackView.addArrangedSubview(
+            makeWideIPadLetterRow(
+                letterRows[1],
+                trailingControls: [returnButton],
+                leadingSpacerCount: 1
+            )
+        )
+
+        let leftShiftButton = makeShiftButton()
+        let rightShiftButton = makeShiftButton()
+        let commaButton = makeWidePunctuationButton(",", alternateKey: "!")
+        let periodButton = makeWidePunctuationButton(".", alternateKey: "?")
+        keyboardStackView.addArrangedSubview(
+            makeWideIPadLetterRow(
+                letterRows[2],
+                leadingControls: [leftShiftButton],
+                trailingControls: [commaButton, periodButton, rightShiftButton]
+            )
+        )
+    }
+
+    private func buildWideIPadSymbolRows(
+        rows: [[String]],
+        pageTitle: String,
+        destination: KeyboardPage
+    ) {
+        guard let firstRow = rows.first, let secondRow = rows.dropFirst().first else { return }
+
+        let deleteButton = makeDeleteButton()
+        keyboardStackView.addArrangedSubview(
+            makeWideIPadCharacterRow(firstRow, trailingControls: [deleteButton])
+        )
+
+        let returnButton = makeReturnButton()
+        keyboardStackView.addArrangedSubview(
+            makeWideIPadCharacterRow(secondRow, trailingControls: [returnButton])
+        )
+
+        keyboardStackView.addArrangedSubview(
+            makeWideIPadPunctuationRow(pageTitle: pageTitle, destination: destination)
+        )
+    }
+
+    private func buildWideIPadNumberRows() {
+        let deleteButton = makeDeleteButton()
+        keyboardStackView.addArrangedSubview(
+            makeWideIPadCharacterRow(numberRows[0], trailingControls: [deleteButton])
+        )
+
+        let returnButton = makeReturnButton()
+        keyboardStackView.addArrangedSubview(
+            makeWideIPadSymbolRow(
+                wideIPadNumberSecondRow,
+                trailingControls: [returnButton],
+                leadingSpacerCount: 1
+            )
+        )
+
+        let pageButton = makePageButton(title: "#+=", destination: .symbols)
+        let numberButtons = wideIPadNumberThirdRow.map { makeWideIPadSymbolButton($0) }
+        let trailingPageButton = makePageButton(title: "#+=", destination: .symbols)
+        keyboardStackView.addArrangedSubview(
+            makeWideIPadRow(keyButtons: [pageButton] + numberButtons + [trailingPageButton])
+        )
+    }
+
+    private func buildWideIPadNumberAlternateRows() {
+        let deleteButton = makeDeleteButton()
+        keyboardStackView.addArrangedSubview(
+            makeWideIPadCharacterRow(numberRows[0], trailingControls: [deleteButton])
+        )
+
+        let alternateSecondRow = wideIPadNumberSecondRow.map(\.alternate)
+        let returnButton = makeReturnButton()
+        keyboardStackView.addArrangedSubview(
+            makeWideIPadCharacterRow(
+                alternateSecondRow,
+                trailingControls: [returnButton],
+                leadingSpacerCount: 1
+            )
+        )
+
+        let leadingPageButton = makePageButton(title: "123", destination: .numbers)
+        let alternateThirdRow = wideIPadNumberThirdRow.map(\.alternate)
+        let alternateButtons = alternateThirdRow.map { key in
+            let button = makeKey(title: key, role: .character)
+            button.addAction(
+                UIAction { [weak self] _ in self?.enterSymbol(key) },
+                for: .touchUpInside
+            )
+            return button
+        }
+        let trailingPageButton = makePageButton(title: "123", destination: .numbers)
+        keyboardStackView.addArrangedSubview(
+            makeWideIPadRow(
+                keyButtons: [leadingPageButton] + alternateButtons + [trailingPageButton]
+            )
+        )
+    }
+
+    private func makeWideIPadLetterRow(
+        _ keys: [String],
+        leadingControls: [UIButton] = [],
+        trailingControls: [UIButton] = [],
+        leadingSpacerCount: Int = 0
+    ) -> UIView {
+        let keyButtons = keys.map { key in
+            let displayedKey = shiftState == .lowercased ? key : key.uppercased()
+            let button = makeLetterKey(letter: key, displayedLetter: displayedKey)
+            button.addAction(
+                UIAction { [weak self] _ in self?.enterLetter(key) },
+                for: .touchUpInside
+            )
+            return button
+        }
+        return makeWideIPadRow(
+            keyButtons: keyButtons,
+            leadingControls: leadingControls,
+            trailingControls: trailingControls,
+            leadingSpacerCount: leadingSpacerCount
+        )
+    }
+
+    private func makeWideIPadCharacterRow(
+        _ keys: [String],
+        trailingControls: [UIButton],
+        leadingSpacerCount: Int = 0
+    ) -> UIView {
+        let keyButtons = keys.map { key in
+            let button = makeKey(title: key, role: .character)
+            button.addAction(
+                UIAction { [weak self] _ in self?.enterSymbol(key) },
+                for: .touchUpInside
+            )
+            return button
+        }
+        return makeWideIPadRow(
+            keyButtons: keyButtons,
+            trailingControls: trailingControls,
+            leadingSpacerCount: leadingSpacerCount
+        )
+    }
+
+    private func makeWideIPadSymbolRow(
+        _ keys: [WideSymbolKey],
+        trailingControls: [UIButton],
+        leadingSpacerCount: Int = 0
+    ) -> UIView {
+        let keyButtons = keys.map { makeWideIPadSymbolButton($0) }
+        return makeWideIPadRow(
+            keyButtons: keyButtons,
+            trailingControls: trailingControls,
+            leadingSpacerCount: leadingSpacerCount
+        )
+    }
+
+    private func makeWideIPadPunctuationRow(
+        pageTitle: String,
+        destination: KeyboardPage
+    ) -> UIView {
+        let pageButton = makePageButton(title: pageTitle, destination: destination)
+        let punctuationButtons = punctuationKeys.map { makeWidePunctuationButton($0) }
+        return makeWideIPadRow(
+            keyButtons: [pageButton] + punctuationButtons,
+            leadingSpacerCount: 2
+        )
+    }
+
+    private func makeWideIPadRow(
+        keyButtons: [UIButton],
+        leadingControls: [UIButton] = [],
+        trailingControls: [UIButton] = [],
+        leadingSpacerCount: Int = 0
+    ) -> UIView {
+        let row = UIStackView()
+        row.axis = .horizontal
+        row.spacing = 5
+        row.distribution = .fillEqually
+
+        let slotCount = 11
+        let occupiedSlotCount = leadingControls.count + keyButtons.count + trailingControls.count
+        let leadingSpacers = min(leadingSpacerCount, max(0, slotCount - occupiedSlotCount))
+        let trailingSpacers = max(0, slotCount - occupiedSlotCount - leadingSpacers)
+
+        for _ in 0..<leadingSpacers {
+            row.addArrangedSubview(UIView())
+        }
+        leadingControls.forEach { row.addArrangedSubview($0) }
+        keyButtons.forEach { row.addArrangedSubview($0) }
+        trailingControls.forEach { row.addArrangedSubview($0) }
+        for _ in 0..<trailingSpacers {
+            row.addArrangedSubview(UIView())
+        }
+        return wrap(row, horizontalInset: 0)
+    }
+
+    private func makeShiftButton() -> UIButton {
+        let shiftButton = makeIconKey(
+            systemName: shiftSymbolName,
+            accessibilityLabel: "Shift",
+            role: .control,
+            height: 50
+        )
+        shiftButton.addAction(
+            UIAction { [weak self] _ in self?.toggleShift() },
+            for: .touchUpInside
+        )
+        return shiftButton
+    }
+
+    private func makeWideIPadSymbolButton(_ key: WideSymbolKey) -> UIButton {
+        var configuration = UIButton.Configuration.plain()
+        configuration.contentInsets = .zero
+        configuration.background.backgroundColor = characterKeyColor
+        configuration.background.cornerRadius = 5
+
+        let button = configuredButton(
+            configuration: configuration,
+            normalColor: characterKeyColor,
+            accessibilityLabel: "\(key.primary)，向下滑動輸入\(key.alternate)",
+            height: 42
+        )
+        button.addAction(
+            UIAction { [weak self] _ in self?.enterSymbol(key.primary) },
+            for: .touchUpInside
+        )
+
+        let alternateLabel = UILabel()
+        alternateLabel.text = key.alternate
+        alternateLabel.font = .systemFont(ofSize: 14, weight: .regular)
+        alternateLabel.textColor = .secondaryLabel
+        alternateLabel.textAlignment = .center
+
+        let primaryLabel = UILabel()
+        primaryLabel.text = key.primary
+        primaryLabel.font = .systemFont(ofSize: 21, weight: .regular)
+        primaryLabel.textColor = .label
+        primaryLabel.textAlignment = .center
+
+        let labels = UIStackView(arrangedSubviews: [alternateLabel, primaryLabel])
+        labels.axis = .vertical
+        labels.alignment = .center
+        labels.spacing = -5
+        labels.isUserInteractionEnabled = false
+        labels.translatesAutoresizingMaskIntoConstraints = false
+        button.addSubview(labels)
+        NSLayoutConstraint.activate([
+            labels.centerXAnchor.constraint(equalTo: button.centerXAnchor),
+            labels.centerYAnchor.constraint(equalTo: button.centerYAnchor),
+            labels.topAnchor.constraint(greaterThanOrEqualTo: button.topAnchor, constant: 2),
+            labels.bottomAnchor.constraint(lessThanOrEqualTo: button.bottomAnchor, constant: -2),
+        ])
+
+        let alternateSwipe = UISwipeGestureRecognizer(
+            target: self,
+            action: #selector(handleWideSymbolAlternateSwipe(_:))
+        )
+        alternateSwipe.direction = .down
+        alternateSwipe.name = key.alternate
+        button.addGestureRecognizer(alternateSwipe)
+        return button
+    }
+
+    @objc
+    private func handleWideSymbolAlternateSwipe(_ gesture: UISwipeGestureRecognizer) {
+        guard gesture.state == .ended, let alternate = gesture.name else { return }
+        enterSymbol(alternate)
+    }
+
+    private func makeWidePunctuationButton(
+        _ key: String,
+        alternateKey: String? = nil
+    ) -> UIButton {
+        guard let alternateKey else {
+            let button = makeKey(title: key, role: .character)
+            button.addAction(
+                UIAction { [weak self] _ in self?.enterSymbol(key) },
+                for: .touchUpInside
+            )
+            return button
+        }
+
+        let usesAlternatePrimary = shiftState != .lowercased
+        if usesAlternatePrimary {
+            let button = makeKey(title: alternateKey, role: .character)
+            button.addAction(
+                UIAction { [weak self] _ in self?.enterWidePunctuation(alternateKey) },
+                for: .touchUpInside
+            )
+            return button
+        }
+
+        var configuration = UIButton.Configuration.plain()
+        configuration.contentInsets = .zero
+        configuration.background.backgroundColor = characterKeyColor
+        configuration.background.cornerRadius = 5
+
+        let button = configuredButton(
+            configuration: configuration,
+            normalColor: characterKeyColor,
+            accessibilityLabel: "\(key)，Shift 輸入\(alternateKey)",
+            height: 42
+        )
+        button.addAction(
+            UIAction { [weak self] _ in self?.enterWidePunctuation(key) },
+            for: .touchUpInside
+        )
+
+        let alternateLabel = UILabel()
+        alternateLabel.text = alternateKey
+        alternateLabel.font = .systemFont(ofSize: 14, weight: .regular)
+        alternateLabel.textColor = .secondaryLabel
+        alternateLabel.textAlignment = .center
+
+        let primaryLabel = UILabel()
+        primaryLabel.text = key
+        primaryLabel.font = .systemFont(ofSize: 21, weight: .regular)
+        primaryLabel.textColor = .label
+        primaryLabel.textAlignment = .center
+
+        let labels = UIStackView(arrangedSubviews: [alternateLabel, primaryLabel])
+        labels.axis = .vertical
+        labels.alignment = .center
+        labels.spacing = -5
+        labels.isUserInteractionEnabled = false
+        labels.translatesAutoresizingMaskIntoConstraints = false
+        button.addSubview(labels)
+        NSLayoutConstraint.activate([
+            labels.centerXAnchor.constraint(equalTo: button.centerXAnchor),
+            labels.centerYAnchor.constraint(equalTo: button.centerYAnchor),
+            labels.topAnchor.constraint(greaterThanOrEqualTo: button.topAnchor, constant: 2),
+            labels.bottomAnchor.constraint(lessThanOrEqualTo: button.bottomAnchor, constant: -2),
+        ])
+        return button
+    }
+
+    private func enterWidePunctuation(_ symbol: String) {
+        enterSymbol(symbol)
+        if shiftState == .uppercased {
+            shiftState = .lowercased
+            rebuildKeyboard()
+        }
     }
 
     private func makeCharacterRow(
@@ -341,6 +773,10 @@ final class KeyboardViewController: UIInputViewController {
     }
 
     private func makeBottomRow() -> UIView {
+        if layoutMode == .wideIPad {
+            return makeWideIPadBottomRow()
+        }
+
         let row = UIStackView()
         row.axis = .horizontal
         row.spacing = 5
@@ -350,29 +786,103 @@ final class KeyboardViewController: UIInputViewController {
         let pageDestination = currentPage == .letters
             ? KeyboardPage.numbers
             : KeyboardPage.letters
-        let pageButton = makeKey(title: pageTitle, role: .control, fontSize: 14)
-        pageButton.addAction(
-            UIAction { [weak self] _ in self?.switchPage(to: pageDestination) },
-            for: .touchUpInside
-        )
+        let pageButton = makePageButton(title: pageTitle, destination: pageDestination)
         pageButton.widthAnchor.constraint(equalToConstant: 52).isActive = true
         row.addArrangedSubview(pageButton)
 
         if requiresInputModeSwitchKey {
-            let inputModeButton = makeIconKey(
-                systemName: "globe",
-                accessibilityLabel: "切換鍵盤",
-                role: .control
-            )
-            inputModeButton.addTarget(
-                self,
-                action: #selector(handleInputModeList(from:with:)),
-                for: .allTouchEvents
-            )
+            let inputModeButton = makeInputModeButton()
             inputModeButton.widthAnchor.constraint(equalToConstant: 44).isActive = true
             row.addArrangedSubview(inputModeButton)
         }
 
+        let spaceButton = makeSpaceButton()
+        row.addArrangedSubview(spaceButton)
+
+        let returnButton = makeReturnButton()
+        returnButton.widthAnchor.constraint(equalToConstant: 70).isActive = true
+        row.addArrangedSubview(returnButton)
+
+        return wrap(row, horizontalInset: 0)
+    }
+
+    private func makeWideIPadBottomRow() -> UIView {
+        let row = UIStackView()
+        row.axis = .horizontal
+        row.spacing = 5
+        row.distribution = .fill
+
+        if requiresInputModeSwitchKey {
+            let inputModeButton = makeInputModeButton()
+            row.addArrangedSubview(inputModeButton)
+            inputModeButton.widthAnchor.constraint(
+                equalTo: row.widthAnchor,
+                multiplier: 0.085
+            ).isActive = true
+        }
+
+        let pageTitle = currentPage == .letters ? "123" : "ABC"
+        let pageDestination = currentPage == .letters
+            ? KeyboardPage.numbers
+            : KeyboardPage.letters
+        let leadingPageButton = makePageButton(title: pageTitle, destination: pageDestination)
+        row.addArrangedSubview(leadingPageButton)
+        leadingPageButton.widthAnchor.constraint(
+            equalTo: row.widthAnchor,
+            multiplier: 0.09
+        ).isActive = true
+
+        row.addArrangedSubview(makeSpaceButton())
+
+        let trailingPageButton = makePageButton(title: pageTitle, destination: pageDestination)
+        row.addArrangedSubview(trailingPageButton)
+        trailingPageButton.widthAnchor.constraint(
+            equalTo: row.widthAnchor,
+            multiplier: 0.125
+        ).isActive = true
+
+        let dismissButton = makeIconKey(
+            systemName: "keyboard.chevron.compact.down",
+            accessibilityLabel: "收起鍵盤",
+            role: .control
+        )
+        dismissButton.addAction(
+            UIAction { [weak self] _ in self?.dismissKeyboard() },
+            for: .touchUpInside
+        )
+        row.addArrangedSubview(dismissButton)
+        dismissButton.widthAnchor.constraint(
+            equalTo: row.widthAnchor,
+            multiplier: 0.125
+        ).isActive = true
+
+        return wrap(row, horizontalInset: 0)
+    }
+
+    private func makePageButton(title: String, destination: KeyboardPage) -> UIButton {
+        let pageButton = makeKey(title: title, role: .control, fontSize: 14)
+        pageButton.addAction(
+            UIAction { [weak self] _ in self?.switchPage(to: destination) },
+            for: .touchUpInside
+        )
+        return pageButton
+    }
+
+    private func makeInputModeButton() -> UIButton {
+        let inputModeButton = makeIconKey(
+            systemName: "globe",
+            accessibilityLabel: "切換鍵盤",
+            role: .control
+        )
+        inputModeButton.addTarget(
+            self,
+            action: #selector(handleInputModeList(from:with:)),
+            for: .allTouchEvents
+        )
+        return inputModeButton
+    }
+
+    private func makeSpaceButton() -> UIButton {
         let spaceButton = makeKey(title: "HybridIME", role: .character, fontSize: 16)
         spaceButton.accessibilityLabel = "空格"
         spaceButton.addAction(
@@ -388,9 +898,11 @@ final class KeyboardViewController: UIInputViewController {
         cursorGesture.cancelsTouchesInView = true
         spaceButton.addGestureRecognizer(cursorGesture)
         spaceButton.widthAnchor.constraint(greaterThanOrEqualToConstant: 105).isActive = true
-        row.addArrangedSubview(spaceButton)
         self.spaceButton = spaceButton
+        return spaceButton
+    }
 
+    private func makeReturnButton() -> UIButton {
         let returnButton = makeKey(
             title: returnKeyTitle,
             role: .control,
@@ -400,11 +912,8 @@ final class KeyboardViewController: UIInputViewController {
             UIAction { [weak self] _ in self?.commitReturn() },
             for: .touchUpInside
         )
-        returnButton.widthAnchor.constraint(equalToConstant: 70).isActive = true
-        row.addArrangedSubview(returnButton)
         self.returnButton = returnButton
-
-        return wrap(row, horizontalInset: 0)
+        return returnButton
     }
 
     private func makeDeleteButton(height: CGFloat = 42) -> UIButton {
@@ -528,7 +1037,11 @@ final class KeyboardViewController: UIInputViewController {
         button.layer.shadowOpacity = 0.22
         button.layer.shadowRadius = 0.5
         button.layer.shadowOffset = CGSize(width: 0, height: 1)
-        button.heightAnchor.constraint(equalToConstant: height).isActive = true
+        let heightConstraint = button.heightAnchor.constraint(equalToConstant: height)
+        if layoutMode == .wideIPad {
+            heightConstraint.priority = UILayoutPriority(749)
+        }
+        heightConstraint.isActive = true
         button.configurationUpdateHandler = { button in
             guard var configuration = button.configuration else { return }
             configuration.background.backgroundColor = button.isHighlighted
@@ -578,6 +1091,7 @@ final class KeyboardViewController: UIInputViewController {
         let needsInputModeSwitchKey = self.needsInputModeSwitchKey
         guard requiresInputModeSwitchKey != needsInputModeSwitchKey else { return }
         requiresInputModeSwitchKey = needsInputModeSwitchKey
+        guard hasBuiltKeyboard else { return }
         rebuildKeyboard()
     }
 

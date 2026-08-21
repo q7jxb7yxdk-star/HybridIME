@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-readonly HYBRIDIME_VERSION="1.1.2"
+readonly HYBRIDIME_VERSION="1.2.0"
 readonly HYBRIDIME_BUILD="20260821"
 readonly HYBRIDIME_DEPLOYMENT_TARGET="26.0"
 readonly HYBRIDIME_TEAM_ID="WX793X49GJ"
@@ -62,6 +62,53 @@ require_equal() {
     [[ "${actual}" == "${expected}" ]] || fail "${description}: expected '${expected}', got '${actual}'"
 }
 
+resolved_build_setting() {
+    local settings="$1"
+    local setting_name="$2"
+    local -a values
+
+    values=("${(@f)$(/usr/bin/awk -v key="${setting_name}" '
+        {
+            line = $0
+            sub(/^[[:space:]]*/, "", line)
+            prefix = key " = "
+            if (index(line, prefix) == 1) {
+                print substr(line, length(prefix) + 1)
+            }
+        }
+    ' <<< "${settings}")}")
+    (( ${#values} == 1 )) || fail "expected one resolved ${setting_name} setting, found ${#values}"
+    print -r -- "${values[1]}"
+}
+
+require_macos_scheme_build_settings() {
+    local configuration="$1"
+    local settings
+
+    if ! settings="$(xcodebuild \
+        -project HybridIME.xcodeproj \
+        -scheme HybridIME \
+        -configuration "${configuration}" \
+        -destination "generic/platform=macOS" \
+        -derivedDataPath "${HYBRIDIME_DERIVED_DATA}/Preflight-${configuration}" \
+        -showBuildSettings)"; then
+        fail "cannot resolve HybridIME ${configuration} build settings"
+    fi
+
+    require_equal "$(resolved_build_setting "${settings}" TARGET_NAME)" "HybridIME" \
+        "${configuration} target name"
+    require_equal "$(resolved_build_setting "${settings}" PLATFORM_NAME)" "macosx" \
+        "${configuration} platform"
+    require_equal "$(resolved_build_setting "${settings}" PRODUCT_BUNDLE_IDENTIFIER)" "${HYBRIDIME_BUNDLE_ID}" \
+        "${configuration} bundle identifier"
+    require_equal "$(resolved_build_setting "${settings}" MARKETING_VERSION)" "${HYBRIDIME_VERSION}" \
+        "${configuration} marketing version"
+    require_equal "$(resolved_build_setting "${settings}" CURRENT_PROJECT_VERSION)" "${HYBRIDIME_BUILD}" \
+        "${configuration} build number"
+    require_equal "$(resolved_build_setting "${settings}" MACOSX_DEPLOYMENT_TARGET)" "${HYBRIDIME_DEPLOYMENT_TARGET}" \
+        "${configuration} deployment target"
+}
+
 require_resource() {
     local resource="$1"
     [[ -f "${HYBRIDIME_APP}/Contents/Resources/${resource}" ]] || fail "missing packaged resource: ${resource}"
@@ -97,12 +144,8 @@ plutil -lint HybridIME/Base.lproj/InfoPlist.strings >/dev/null
 plutil -lint HybridIME/en.lproj/InfoPlist.strings >/dev/null
 plutil -lint HybridIME/zh-Hant.lproj/InfoPlist.strings >/dev/null
 
-[[ "$(rg -c "MARKETING_VERSION = ${HYBRIDIME_VERSION};" HybridIME.xcodeproj/project.pbxproj)" == "2" ]] || \
-    fail "MARKETING_VERSION is not ${HYBRIDIME_VERSION} in both configurations"
-[[ "$(rg -c "CURRENT_PROJECT_VERSION = ${HYBRIDIME_BUILD};" HybridIME.xcodeproj/project.pbxproj)" == "2" ]] || \
-    fail "CURRENT_PROJECT_VERSION is not ${HYBRIDIME_BUILD} in both configurations"
-[[ "$(rg -c "MACOSX_DEPLOYMENT_TARGET = ${HYBRIDIME_DEPLOYMENT_TARGET};" HybridIME.xcodeproj/project.pbxproj)" == "2" ]] || \
-    fail "target deployment version is not ${HYBRIDIME_DEPLOYMENT_TARGET} in both configurations"
+require_macos_scheme_build_settings Debug
+require_macos_scheme_build_settings Release
 HYBRIDIME_IDENTITIES="$(security find-identity -v -p codesigning)"
 [[ "${HYBRIDIME_IDENTITIES}" == *"${HYBRIDIME_SIGNING_IDENTITY}"* ]] || \
     fail "Developer ID Application identity is unavailable"

@@ -270,7 +270,7 @@ The extension point is `com.apple.keyboard-service`, principal class is `Keyboar
 
 Runtime source reads no environment variables. `Scripts/release.sh` recognizes `HYBRIDIME_NOTARY_PROFILE`, `HYBRIDIME_RESUME_AFTER_APP_NOTARIZATION` and `HYBRIDIME_RELEASE_ROOT_OVERRIDE`; these are release-only controls. The notary profile names a Keychain item and must not be documented as a secret value.
 
-The release script is currently **Inactive** for version 1.2.0 because its fixed `HYBRIDIME_VERSION=1.1.2` conflicts with project settings; preflight is designed to fail on that mismatch.
+The release script resolves the `HybridIME` macOS scheme's Debug and Release build settings and hard-stops unless both use version `1.2.0`, build `20260821`, deployment target `26.0`, and the expected macOS target and bundle ID. This preflight does not perform or prove signing, notarization, stapling, or publication.
 
 ## 10. Error Handling and Logging
 
@@ -293,7 +293,7 @@ Logged errors contain resource names or local error descriptions; source does no
 - SQL lookup values use prepared bindings. Dataset table／column selectors are internal fixed strings.
 - Host text is read only as needed for candidate context and replacement guards; source has no upload path.
 - There is no UI to inspect or clear learning data, and no documented retention limit for distinct codes／contexts. Only candidates per learned Chinese context are capped.
-- Release signing, notarization, stapling and Gatekeeper checks exist in `Scripts/release.sh`, but current version mismatch prevents claiming a release-ready path and none of those external validations are run as part of ordinary development.
+- Release signing, notarization, stapling and Gatekeeper checks exist in `Scripts/release.sh`; none of those external validations are run as part of ordinary development, and their presence does not prove a completed release.
 
 ## 12. Testing
 
@@ -361,7 +361,7 @@ This section is updated from commands actually executed during the current docum
 
 ## 13. Known Limitations and Technical Debt
 
-- `HybridIME/StaticLexicon.swift`, both SQLite learning-store changes and their harnesses are currently uncommitted／untracked working-tree work; verification must be tied to the current checkout.
+- Verification must be tied to the exact checkout and build inputs under test; prior build results do not establish the behavior of a later checkout.
 - There is no migration from old `UserDefaults` learning data to schema version 1 SQLite.
 - macOS and iOS duplicate decoder, dictionary, association, ranking and punctuation concepts rather than importing a shared core.
 - `HybridIME/InputMethodController.swift` and especially `HybridIMEKeyboard/KeyboardViewController.swift` centralize many state-machine and UI responsibilities.
@@ -374,7 +374,7 @@ This section is updated from commands actually executed during the current docum
 - No settings UI clears learning data; record cardinality has no global bound or pruning policy.
 - SQLite execution errors are mostly silent and there are no migrations beyond initial schema creation.
 - No XCTest, UI tests, CI, lint, formatter, performance tests or extension memory-budget tests are configured.
-- `Scripts/release.sh` version 1.1.2 conflicts with project 1.2.0 and is intentionally fail-fast rather than usable as-is.
+- `Scripts/release.sh` hard-stops when the resolved Debug or Release settings for the macOS `HybridIME` scheme drift from version `1.2.0`, build `20260821`, deployment target `26.0`, its expected target, or bundle ID.
 - Project signing contains an owner-specific development team, reducing checkout portability until another developer selects their team.
 - Repository has no project-wide source-code license.
 
@@ -400,7 +400,7 @@ The following are **Planned / Not implemented** recommendations derived from cur
 - Add XCTest targets and fixture bundles around current standalone cases, plus iOS extension memory／startup and host-context tests.
 - Add user controls to clear learning data and a bounded retention／pruning policy.
 - Expose resource readiness and diagnostic state without logging typed text.
-- Synchronize release metadata only as a separately approved release-preparation change; preserve current fail-fast signature, notarization and resource boundaries.
+- Before an actual release, retain the preflight, signature, notarization, resource and public-artifact validation boundaries, and obtain separate approval for every external state change.
 
 Any refactor must preserve offline operation, parameterized SQLite values, platform container separation, fail-closed host replacement and third-party attribution files.
 

@@ -587,7 +587,7 @@ final class KeyboardViewController: UIInputViewController,
         inputModeButton.widthAnchor.constraint(equalToConstant: 44).isActive = true
         row.addArrangedSubview(inputModeButton)
 
-        let spaceButton = makeKey(title: "space", role: .character, fontSize: 16)
+        let spaceButton = makeKey(title: "HybridIME", role: .character, fontSize: 16)
         spaceButton.accessibilityLabel = "空格"
         spaceButton.addAction(
             UIAction { [weak self] _ in self?.commitSpace() },
@@ -1029,7 +1029,7 @@ final class KeyboardViewController: UIInputViewController,
             cursorVerticalGestureStep = 0
             cursorPreferredColumn = 0
             setCursorTrackpadMode(active: false)
-            updateSpaceButtonTitle("space", accessibilityLabel: "空格")
+            updateSpaceButtonTitle("HybridIME", accessibilityLabel: "空格")
         default:
             break
         }

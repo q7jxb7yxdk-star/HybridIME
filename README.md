@@ -162,7 +162,7 @@ python3 Scripts/build_static_lexicon.py
 
 ## 已知限制
 
-- 新 SQLite runtime 與 learning-store 變更存在於目前 working tree，但其 release／安裝後行為必須以本次 build 結果及後續實機測試分開判斷。
+- SQLite runtime 與 learning-store 的 release／安裝後行為必須以本次 build 結果及後續實機測試分開判斷。
 - 舊版 `UserDefaults` learning keys 沒有遷移到 SQLite 的程式；現有學習可能不會延續。
 - macOS target 未啟用 App Sandbox；learning database 沒有額外加密，也沒有清除學習資料的設定 UI。
 - Apple 沒有公開 macOS 內建倉頡解碼 API，碼表與候選次序不能保證完全一致。
@@ -170,7 +170,7 @@ python3 Scripts/build_static_lexicon.py
 - iOS 先插入英文字碼再刪除替換；若 host 不提供足夠 context、游標已移動或文字已改變，guard 會拒絕替換。
 - iOS source 沒有 `advanceToNextInputMode`／`handleInputModeList` control；使用者目前不能由鍵盤 UI 切換到下一個鍵盤。
 - 第三方鍵盤在 secure text fields、電話鍵盤或 host 禁用 extension 時可能由系統鍵盤取代；本次未做 device／多 app 相容性驗證。
-- `Scripts/release.sh` 目前固定 `1.1.2`，project targets 是 `1.2.0`；release preflight 會因版本不一致而停止。不要把該 script 視為目前可直接發布的流程。
+- `Scripts/release.sh` 的 preflight 會讀取 `HybridIME` macOS scheme 的 Debug／Release resolved build settings，並硬性要求版本 `1.2.0`、build `20260821` 與 deployment target `26.0`。這只準備 release 流程，並不代表簽署、公證或發佈已完成。
 - repository 沒有自動測試 target、CI、效能量測或 memory-budget regression test。
 
 ## 授權

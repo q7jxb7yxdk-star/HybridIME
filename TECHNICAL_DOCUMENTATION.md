@@ -261,6 +261,14 @@ pass-through fallback，避免倉頡碼被誤記為英文語境。此狀態會�
 中文後：1 ，   2 ,
 ```
 
+上述直接插入只會在目標文字 client 已提供有效插入位置時執行。標點分支在
+`buffer` 為空時先檢查 sender 可轉為 `IMKTextInput`，且
+`selectedRange().location != NSNotFound`；若任一條件不成立，會在改變標點、
+聯想或語境狀態前直接回傳 `false`，把原始按鍵交回目標 app。這讓 Google Sheets
+等網頁文字 client 在只有 cell selection、尚未進入文字編輯模式時，可用第一個
+符號按鍵建立編輯 session，而不會被 HybridIME 提前消耗。已有組字 `buffer` 時
+不套用此 guard，仍會先提交現有組字，再按原有流程輸出標點。
+
 `beginPunctuationSelection` 會透過 InputMethodKit 傳入的 `IMKTextInput` client
 讀取插入前的 `selectedRange()`，保存已輸出標點的文件範圍。選取其他候選時，
 `replacePendingPunctuation(with:to:)` 會使用同一個 `IMKTextInput` 驗證目前游標及

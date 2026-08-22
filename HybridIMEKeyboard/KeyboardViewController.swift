@@ -174,7 +174,8 @@ final class KeyboardViewController: UIInputViewController {
     }
 
     private func configureInterface() {
-        view.backgroundColor = keyboardBackgroundColor
+        view.backgroundColor = .clear
+        view.isOpaque = false
 
         candidateStackView.axis = .horizontal
         candidateStackView.alignment = .fill
@@ -1899,7 +1900,7 @@ final class KeyboardViewController: UIInputViewController {
     private func updateAppearance() {
         let darkAppearance = textDocumentProxy.keyboardAppearance == .dark
         view.overrideUserInterfaceStyle = darkAppearance ? .dark : .light
-        view.backgroundColor = keyboardBackgroundColor
+        view.backgroundColor = .clear
     }
 
     private func updateReturnKeyTitle() {

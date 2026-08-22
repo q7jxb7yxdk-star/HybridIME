@@ -178,11 +178,13 @@ macOS `StaticLexicon` 以 `SQLITE_OPEN_FULLMUTEX` 唯讀開啟資料庫、啟用
 
 `InputMethodController` 是 macOS 組字與事件的負責者。`KeyboardViewController` 同時是 iOS UI 與狀態機的負責者，負責按鍵版面、候選、標點、聯想上下文、游標手勢、鍵盤切換、顏色及 Return 鍵標籤。大型 iOS 控制器是目前的耦合點。
 
-iOS 控制器在載入時，以及文字／版面狀態變更時讀取 `needsInputModeSwitchKey`。值為 `true` 時，會建立以 `handleInputModeList(from:with:)` 為目標的地球鍵，處理所有觸控事件；如此 iOS 能同時處理切換與長按顯示已啟用鍵盤清單。目前鍵盤 UI 不包含表情符號目錄、搜尋預留位置或表情符號頁面。
+iOS 控制器固定建立以 `handleInputModeList(from:with:)` 為目標的地球鍵，並處理所有觸控事件；如此 iOS 能同時處理切換與長按顯示已啟用鍵盤清單，而不需因 `needsInputModeSwitchKey` 變化重建鍵盤。目前鍵盤 UI 不包含表情符號目錄、搜尋預留位置或表情符號頁面。
 
 ### iOS 版面模式與替代符號
 
 `KeyboardViewController` 在版面配置後，若裝置是 iPad、水平尺寸類別為 `regular` 且鍵盤檢視寬度至少 700 點，便選取 `wideIPad`；否則使用 `compact`。初始的版面配置前選擇接受任何非 `compact` 的 iPad 水平尺寸類別，接著由 `viewWillLayoutSubviews()` 依最終寬度重新協調。寬版模式使用 353 點鍵盤高度、等比分配各列以及固定的 11 格列；`compact` 模式使用 260 點。寬版字母列將 Delete 放在第一列、Return 放在第二列，並在第三列兩端放置 Shift，另有逗號與句號標點控制。
+
+鍵盤根視圖使用透明且非不透明的 surface，讓 iOS 宿主提供的鍵盤背景材質延伸至自訂內容區，視覺上銜接由系統管理的底部地球／咪高峰區。按鍵與游標觸控板覆蓋層仍使用自己的動態顏色。系統底部區不屬於 extension，程式不能直接設定其顏色。
 
 寬版數字模式呈現上下堆疊的主要／替代配對：`@／¥`、`#／€`、`$／£`、`&／_`、`*／^`、`(／[`、`)／]`、`'／{`、`"／}`、`%／§`、`-／|`、`+／~`、`=／…`、`/／\\`、`;／<`、`:／>`、`,／!` 與 `.／?`。單指平移只有在向下位移達到 12 點且大於水平位移時才會選取替代符號。選取期間會隱藏堆疊標籤、顯示置中的替代預覽並反白按鍵；結束手勢會提交替代符號，取消則還原一般標籤。主要按鍵 `@`、`#`、`$`、`&`、`(`、`)`、`'`、`"` 與 `/` 使用零堆疊間距與邊緣內縮；其餘配對使用 -5 點堆疊間距與 2 點邊緣內縮。寬版字母標點控制也會將 `!` 與 `?` 作為逗號與句號的向下輕掃替代符號。
 
@@ -267,7 +269,7 @@ macOS 將預設標點候選作為標記文字插入，並在替換前驗證用�
 
 所有建置目標都將 Swift 語言版本設定為 5.0。專案沒有 `.xcconfig`、`.swift-version`、`.xcode-version`、CI 矩陣或套件鎖定檔。中繼資料記錄以 Xcode 26.5／26.6 建立或升級，但這不是正式的最低 Xcode 宣告。
 
-兩個 iOS 產品都以裝置系列 `1,2`（iPhone 與 iPad）為建置目標，並使用 iPhoneOS SDK。`HybridIMEiOS` 宿主明確將 `SUPPORTED_PLATFORMS` 限制為 `iphoneos iphonesimulator`，並停用 Mac Catalyst、Designed for iPhone／iPad on Mac，以及 Designed for iPhone／iPad on visionOS。這四項平台限制是宿主建置目標設定；鍵盤延伸功能不會在自己的建置目標設定中重複設定。
+兩個 iOS 產品都以裝置系列 `1,2`（iPhone 與 iPad）為建置目標，並使用 iPhoneOS SDK。`HybridIMEiOS` 與 `HybridIMEKeyboard` 均明確將 `SUPPORTED_PLATFORMS` 限制為 `iphoneos iphonesimulator`，並停用 Mac Catalyst、Designed for iPhone／iPad on Mac，以及 Designed for iPhone／iPad on visionOS。
 
 ### macOS Info.plist 與權限設定
 
@@ -373,11 +375,13 @@ swiftc -module-cache-path /tmp/hybridime-module-cache-keyboard \
 
 在 HEAD `56fcaa7` 的 2026-08-22 文件更新中，未簽署的通用 iOS 模擬器 Debug 建置再次通過 `HybridIMEiOS` 與 `HybridIMEKeyboard`，並編譯 arm64 與 x86_64 切片。這僅是編譯與套件驗證；未執行模擬器鍵盤啟用或手勢互動。
 
+後續在 iOS 26 Simulator 與實體 iPhone 進行有限鍵盤切換診斷：宿主會在轉場期間以 required 高度約束暫時把 extension 根視圖由最終 260 點配置為較高 frame；最小空白鍵盤亦能重現，故不能歸因於 SQLite、解碼器或完整按鍵樹。公開 API 只能以 primary view 的 Auto Layout 約束要求最終高度，不能控制宿主的中途 frame。透明根視圖在 Simulator 的視覺檢查中可與系統底部材質銜接；這不代表跨裝置、外觀與宿主均已驗證。
+
 ### 外部未驗證
 
 - 已安裝 macOS InputMethodKit 的註冊、端點與真實文字輸入。
 - 第三方 macOS 用戶端間的候選定位與替換。
-- iOS 模擬器／實體裝置的鍵盤啟用、記憶體使用量與宿主相容性。
+- iOS 鍵盤的完整跨裝置、方向、外觀、記憶體使用量與宿主相容性矩陣。
 - 簽署、封存、公證、DMG、GitHub 發行或 App Store 行為。
 
 ## 13. 已知限制與技術債
@@ -390,7 +394,7 @@ swiftc -module-cache-path /tmp/hybridime-module-cache-keyboard \
 - 倉頡 TSV 仍會解析至記憶體；SQLite 遷移僅涵蓋雙語與聯想資料。
 - macOS 資源預載入沒有就緒狀態、進度 UI 或重試。
 - iOS 替換依賴宿主上下文與立即插入／刪除行為，而非標記文字組字。
-- iOS 依 `needsInputModeSwitchKey` 條件建立地球鍵，並將切換／長按選取交給 `handleInputModeList(from:with:)`；不同寬度、方向與已啟用鍵盤組合下的裝置行為仍未驗證。
+- iOS 固定建立地球鍵，並將切換／長按選取交給 `handleInputModeList(from:with:)`；部分裝置也會在 extension 外顯示系統地球鍵，不同寬度、方向與已啟用鍵盤組合下的行為仍需持續驗證。
 - iPad 在 700 點邊界的寬版版面切換、11 格幾何、堆疊符號標籤，以及 12 點替代符號輕掃預覽／提交互動，在模擬器與裝置上的視覺及行為仍未驗證。
 - iOS 垂直游標備援會估算每行十個字元，無法得知視覺換行。
 - 沒有可清除學習資料的設定 UI；記錄數量沒有全域上限或修剪政策。

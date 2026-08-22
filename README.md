@@ -1,18 +1,18 @@
 # HybridIME
 
-HybridIME 是一套以 Swift 開發的中英混合倉頡五代輸入工具，同一個 Xcode project 目前包含：
+HybridIME 是一套以 Swift 開發的中英混合倉頡五代輸入工具，同一個 Xcode 專案目前包含：
 
 - macOS InputMethodKit 輸入法 `HybridIME`。
-- iOS／iPadOS host app `HybridIMEiOS`。
-- 嵌入 host app 的 Custom Keyboard extension `HybridIMEKeyboard`。
+- iOS／iPadOS 主程式 `HybridIMEiOS`。
+- 嵌入主程式的自訂鍵盤延伸功能 `HybridIMEKeyboard`。
 
-輸入英文字母時，兩個輸入法都會同時把內容視為英文與倉頡碼，並提供倉頡字、雙向翻譯、聯想與本機智能候選。所有 runtime 詞典均隨 app 離線提供；source 中沒有網路 API、帳戶、telemetry 或 cloud sync 路徑。
+輸入英文字母時，兩個輸入法都會同時把內容視為英文與倉頡碼，並提供倉頡字、雙向翻譯、聯想與本機智能候選。所有執行期詞典均隨應用程式離線提供；原始碼中沒有網路 API、帳戶、遙測或雲端同步路徑。
 
-> 狀態說明：本文件以目前 working tree 為準。`Implemented` 表示 source 已接入正常路徑，不等同已在本次任務完成實機驗證；實際驗證結果見[開發與驗證](#開發與驗證)。
+> 狀態說明：本文件以目前 Git 工作樹為準。「已實作」表示原始碼已接入正常路徑，不等同已在本次任務完成實機驗證；實際驗證結果見[開發與驗證](#開發與驗證)。
 
 ## 功能
 
-### 共同功能（Implemented）
+### 共同功能（已實作）
 
 - 倉頡五代單字解碼，最多五碼；超過五碼仍可輸入英文。
 - 以 Core Text 過濾目前系統字型無法正常顯示的候選字。
@@ -21,44 +21,44 @@ HybridIME 是一套以 Swift 開發的中英混合倉頡五代輸入工具，同
 - 中英文聯想候選與連續中文學習。
 - 依最近選擇提升智能候選；學習資料只寫入本機 SQLite。
 - 依中文／英文前文選擇全形或半形標點，並提供替代標點候選。
-- 以 bundled read-only SQLite lexicon 查詢雙語與聯想資料。
+- 以隨附的唯讀 SQLite 詞庫查詢雙語與聯想資料。
 
-### macOS（Implemented）
+### macOS（已實作）
 
-- classic InputMethodKit `.app`，以背景程序建立 `IMKServer`。
+- 傳統 InputMethodKit `.app`，以背景程序建立 `IMKServer`。
 - 在文字插入點附近顯示不搶焦點的候選視窗。
 - `Space` 輸出英文及空格；若第一項是已學習的中文候選則提交中文。
 - `Shift + Space` 輸出原始英文、不附加空格，並記錄該選擇。
-- `Return` 或 `1`–`0` 選取候選；`Delete`、`Esc`、標點及 app 快捷鍵有獨立狀態處理。
-- Command、Control、Option、滑鼠及系統輸入事件交回目前 app。
+- `Return` 或 `1`–`0` 選取候選；`Delete`、`Esc`、標點及應用程式快捷鍵有獨立狀態處理。
+- Command、Control、Option、滑鼠及系統輸入事件交回目前應用程式。
 
-### iOS／iPadOS（Implemented，runtime 未驗證）
+### iOS／iPadOS（已實作，執行期未驗證）
 
 - UIKit 自訂鍵盤，包含字母、數字與符號頁面。
-- iPad 在 regular horizontal size class 且鍵盤寬度至少 700 pt 時，使用 11-slot、353 pt 高的寬版配置；其他情況維持 compact 配置。
-- 寬版數字符號鍵同時顯示主要與替代符號；向下滑動至少 12 pt 且垂直位移大於水平位移時，會顯示替代符號預覽並輸入替代符號。
+- iPad 在水平尺寸類別為 `regular` 且鍵盤寬度至少 700 點時，使用 11 格、353 點高的寬版配置；其他情況維持緊湊配置。
+- 寬版數字符號鍵同時顯示主要與替代符號；向下滑動至少 12 點且垂直位移大於水平位移時，會顯示替代符號預覽並輸入替代符號。
 - 候選列、倉頡字根提示、大小寫與 Caps Lock。
 - 點按已學習候選、翻譯、標點或聯想候選時替換已插入文字。
-- 長按 Space 後水平／垂直拖曳游標，並提供 selection feedback。
-- extension 宣告 `RequestsOpenAccess=false`，離線詞典及學習不需要「允許完整取用」。
-- 當 `needsInputModeSwitchKey` 為真時，顯示 Globe 鍵並使用 `handleInputModeList(from:with:)` 切換或長按選擇已啟用鍵盤。
-- SwiftUI host app 提供加入與使用鍵盤、離線本機學習及第三方鍵盤系統限制的說明。
+- 長按 Space 後水平／垂直拖曳游標，並提供選取回饋。
+- 延伸功能宣告 `RequestsOpenAccess=false`，離線詞典及學習不需要「允許完整取用」。
+- 當 `needsInputModeSwitchKey` 為真時，顯示地球鍵並使用 `handleInputModeList(from:with:)` 切換或長按選擇已啟用鍵盤。
+- SwiftUI 主程式提供加入與使用鍵盤、離線本機學習及第三方鍵盤系統限制的說明。
 - `HybridIMEKeyboard/PrivacyInfo.xcprivacy` 宣告不追蹤、不收集資料，以及 Shift 雙擊計時所需的 `SystemBootTime` 原因 `35F9.1`。
 
 ## 系統需求
 
-| 項目 | Repository 宣告 |
+| 項目 | 儲存庫宣告 |
 | --- | --- |
-| macOS deployment target | `26.0` |
-| iOS／iPadOS deployment target | `26.0` |
-| Swift language version | `5.0` build setting |
-| Xcode | 沒有 tool-version file 或 CI 明確宣告最低版本；project metadata 由 Xcode 26.5／26.6 建立或更新，需使用能讀取 object version 77 並提供 SDK 26 的 Xcode |
-| Python | 只供建立及驗證靜態 SQLite lexicon；版本未在 repository 鎖定 |
-| 第三方 package | 無 Swift Package、CocoaPods、Carthage、npm 或其他 package manifest／lockfile |
+| macOS 部署目標 | `26.0` |
+| iOS／iPadOS 部署目標 | `26.0` |
+| Swift 語言版本 | 建置設定為 `5.0` |
+| Xcode | 沒有工具版本檔或 CI 明確宣告最低版本；專案中繼資料由 Xcode 26.5／26.6 建立或更新，需使用能讀取 `object version 77` 並提供 SDK 26 的 Xcode |
+| Python | 只供建立及驗證靜態 SQLite 詞庫；版本未在儲存庫鎖定 |
+| 第三方套件 | 無 Swift Package、CocoaPods、Carthage、npm 或其他套件資訊清單／鎖定檔 |
 
-App runtime 使用 Apple 平台 framework：AppKit、InputMethodKit、UIKit、SwiftUI、Foundation、CoreText 與系統 SQLite3。
+應用程式執行期使用 Apple 平台框架：AppKit、InputMethodKit、UIKit、SwiftUI、Foundation、CoreText 與系統 SQLite3。
 
-macOS 日常開發 build 可停用 code signing；要安裝並實際啟用輸入法，需有效的本機開發簽署。iOS 真機執行亦需使用自己的 Apple Development team。project 目前含有 owner-specific team 設定，其他開發者應在 Xcode 的 Signing & Capabilities 選擇自己的 team，不應沿用 repository 中的值作 credential。
+macOS 日常開發建置可停用程式碼簽署；要安裝並實際啟用輸入法，需有效的本機開發簽署。iOS 真機執行亦需使用自己的 Apple Development 團隊。專案目前含有擁有者專用的團隊設定，其他開發者應在 Xcode 的 Signing & Capabilities 選擇自己的團隊，不應沿用儲存庫中的值作為憑證。
 
 ## 取得與開啟專案
 
@@ -68,19 +68,19 @@ cd HybridIME
 open HybridIME.xcodeproj
 ```
 
-Repository 不需要另外安裝 package dependencies，也沒有 environment file 或 runtime API key。
+儲存庫不需要另外安裝套件相依項目，也沒有環境設定檔或執行期 API 金鑰。
 
-Xcode 中可使用以下 schemes：
+Xcode 中可使用以下 scheme：
 
 - `HybridIME`：macOS 輸入法。
-- `HybridIMEiOS`：iOS／iPadOS host app，會同時 build 並嵌入 keyboard extension。
-- `HybridIMEKeyboard`：獨立 build keyboard extension；通常由 host app scheme 驅動。
+- `HybridIMEiOS`：iOS／iPadOS 主程式，會同時建置並嵌入鍵盤延伸功能。
+- `HybridIMEKeyboard`：獨立建置鍵盤延伸功能；通常由主程式的 scheme 驅動。
 
 ## 建置與執行
 
 ### macOS
 
-在 Xcode 選擇 `HybridIME` scheme 與 `My Mac`。不簽署的命令列 build：
+在 Xcode 選擇 `HybridIME` scheme 與 `My Mac`。不簽署的命令列建置：
 
 ```sh
 xcodebuild \
@@ -93,13 +93,13 @@ xcodebuild \
   build
 ```
 
-要使用輸入法，需把已適當簽署的 `HybridIME.app` 放入 `~/Library/Input Methods/`，再從「系統設定 > 鍵盤 > 文字輸入」加入「中英混合輸入法」。build 成功只證明產物可建立，不證明已安裝的 app、LaunchServices 註冊或 InputMethodKit endpoint 正常。
+要使用輸入法，需把已適當簽署的 `HybridIME.app` 放入 `~/Library/Input Methods/`，再從「系統設定 > 鍵盤 > 文字輸入」加入「中英混合輸入法」。建置成功只證明產物可建立，不證明已安裝的應用程式、LaunchServices 註冊或 InputMethodKit 端點正常。
 
-若已安裝版本出現「已選取但沒有輸入反應」，請參閱[技術文件的 InputMethodKit 診斷](TECHNICAL_DOCUMENTATION.md#macos-inputmethodkit-lifecycle)。
+若已安裝版本出現「已選取但沒有輸入反應」，請參閱[技術文件的 InputMethodKit 診斷](TECHNICAL_DOCUMENTATION.md#macos-inputmethodkit-生命週期)。
 
 ### iOS／iPadOS
 
-在 Xcode 選擇 `HybridIMEiOS` scheme 與 Simulator 或已簽署的 device。命令列 Simulator build：
+在 Xcode 選擇 `HybridIMEiOS` scheme 與模擬器或已簽署的裝置。模擬器命令列建置：
 
 ```sh
 xcodebuild \
@@ -112,11 +112,11 @@ xcodebuild \
   build
 ```
 
-安裝 host app 後，前往「設定 > 一般 > 鍵盤 > 鍵盤 > 新增鍵盤」，選擇 `HybridIMEKeyboard`。當系統需要鍵盤切換控制時，HybridIME 底列會顯示 Globe 鍵；點按可切換鍵盤，長按可選擇已啟用的鍵盤。
+安裝主程式後，前往「設定 > 一般 > 鍵盤 > 鍵盤 > 新增鍵盤」，選擇 `HybridIMEKeyboard`。當系統需要鍵盤切換控制時，HybridIME 底列會顯示地球鍵；點按可切換鍵盤，長按可選擇已啟用的鍵盤。
 
 ## 基本輸入方式
 
-macOS 輸入 `hsp` 後可用 `Return` 或候選數字鍵提交「怎」；按 `Space` 則輸出 `hsp `。iOS 會先透過 `UITextDocumentProxy` 把鍵入字母插入 host，點選候選後再刪除該字碼並插入候選。
+macOS 輸入 `hsp` 後可用 `Return` 或候選數字鍵提交「怎」；按 `Space` 則輸出 `hsp `。iOS 會先透過 `UITextDocumentProxy` 把鍵入字母插入宿主應用程式，點選候選後再刪除該字碼並插入候選。
 
 兩平台一般候選次序為：
 
@@ -136,58 +136,58 @@ v 女  w 田  x 難  y 卜  z 重
 ## 專案結構
 
 ```text
-HybridIME/                 macOS InputMethodKit target、倉頡資料及資料來源 TSV
-HybridIMEKeyboard/         iOS Custom Keyboard、bundled SQLite lexicon 及鍵盤資源
-HybridIMEiOS/              iOS／iPadOS host app 與設定說明 UI
-HybridIME.xcodeproj/       targets、build settings 與 schemes
-Scripts/                   資料生成、SQLite 驗證、standalone tests 及 release tooling
+HybridIME/                 macOS InputMethodKit 建置目標、倉頡資料及資料來源 TSV
+HybridIMEKeyboard/         iOS 自訂鍵盤、隨附 SQLite 詞庫及鍵盤資源
+HybridIMEiOS/              iOS／iPadOS 主程式與設定說明介面
+HybridIME.xcodeproj/       建置目標、建置設定與 schemes
+Scripts/                   資料生成、SQLite 驗證、獨立測試及發佈工具
 README.md                  開發者入口與執行方式
 TECHNICAL_DOCUMENTATION.md 架構、資料流、設定、測試及維護細節
-Info.plist                 macOS InputMethodKit bundle 設定
+Info.plist                 macOS InputMethodKit 套件設定
 ```
 
 ## 開發與驗證
 
-Repository 沒有 XCTest／UI test target、formatter、linter 或 CI。`Scripts/` 下的 tests 是以 `swiftc` 編譯執行的離線 harness；其存在只代表 test-covered，不代表任何 checkout 都已通過。
+儲存庫沒有 XCTest／UI 測試建置目標、格式化工具、程式碼檢查工具或 CI。`Scripts/` 下的測試是以 `swiftc` 編譯執行的離線測試工具；其存在只代表相關範圍已有測試，不代表任何版本的工作樹都已通過。
 
-靜態 lexicon 的 source equality 驗證：
+靜態詞庫的原始資料一致性驗證：
 
 ```sh
 python3 Scripts/verify_static_lexicon.py
 ```
 
-重新建立 lexicon 會覆寫 checked-in SQLite 及複製 notices，只有更新資料時才應執行：
+重新建立詞庫會覆寫已納入版本控制的 SQLite，並複製授權聲明；只有更新資料時才應執行：
 
 ```sh
 python3 Scripts/build_static_lexicon.py
 ```
 
-本次文件任務的實際驗證結果記錄在[技術文件的 Testing](TECHNICAL_DOCUMENTATION.md#12-testing)。release、簽署、公證、安裝及外部 runtime 驗證不屬於一般開發 validation。
+本次文件任務的實際驗證結果記錄在[技術文件的測試章節](TECHNICAL_DOCUMENTATION.md#12-測試)。發佈、簽署、公證、安裝及外部執行期驗證不屬於一般開發驗證。
 
 ## 已知限制
 
-- SQLite runtime 與 learning-store 的 release／安裝後行為必須以本次 build 結果及後續實機測試分開判斷。
-- 舊版 `UserDefaults` learning keys 沒有遷移到 SQLite 的程式；現有學習可能不會延續。
-- macOS target 未啟用 App Sandbox；learning database 沒有額外加密，也沒有清除學習資料的設定 UI。
+- SQLite 執行期與學習資料庫的發佈／安裝後行為必須以本次建置結果及後續實機測試分開判斷。
+- 舊版 `UserDefaults` 學習鍵值沒有遷移到 SQLite 的程式；現有學習可能不會延續。
+- macOS 建置目標未啟用 App Sandbox；學習資料庫沒有額外加密，也沒有清除學習資料的設定介面。
 - Apple 沒有公開 macOS 內建倉頡解碼 API，碼表與候選次序不能保證完全一致。
-- macOS 候選視窗最多顯示十項，沒有翻頁；候選位置與中文詞組替換依賴 host 正確實作 text-input API。
-- iOS 先插入英文字碼再刪除替換；若 host 不提供足夠 context、游標已移動或文字已改變，guard 會拒絕替換。
-- iOS 會在 `needsInputModeSwitchKey` 為真時提供 Globe 鍵；其在各種 device、方向與多鍵盤組合下的行為仍需實機驗證。
-- iPad 寬版配置、替代符號下滑門檻與 preview 在不同裝置、方向及 app 內的視覺與操作行為仍需 Simulator／實機驗證。
-- 第三方鍵盤在安全文字欄位、電話／姓名電話鍵盤或 host 禁用 extension 時會由系統鍵盤取代；本次未做 device／多 app 相容性驗證。
-- `Scripts/release.sh` 的 preflight 會讀取 `HybridIME` macOS scheme 的 Debug／Release resolved build settings，並硬性要求版本 `1.2.0`、build `20260821` 與 deployment target `26.0`。這只準備 release 流程，並不代表簽署、公證或發佈已完成。
-- repository 沒有自動測試 target、CI、效能量測或 memory-budget regression test。
+- macOS 候選視窗最多顯示十項，沒有翻頁；候選位置與中文詞組替換依賴宿主應用程式正確實作文字輸入 API。
+- iOS 先插入英文字碼再刪除替換；若宿主應用程式不提供足夠前後文、游標已移動或文字已改變，防護條件會拒絕替換。
+- iOS 會在 `needsInputModeSwitchKey` 為真時提供地球鍵；其在各種裝置、方向與多鍵盤組合下的行為仍需實機驗證。
+- iPad 寬版配置、替代符號下滑門檻與預覽在不同裝置、方向及應用程式內的視覺與操作行為仍需模擬器／實機驗證。
+- 第三方鍵盤在安全文字欄位、電話／姓名電話鍵盤或宿主應用程式禁用延伸功能時會由系統鍵盤取代；本次未做裝置／多應用程式相容性驗證。
+- `Scripts/release.sh` 的前置檢查會讀取 `HybridIME` macOS scheme 的 Debug／Release 已解析建置設定，並硬性要求版本 `1.2.0`、組建編號 `20260821` 與部署目標 `26.0`。這只準備發佈流程，並不代表簽署、公證或發佈已完成。
+- 儲存庫沒有自動測試建置目標、CI、效能量測或記憶體預算迴歸測試。
 
 ## 授權
 
-Repository 沒有找到 project-wide `LICENSE`，因此不能推斷 HybridIME source code 的再利用授權。
+儲存庫沒有找到涵蓋整個專案的 `LICENSE`，因此不能推斷 HybridIME 原始碼的再利用授權。
 
 第三方資料的授權與歸屬分別位於：
 
 - `HybridIME/CangjieData/LICENSE-Rime-Cangjie.txt` 與 `HybridIME/CangjieData/NOTICE.txt`。
-- `HybridIMEKeyboard/CangjieData/LICENSE-Rime-Cangjie.txt` 與 `HybridIMEKeyboard/CangjieData/NOTICE-Rime-Cangjie.txt`，隨 iOS runtime Cangjie table 提供。
+- `HybridIMEKeyboard/CangjieData/LICENSE-Rime-Cangjie.txt` 與 `HybridIMEKeyboard/CangjieData/NOTICE-Rime-Cangjie.txt`，隨 iOS 執行期倉頡表提供。
 - `HybridIME/DictionaryData/LICENSE-CC-CEDICT.txt` 與 `HybridIME/DictionaryData/NOTICE-CC-CEDICT.txt`。
 - `HybridIME/AssociationData/LICENSE-Rime-Essay.txt`、`HybridIME/AssociationData/NOTICE-Rime-Essay.txt` 與 `HybridIME/AssociationData/NOTICE-Tatoeba-CC0.txt`。
-- `HybridIMEKeyboard/LexiconData/` 內隨 bundled SQLite 一併提供的對應 license／notice。
+- `HybridIMEKeyboard/LexiconData/` 內隨附 SQLite 一併提供的對應授權／聲明文件。
 
 詳細實作請參閱 [TECHNICAL_DOCUMENTATION.md](TECHNICAL_DOCUMENTATION.md)。

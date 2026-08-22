@@ -59,8 +59,9 @@ final class KeyboardViewController: UIInputViewController {
         }
     }
 
-    private let decoder = CangjieDecoder()
-    private let offlineLexicon = OfflineLexicon()
+    private var decoder: CangjieDecoder?
+    private var decoderLoadingTask: Task<Void, Never>?
+    private lazy var offlineLexicon = OfflineLexicon()
     private lazy var associationDictionary = KeyboardAssociationDictionary(
         lexicon: offlineLexicon
     )
@@ -87,7 +88,6 @@ final class KeyboardViewController: UIInputViewController {
     private var associationLanguage: KeyboardAssociationDictionary.Language?
     private var learnedChineseContext = ""
     private var currentPage = KeyboardPage.letters
-    private var requiresInputModeSwitchKey = false
     private var shiftState = ShiftState.lowercased
     private var lastShiftTapTime: TimeInterval = 0
     private var cursorGestureStartPoint = CGPoint.zero
@@ -151,7 +151,6 @@ final class KeyboardViewController: UIInputViewController {
             ? .wideIPad
             : .compact
         configureInterface()
-        requiresInputModeSwitchKey = needsInputModeSwitchKey
         rebuildKeyboard()
         hasBuiltKeyboard = true
         refreshComposition()
@@ -161,14 +160,17 @@ final class KeyboardViewController: UIInputViewController {
     override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
         updateLayoutModeIfNeeded()
-        updateInputModeSwitchKeyVisibility()
+    }
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        preloadDecoderIfNeeded()
     }
 
     override func textDidChange(_ textInput: UITextInput?) {
         super.textDidChange(textInput)
         updateAppearance()
         updateReturnKeyTitle()
-        updateInputModeSwitchKeyVisibility()
     }
 
     private func configureInterface() {
@@ -318,6 +320,21 @@ final class KeyboardViewController: UIInputViewController {
         layoutMode = nextMode
         guard hasBuiltKeyboard else { return }
         rebuildKeyboard()
+    }
+
+    private func preloadDecoderIfNeeded() {
+        guard decoder == nil, decoderLoadingTask == nil else { return }
+        decoderLoadingTask = Task { [weak self] in
+            let decoder = await Task.detached(priority: .userInitiated) {
+                CangjieDecoder()
+            }.value
+            guard !Task.isCancelled, let self else { return }
+            self.decoder = decoder
+            self.decoderLoadingTask = nil
+            if !self.buffer.isEmpty {
+                self.refreshComposition()
+            }
+        }
     }
 
     private func buildWideIPadLetterRows() {
@@ -865,11 +882,9 @@ final class KeyboardViewController: UIInputViewController {
         pageButton.widthAnchor.constraint(equalToConstant: 52).isActive = true
         row.addArrangedSubview(pageButton)
 
-        if requiresInputModeSwitchKey {
-            let inputModeButton = makeInputModeButton()
-            inputModeButton.widthAnchor.constraint(equalToConstant: 44).isActive = true
-            row.addArrangedSubview(inputModeButton)
-        }
+        let inputModeButton = makeInputModeButton()
+        inputModeButton.widthAnchor.constraint(equalToConstant: 44).isActive = true
+        row.addArrangedSubview(inputModeButton)
 
         let spaceButton = makeSpaceButton()
         row.addArrangedSubview(spaceButton)
@@ -887,14 +902,12 @@ final class KeyboardViewController: UIInputViewController {
         row.spacing = 5
         row.distribution = .fill
 
-        if requiresInputModeSwitchKey {
-            let inputModeButton = makeInputModeButton()
-            row.addArrangedSubview(inputModeButton)
-            inputModeButton.widthAnchor.constraint(
-                equalTo: row.widthAnchor,
-                multiplier: 0.085
-            ).isActive = true
-        }
+        let inputModeButton = makeInputModeButton()
+        row.addArrangedSubview(inputModeButton)
+        inputModeButton.widthAnchor.constraint(
+            equalTo: row.widthAnchor,
+            multiplier: 0.085
+        ).isActive = true
 
         let pageTitle = currentPage == .letters ? "123" : "ABC"
         let pageDestination = currentPage == .letters
@@ -1160,14 +1173,6 @@ final class KeyboardViewController: UIInputViewController {
         }
         rebuildKeyboard()
         refreshComposition()
-    }
-
-    private func updateInputModeSwitchKeyVisibility() {
-        let needsInputModeSwitchKey = self.needsInputModeSwitchKey
-        guard requiresInputModeSwitchKey != needsInputModeSwitchKey else { return }
-        requiresInputModeSwitchKey = needsInputModeSwitchKey
-        guard hasBuiltKeyboard else { return }
-        rebuildKeyboard()
     }
 
     private func toggleShift() {
@@ -1555,8 +1560,17 @@ final class KeyboardViewController: UIInputViewController {
     }
 
     private func refreshComposition() {
+        guard !buffer.isEmpty else {
+            currentCandidateActions = []
+            currentCandidates = []
+            learnedCandidate = nil
+            compositionLabel.text = ""
+            rebuildCandidateButtons()
+            return
+        }
+
         let cangjieCandidates = buffer.count <= 5
-            ? decoder.candidates(for: buffer, limit: 10)
+            ? decoder?.candidates(for: buffer, limit: 10) ?? []
             : []
         let dictionaryCandidates = offlineLexicon.chineseCandidates(
             for: buffer,

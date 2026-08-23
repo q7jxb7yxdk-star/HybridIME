@@ -1,5 +1,5 @@
 # HybridIME Cangjie code change log.
-# This file records confirmed macOS Cangjie differences applied to hybrid-cangjie5.dict.tsv.
+# This file records confirmed macOS Cangjie differences incorporated in the canonical SQLite cangjie table.
 # It is documentation only; HybridIME does not load this file at runtime.
 # character	old_code	new_code
 怎	osp	hsp

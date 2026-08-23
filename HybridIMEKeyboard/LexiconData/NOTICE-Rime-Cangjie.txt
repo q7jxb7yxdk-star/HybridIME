@@ -1,4 +1,4 @@
-HybridIMEKeyboard includes Cangjie 5 dictionary data from:
+HybridIME includes Cangjie 5 dictionary data from:
 
 Rime Cangjie
 https://github.com/rime/rime-cangjie

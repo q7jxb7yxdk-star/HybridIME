@@ -26,16 +26,8 @@ final class InputResources {
         let lexicon = StaticLexicon()
         bilingualDictionary = BilingualDictionary(lexicon: lexicon)
         associationDictionary = AssociationDictionary(lexicon: lexicon)
-
-        Task.detached(priority: .userInitiated) {
-            let cangjieDecoder = CangjieDecoder()
-
-            await MainActor.run {
-                let resources = InputResources.shared
-                resources.cangjieDecoder = cangjieDecoder
-                resources.isLoading = false
-            }
-        }
+        cangjieDecoder = CangjieDecoder(lexicon: lexicon)
+        isLoading = false
     }
 }
 

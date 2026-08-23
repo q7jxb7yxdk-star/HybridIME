@@ -227,10 +227,7 @@ for resource in \
     NOTICE-Tatoeba-CC0.txt \
     NOTICE.txt \
     cangjie-change-log.tsv \
-    cangjie5.base.dict.yaml \
-    cangjie5.extended.dict.yaml \
-    hybridime-lexicon.sqlite3 \
-    hybrid-cangjie5.dict.tsv
+    hybridime-lexicon.sqlite3
 do
     require_resource "${resource}"
 done
@@ -238,13 +235,20 @@ done
 readonly HYBRIDIME_STATIC_LEXICON="${HYBRIDIME_APP}/Contents/Resources/hybridime-lexicon.sqlite3"
 [[ "$(sqlite3 "${HYBRIDIME_STATIC_LEXICON}" "PRAGMA integrity_check;")" == "ok" ]] || \
     fail "packaged static lexicon failed SQLite integrity check"
-require_equal "$(sqlite3 "${HYBRIDIME_STATIC_LEXICON}" "PRAGMA user_version;")" "1" "static lexicon schema version"
+require_equal "$(sqlite3 "${HYBRIDIME_STATIC_LEXICON}" "PRAGMA user_version;")" "2" "static lexicon schema version"
+require_equal \
+    "$(sqlite3 "${HYBRIDIME_STATIC_LEXICON}" "SELECT group_concat(name, ',') FROM (SELECT name FROM sqlite_schema WHERE type = 'table' ORDER BY rowid);")" \
+    "cangjie,association,bilingual" \
+    "static lexicon table order"
 
 for obsolete_resource in \
     cedict-index.tsv \
     chinese-associations.tsv \
     dictionary-overrides.tsv \
-    english-associations.tsv
+    english-associations.tsv \
+    hybrid-cangjie5.dict.tsv \
+    cangjie5.base.dict.yaml \
+    cangjie5.extended.dict.yaml
 do
     require_absent_resource "${obsolete_resource}"
 done

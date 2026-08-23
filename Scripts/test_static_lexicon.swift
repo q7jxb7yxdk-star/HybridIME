@@ -11,6 +11,14 @@ enum StaticLexiconTest {
         )
 
         try require(
+            lexicon.cangjieCandidates(code: "A", limit: 2) == ["日", "曰"],
+            "Cangjie lookup preserves source order"
+        )
+        try require(
+            lexicon.cangjieCandidates(code: "a", limit: 1) == ["日"],
+            "Cangjie lookup limit"
+        )
+        try require(
             lexicon.bilingualCandidates(
                 direction: .englishToChinese,
                 key: "test",

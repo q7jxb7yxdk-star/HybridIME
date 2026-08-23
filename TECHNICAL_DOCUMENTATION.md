@@ -18,14 +18,13 @@ HybridIME 在一個 Xcode 專案中提供兩套平台配接器：
 - macOS `HybridIME`：經典的 InputMethodKit 應用程式，`IMKInputController` 接收事件並用 `IMKTextInput` 更新宿主應用程式。
 - iOS／iPadOS `HybridIMEKeyboard`：`UIInputViewController` 鍵盤延伸功能，以 `UITextDocumentProxy` 插入、刪除與移動游標；由 SwiftUI 宿主應用程式 `HybridIMEiOS` 嵌入。
 
-兩平台各有自己的控制器、詞典包裝層、聯想邏輯與學習儲存庫，沒有獨立的共享 Swift 模組。它們共用已納入儲存庫的倉頡 TSV 和同一份生成後的 SQLite 詞彙資產，但原始碼有重複實作。
+兩平台各有自己的控制器、詞典包裝層、聯想邏輯與學習儲存庫，沒有獨立的共享 Swift 模組。它們使用同一份生成後的 SQLite 詞彙資產，但原始碼有重複實作。
 
 正常執行期完全離線：
 
-1. 載入隨附的倉頡 TSV。
-2. 以隨附的唯讀 SQLite 查詢雙語與聯想資料。
-3. 由平台控制器管理組字狀態、候選及宿主文字替換。
-4. 把使用者選擇寫入建置目標容器的本機 SQLite 學習資料庫。
+1. 以隨附的唯讀 SQLite 查詢倉頡、雙語與聯想資料。
+2. 由平台控制器管理組字狀態、候選及宿主文字替換。
+3. 把使用者選擇寫入建置目標容器的本機 SQLite 學習資料庫。
 
 沒有執行期後端、HTTP 提供者、登入、APNs、iCloud、Keychain 或遙測路徑。
 
@@ -34,11 +33,11 @@ HybridIME 在一個 Xcode 專案中提供兩套平台配接器：
 ```mermaid
 flowchart LR
     subgraph staticSources["靜態來源"]
-        C[倉頡 TSV]
         T[CC-CEDICT / Rime Essay / Tatoeba TSV]
-        B[build_static_lexicon.py]
+        B[update_static_lexicon.swift]
         L[(hybridime-lexicon.sqlite3)]
         T --> B --> L
+        L -.驗證固定 cangjie.-> B
     end
 
     subgraph macOS
@@ -46,7 +45,6 @@ flowchart LR
         MC[CangjieDecoder / StaticLexicon]
         MW[(UserLearningStore SQLite)]
         MP[CandidateWindowController]
-        C --> MC
         L --> MC
         MC --> IMK
         MW <--> IMK
@@ -58,7 +56,6 @@ flowchart LR
         KVC[KeyboardViewController]
         IC[CangjieDecoder / OfflineLexicon]
         IW[(KeyboardUserLearningStore SQLite)]
-        C --> IC
         L --> IC
         IC --> KVC
         IW <--> KVC
@@ -72,7 +69,7 @@ flowchart LR
 - 解碼器／詞彙／聯想／排序器不會呼叫 UI 程式碼。
 - 候選 UI 使用控制器產生的呈現資料。
 - 學習儲存庫負責 SQLite 結構與持久化；儲存庫無法使用時，呼叫端會收到空結果。
-- 建置腳本讀取來源資料並產生已納入儲存庫的執行期資產；執行期絕不讀取原始 CC-CEDICT／聯想 TSV。
+- 更新腳本讀取雙語／聯想來源並更新已納入儲存庫的執行期資產；執行期絕不讀取原始 CC-CEDICT 或聯想 TSV，倉頡則只讀取 SQLite canonical table。
 
 沒有相依性注入框架。macOS `InputResources` 與 iOS 控制器屬性充當組字根。正式執行使用共用的單例學習儲存庫；接受資料庫 URL 的初始化器支援獨立測試。
 
@@ -83,38 +80,39 @@ flowchart LR
 | `HybridIME/HybridIMEApp.swift` | macOS `NSApplication` 入口、`IMKServer`、共用資源預載入 |
 | `HybridIME/InputMethodController.swift` | macOS 事件狀態機、候選、提交、標點與聯想 |
 | `HybridIME/CandidateWindowController.swift` | 不啟用的 macOS 候選面板與插入點定位 |
-| `HybridIME/CangjieDecoder.swift` | macOS 倉頡 TSV 解析器與字形過濾器 |
-| `HybridIME/StaticLexicon.swift` | macOS 唯讀 SQLite 雙語／聯想查詢 |
+| `HybridIME/CangjieDecoder.swift` | macOS SQLite 倉頡查詢與字形過濾器 |
+| `HybridIME/StaticLexicon.swift` | macOS 唯讀 SQLite 倉頡／雙語／聯想查詢 |
 | `HybridIME/BilingualDictionary.swift` | macOS 雙語詞彙查詢的領域包裝層 |
 | `HybridIME/AssociationDictionary.swift` | macOS 靜態與學習聯想的合併／排序 |
 | `HybridIME/SmartCandidateRanker.swift` | macOS 最近使用智慧候選選擇 |
 | `HybridIME/UserLearningStore.swift` | macOS 可寫入的 SQLite 學習結構 |
 | `HybridIMEKeyboard/KeyboardViewController.swift` | iOS 鍵盤 UI、文字代理操作與組字狀態 |
-| `HybridIMEKeyboard/OfflineLexicon.swift` | iOS 具有限制快取的唯讀 SQLite 查詢 |
+| `HybridIMEKeyboard/OfflineLexicon.swift` | iOS 具有限制快取的唯讀 SQLite 倉頡／雙語／聯想查詢 |
 | `HybridIMEKeyboard/KeyboardAssociationDictionary.swift` | iOS 聯想合併／排序 |
 | `HybridIMEKeyboard/KeyboardUserLearningStore.swift` | iOS 可寫入的 SQLite 學習結構 |
 | `HybridIMEKeyboard/PunctuationStrategy.swift` | iOS 標點定義、上下文與顯示標籤 |
 | `HybridIMEKeyboard/PrivacyInfo.xcprivacy` | 鍵盤延伸功能隱私權資訊清單：不追蹤／無收集資料，以及 SystemBootTime 理由 `35F9.1` |
 | `HybridIMEiOS/ContentView.swift` | 宿主應用程式設定、離線本機學習與第三方鍵盤系統限制說明 |
-| `HybridIME/CangjieData/` | 執行期倉頡資料表、上游快照、變更記錄與聲明 |
+| `HybridIME/CangjieData/` | 保留的倉頡變更記錄、授權與聲明；不含可重建資料 |
 | `HybridIME/DictionaryData/` | 用於產生 SQLite 的 CC-CEDICT 來源索引、覆寫項目、授權與聲明 |
 | `HybridIME/AssociationData/` | 中文／英文聯想來源索引、授權與聲明 |
-| `HybridIMEKeyboard/CangjieData/` | iOS 執行期倉頡資料表與 Rime Cangjie 授權／聲明 |
 | `HybridIMEKeyboard/LexiconData/` | 鍵盤延伸功能使用的隨附 SQLite 詞彙與複製的聲明 |
 | `Scripts/` | 資料集建置器、驗證器、獨立測試與發行工具 |
 
-專案使用 Xcode 檔案系統同步群組。macOS 建置目標明確排除原始詞典／聯想 TSV 資源，並明確包含 `HybridIMEKeyboard/LexiconData/hybridime-lexicon.sqlite3`；因此兩個平台建置目標都使用儲存庫中同一份生成的詞彙檔案。
+專案使用 Xcode 檔案系統同步群組。macOS 建置目標明確排除原始詞典／聯想 TSV 資源，並明確包含 `HybridIMEKeyboard/LexiconData/hybridime-lexicon.sqlite3`；因此兩個平台建置目標都使用儲存庫中同一份生成的詞彙檔案，且不封裝可重建的資料 TSV。
 
 ## 4. 資料流程
 
 ### 靜態資料產生
 
-`Scripts/build_cedict_index.swift`、`Scripts/build_chinese_associations.swift` 與 `Scripts/build_english_associations.swift` 產生來源 TSV 索引。接著由 `Scripts/build_static_lexicon.py`：
+`Scripts/build_cedict_index.swift`、`Scripts/build_chinese_associations.swift` 與 `Scripts/build_english_associations.swift` 產生來源 TSV 索引。`Scripts/update_static_lexicon.swift` 會：
 
-1. 建立 `bilingual(direction, key, candidates)` 與 `association(language, key, candidates)` WITHOUT ROWID 資料表。
-2. 將英文鍵值正規化為小寫，並保留以定位字元分隔的候選順序。
-3. 套用 `HybridIME/DictionaryData/dictionary-overrides.tsv` 的 `add-e`、`add-z`、`replace-e`、`replace-z` 操作。
-4. 設定 `PRAGMA user_version=1`、清理資料庫，並將第三方聲明複製到 `LexiconData/`。
+1. 先驗證既有 SQLite 的完整性、`user_version=2`、固定表次序 `cangjie → association → bilingual`，以及 `cangjie` 的結構、33,319 筆資料、36,862 個候選與固定內容指紋。
+2. 只在 transaction 中清除並重新寫入 `association(language, key, candidates)` 與 `bilingual(direction, key, candidates)`；絕不 drop、重建或修改 `cangjie`。
+3. 將英文鍵值正規化為小寫，保留來源候選順序，並套用 `HybridIME/DictionaryData/dictionary-overrides.tsv` 的 `add-e`、`add-z`、`replace-e`、`replace-z` 操作。
+4. 將 Rime Cangjie、CC-CEDICT、Rime Essay 與 Tatoeba 的授權／聲明更新至 `LexiconData/`。
+
+`cangjie` 的唯一且固定來源是 `HybridIMEKeyboard/LexiconData/hybridime-lexicon.sqlite3` 內的二進位 SQLite 表；不再有可重建它的 TSV／YAML 或建置工具。`Scripts/verify_static_lexicon.swift` 唯讀開啟該資料庫，驗證固定結構和列數，並完整比對 `association`、`bilingual` 與其來源。
 
 目前已納入儲存庫的資料庫回報 177,594 個雙語資料列與 244,887 個聯想資料列。這些數量是儲存庫快照，不是服務狀態。
 
@@ -202,7 +200,7 @@ iOS 控制器固定建立以 `handleInputModeList(from:with:)` 為目標的地�
 
 ### 靜態資料庫
 
-`hybridime-lexicon.sqlite3` 結構版本為 `1`。它隨附於產品並以唯讀方式開啟，不包含任何使用者資料。
+`hybridime-lexicon.sqlite3` 結構版本為 `2`，依序包含 `cangjie`、`association` 與 `bilingual` 表。它隨附於產品並以唯讀方式開啟，不包含任何使用者資料。
 
 ### 使用者學習資料庫
 
@@ -220,7 +218,7 @@ macOS 與 iOS 儲存庫各自建立：
 
 ### 倉頡
 
-執行期資料表將小寫 ASCII 代碼對應到有順序的單字元候選。每個代碼會移除重複值。Rime 的基本與擴充來源檔案可使用 `Scripts/build_hybrid_cangjie_dict.swift` 合併；本機修正存放於生成的執行期 TSV，並手動記錄在 `HybridIME/CangjieData/cangjie-change-log.tsv`。
+靜態 SQLite 的 `cangjie` 表將小寫 ASCII 代碼對應到有順序的單字元候選。它是版本控制中的唯一固定 canonical source：更新工具只讀取它並拒絕變更，而不再存在可重新生成它的 TSV／YAML。既有變更歷史仍記錄在 `HybridIME/CangjieData/cangjie-change-log.tsv`。
 
 兩個解碼器都使用 Core Text 拒絕替換字型為 `LastResort` 或沒有非零字形的候選。可用性會依字元快取。結果取決於作業系統字型，不能保證普遍支援 Unicode。
 
@@ -283,7 +281,7 @@ macOS 將預設標點候選作為標記文字插入，並在替換前驗證用�
 
 `HybridIMEKeyboard/PrivacyInfo.xcprivacy` 宣告 `NSPrivacyTracking=false`、空的資料收集清單，以及 `NSPrivacyAccessedAPICategorySystemBootTime` 理由 `35F9.1`。這與 `KeyboardViewController` 僅使用 `ProcessInfo.systemUptime` 判斷 Shift 雙擊相符；不會傳送衍生值。採用檔案系統同步群組的 `HybridIMEKeyboard` 建置目標，會將此資訊清單與延伸功能資源一併包含。
 
-延伸功能的 `CangjieData/` 包含生成的 Rime Cangjie 資料表，以及 `NOTICE-Rime-Cangjie.txt` 與 `LICENSE-Rime-Cangjie.txt`。`LexiconData/` 另行保留隨附 SQLite 詞彙所使用的 CC-CEDICT、Rime Essay 與 Tatoeba 聲明／授權。
+`LexiconData/` 保留隨附 SQLite 詞彙所使用的 Rime Cangjie、CC-CEDICT、Rime Essay 與 Tatoeba 聲明／授權。
 
 ### 環境變數
 
@@ -293,9 +291,9 @@ macOS 將預設標點候選作為標記文字插入，並在替換前驗證用�
 
 ## 10. 錯誤處理與記錄
 
-- 缺少倉頡或靜態詞彙資源時會以 `NSLog` 記錄；查詢會降級為空結果，原始英文仍可使用。
+- 缺少靜態詞彙資源時會以 `NSLog` 記錄；倉頡、雙語與聯想查詢會降級為空結果，原始英文仍可使用。
 - 建立或開啟學習資料庫失敗時會記錄錯誤，學習操作會變成無操作／空查詢。
-- 無效 TSV 資料列會略過，不會逐列記錄。
+- 無效的雙語／聯想來源 TSV 會令更新工具停止，不會寫入部分資料。
 - 大多數 SQLite 準備、繫結與步驟執行失敗都會靜默回傳空值；沒有具型別的公開錯誤模型、重試或退避機制。
 - macOS 缺少伺服器識別碼時，Debug 會觸發斷言且不建立 `IMKServer`。
 - 候選替換會檢查目前宿主的範圍／尾綴，文字狀態過期時採取失敗即拒絕。
@@ -322,16 +320,18 @@ Xcode 專案沒有測試建置目標。測試涵蓋由獨立腳本提供：
 
 | 測試工具 | 涵蓋範圍 | 外部服務 |
 | --- | --- | --- |
-| `Scripts/test_static_lexicon.swift` | 雙語查詢、批次最長比對、中文／英文聯想測試資料 | 無 |
+| `Scripts/test_static_lexicon.swift` | 倉頡候選順序／限制、雙語查詢、批次最長比對、中文／英文聯想測試資料 | 無 |
 | `Scripts/test_user_learning_store.swift` | macOS 學習結構與讀寫行為 | 無；暫存 SQLite |
 | `Scripts/test_mac_dictionary.swift` | macOS 詞彙 + 聯想整合與學習重新排序 | 無；暫存 SQLite |
 | `Scripts/test_keyboard_user_learning_store.swift` | iOS 學習結構、替換與完整性 | 無；暫存 SQLite |
-| `Scripts/verify_static_lexicon.py` | 完整性與來源至資料庫完全相等 | 無；以唯讀方式開啟隨附 DB |
+| `Scripts/verify_static_lexicon.swift` | 唯讀完整性、版本、表次序、固定倉頡結構／列數，以及雙語／聯想來源完全相等 | 無；以唯讀方式開啟隨附 DB |
 
 代表性指令只使用 `/tmp` 輸出：
 
 ```sh
-python3 Scripts/verify_static_lexicon.py
+swiftc -parse-as-library -module-cache-path /tmp/hybridime-module-cache-verify \
+  Scripts/verify_static_lexicon.swift -lsqlite3 -o /tmp/hybridime-verify-static
+/tmp/hybridime-verify-static
 
 swiftc -module-cache-path /tmp/hybridime-module-cache-static \
   HybridIME/StaticLexicon.swift Scripts/test_static_lexicon.swift \
@@ -363,14 +363,23 @@ swiftc -module-cache-path /tmp/hybridime-module-cache-keyboard \
 
 ### 本次工作已驗證
 
-本節記錄文件工作期間實際執行、並產生以下歷史結果的指令。這不是後續工作樹變更已建置或測試的證據。
+本次 schema 2 倉頡遷移已完成以下驗證：
+
+- `verify_static_lexicon.swift` 通過 `integrity_check`、`user_version=2`、`cangjie → association → bilingual` 表次序、固定 33,319 筆倉頡結構，以及雙語／聯想來源完全相等檢查；資料列分別為 33,319、244,887 及 177,594。
+- 四個獨立 Swift 測試工具全部通過；靜態詞彙測試涵蓋倉頡大小寫正規化、候選順序與限制。
+- 未簽署 macOS Debug 及通用 iOS Simulator Debug 建置通過。兩個建置產品內的 SQLite 均回報 `integrity_check=ok`、schema 2、預期三表次序及 33,319 筆倉頡資料，並且不含 `hybrid-cangjie5.dict.tsv`。
+- arm64 macOS Debug 版本 1.2.0（組建編號 20260821）另以 Apple Development 簽署並安裝至 `~/Library/Input Methods/HybridIME.app`；安裝後 `codesign --verify --deep --strict` 通過，隨附 SQLite 與儲存庫版本的 SHA-256 相同，且仍回報 33,319 筆倉頡代碼與 36,862 個候選。
+- 已安裝 App 重新註冊 LaunchServices、重啟 `TextInputMenuAgent` 並成功啟動 HybridIME 程序；最近的 InputMethodKit 日誌未出現錯誤或 `NO Endpoint`。這只驗證本機註冊與程序啟動，不代表真實文字輸入、候選呈現或提交行為已通過。
+- `git diff --check` 通過。
+
+以下另保留遷移前文件工作的歷史驗證背景：
 
 - `xcodebuild -list` 找到全部三個建置目標與 scheme。沙盒執行也回報 CoreSimulator 服務不可用；仍完成 scheme 探索。
-- SQLite 唯讀檢查回傳 `integrity_check=ok`、`user_version=1`、177,594 個雙語資料列與 244,887 個聯想資料列。
-- `python3 Scripts/verify_static_lexicon.py` 通過完整的雙語與聯想來源相等性檢查。
+- 歷史 SQLite 唯讀檢查回傳 `integrity_check=ok`、`user_version=1`、177,594 個雙語資料列與 244,887 個聯想資料列；這是在倉頡遷移前的結果。
+- 遷移前的驗證工具曾通過雙語與聯想來源相等性檢查；目前以 Swift 唯讀驗證器取代。
 - 四個獨立測試工具全部通過：`StaticLexicon`、`UserLearningStore`、macOS 詞典整合與 `KeyboardUserLearningStore`。它們的二進位檔與暫存資料庫建立於 `/tmp`；受限制的環境要求將編譯器模組快取重新導向 `/tmp`。
-- 未簽署的 macOS Debug 建置通過 arm64 與 x86_64。建置出的應用程式回報版本 1.2.0（組建編號 20260821），包含 `integrity_check=ok` 的結構版本 1 SQLite，並封裝預期的生成詞彙，而非被排除的原始雙語／聯想 TSV 檔案。
-- 未簽署的通用 iOS 模擬器 Debug 建置通過 `HybridIMEiOS` 及其 `HybridIMEKeyboard` 相依項目。兩個產品都回報版本 1.2.0；嵌入的延伸功能包含倉頡 TSV、聲明與 `integrity_check=ok` 的結構版本 1 SQLite。
+- 未簽署的 macOS Debug 建置曾通過 arm64 與 x86_64；這是 schema 1 的歷史建置證據。
+- 未簽署的通用 iOS 模擬器 Debug 建置曾通過 `HybridIMEiOS` 及其 `HybridIMEKeyboard` 相依項目；這是 schema 1 的歷史建置證據。
 - 文件編輯後，`git diff --check`、plist／權限設定靜態檢查與 Markdown 程式碼圍欄檢查通過。
 
 在 HEAD `56fcaa7` 的 2026-08-22 文件更新中，未簽署的通用 iOS 模擬器 Debug 建置再次通過 `HybridIMEiOS` 與 `HybridIMEKeyboard`，並編譯 arm64 與 x86_64 切片。這僅是編譯與套件驗證；未執行模擬器鍵盤啟用或手勢互動。
@@ -379,10 +388,10 @@ swiftc -module-cache-path /tmp/hybridime-module-cache-keyboard \
 
 ### 外部未驗證
 
-- 已安裝 macOS InputMethodKit 的註冊、端點與真實文字輸入。
+- macOS 真實文字用戶端的按鍵輸入、候選呈現與提交。
 - 第三方 macOS 用戶端間的候選定位與替換。
 - iOS 鍵盤的完整跨裝置、方向、外觀、記憶體使用量與宿主相容性矩陣。
-- 簽署、封存、公證、DMG、GitHub 發行或 App Store 行為。
+- Developer ID 發行簽署、封存、公證、DMG、GitHub 發行或 App Store 行為；本機 Apple Development 簽署不涵蓋這些範圍。
 
 ## 13. 已知限制與技術債
 
@@ -391,7 +400,6 @@ swiftc -module-cache-path /tmp/hybridime-module-cache-keyboard \
 - macOS 與 iOS 各自重複解碼器、詞典、聯想、排序與標點概念，而非匯入共享核心。
 - `HybridIME/InputMethodController.swift`，尤其是 `HybridIMEKeyboard/KeyboardViewController.swift`，集中許多狀態機與 UI 職責。
 - 靜態詞彙快取淘汰是 FIFO 而非 LRU，也沒有記憶體壓力回應。
-- 倉頡 TSV 仍會解析至記憶體；SQLite 遷移僅涵蓋雙語與聯想資料。
 - macOS 資源預載入沒有就緒狀態、進度 UI 或重試。
 - iOS 替換依賴宿主上下文與立即插入／刪除行為，而非標記文字組字。
 - iOS 固定建立地球鍵，並將切換／長按選取交給 `handleInputModeList(from:with:)`；部分裝置也會在 extension 外顯示系統地球鍵，不同寬度、方向與已啟用鍵盤組合下的行為仍需持續驗證。
@@ -407,8 +415,8 @@ swiftc -module-cache-path /tmp/hybridime-module-cache-keyboard \
 ## 14. 設計決策
 
 - **離線優先：**隨附資料與本機學習避免網路依賴，讓 iOS 鍵盤不需完整存取權也能運作。
-- **大型索引使用 SQLite：**雙語與聯想資料內容維持精簡、可查詢，並由小型快取限制大小，避免急切載入 TSV 至物件。
-- **保留原始倉頡 TSV：**保留有順序的資料表維護與既有上游／本機修正工作流程，但代價是啟動時解析。
+- **大型索引使用 SQLite：**倉頡、雙語與聯想資料內容維持精簡、可查詢，並由小型快取限制大小，避免急切載入 TSV 至物件。
+- **固定倉頡 canonical table：**有順序的倉頡資料只保存在版本控制的 SQLite `cangjie` 表；更新工具拒絕修改它，避免意外重排或重建候選。
 - **失敗即拒絕的文字替換：**範圍／尾綴防護寧可拒絕替換，也不在狀態過期後刪除宿主內容。
 - **平台配接器分離：**InputMethodKit 與 `UITextDocumentProxy` 具有不同的生命週期與文字編輯契約；目前的重複實作讓差異保持明確，但增加維護成本。
 - **以最近使用為基礎的學習：**可預測的最近選擇行為比不透明的統計模型簡單，但不使用周遭語言上下文。
@@ -435,8 +443,7 @@ swiftc -module-cache-path /tmp/hybridime-module-cache-keyboard \
 
 隨附資料集各自保留獨立條款：
 
-- Rime Cangjie：請參閱 `HybridIME/CangjieData/LICENSE-Rime-Cangjie.txt` 與 `HybridIME/CangjieData/NOTICE.txt`。
-- iOS Rime Cangjie 執行期資料表：請參閱 `HybridIMEKeyboard/CangjieData/LICENSE-Rime-Cangjie.txt` 與 `HybridIMEKeyboard/CangjieData/NOTICE-Rime-Cangjie.txt`。
+- Rime Cangjie：請參閱 `HybridIME/CangjieData/LICENSE-Rime-Cangjie.txt` 與 `HybridIME/CangjieData/NOTICE.txt`；隨附 SQLite 的副本位於 `HybridIMEKeyboard/LexiconData/`。
 - CC-CEDICT：請參閱 `HybridIME/DictionaryData/LICENSE-CC-CEDICT.txt` 與 `HybridIME/DictionaryData/NOTICE-CC-CEDICT.txt`。
 - Rime Essay 與 Tatoeba：請參閱 `HybridIME/AssociationData/` 中的聲明與授權。
 - iOS 隨附詞彙在 `HybridIMEKeyboard/LexiconData/` 下包含對應副本。

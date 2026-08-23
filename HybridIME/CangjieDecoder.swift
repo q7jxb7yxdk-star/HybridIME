@@ -2,7 +2,6 @@ import Foundation
 import CoreText
 
 struct CangjieDecoder: @unchecked Sendable {
-    nonisolated private static let resourceName = "hybrid-cangjie5.dict"
     private static let glyphAvailabilityCache = NSCache<NSString, NSNumber>()
     private static let baseFont = CTFontCreateUIFontForLanguage(
         .system,
@@ -10,58 +9,21 @@ struct CangjieDecoder: @unchecked Sendable {
         nil
     ) ?? CTFontCreateWithName("Helvetica" as CFString, 17, nil)
 
-    private let table: [String: [String]]
+    private let lexicon: StaticLexicon
 
-    nonisolated init(bundle: Bundle = .main) {
-        table = Self.loadTable(from: bundle)
+    nonisolated init(lexicon: StaticLexicon) {
+        self.lexicon = lexicon
     }
 
     @MainActor
     func candidates(for code: String, limit: Int = 10) -> [String] {
         guard limit > 0 else { return [] }
         return Array(
-            (table[code.lowercased()] ?? [])
+            lexicon.cangjieCandidates(code: code, limit: .max)
                 .lazy
                 .filter(Self.hasGlyph)
                 .prefix(limit)
         )
-    }
-
-    nonisolated private static func loadTable(
-        from bundle: Bundle
-    ) -> [String: [String]] {
-        var table: [String: [String]] = [:]
-
-        guard
-            let url = resourceURL(in: bundle),
-            let contents = try? String(contentsOf: url, encoding: .utf8)
-        else {
-            NSLog("HybridIME could not load \(resourceName).tsv")
-            return table
-        }
-
-        for line in contents.split(whereSeparator: \.isNewline) {
-            guard line.first != "#" else { continue }
-
-            let fields = line.split(separator: "\t", omittingEmptySubsequences: false)
-            guard fields.count >= 2 else { continue }
-
-            let code = String(fields[0]).lowercased()
-            let candidates = fields.dropFirst().map(String.init)
-
-            guard
-                !code.isEmpty,
-                code.allSatisfy({ $0.isASCII && $0.isLowercase }),
-                candidates.allSatisfy({ $0.count == 1 })
-            else {
-                continue
-            }
-
-            var seen: Set<String> = []
-            table[code] = candidates.filter { seen.insert($0).inserted }
-        }
-
-        return table
     }
 
     private static func hasGlyph(for character: String) -> Bool {
@@ -98,18 +60,5 @@ struct CangjieDecoder: @unchecked Sendable {
             forKey: character as NSString
         )
         return result
-    }
-
-    nonisolated private static func resourceURL(
-        in bundle: Bundle
-    ) -> URL? {
-        bundle.url(
-            forResource: resourceName,
-            withExtension: "tsv",
-            subdirectory: "CangjieData"
-        ) ?? bundle.url(
-            forResource: resourceName,
-            withExtension: "tsv"
-        )
     }
 }

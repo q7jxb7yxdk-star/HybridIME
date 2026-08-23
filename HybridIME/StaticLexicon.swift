@@ -73,6 +73,46 @@ final class StaticLexicon: @unchecked Sendable {
         )
     }
 
+    func cangjieCandidates(code: String, limit: Int) -> [String] {
+        guard limit > 0 else { return [] }
+        let normalizedCode = code.lowercased()
+        guard !normalizedCode.isEmpty else { return [] }
+        let cacheKey = CacheKey(table: "cangjie", kind: -1, key: normalizedCode)
+
+        lock.lock()
+        defer { lock.unlock() }
+
+        if let cached = cache[cacheKey] {
+            return Array(cached.prefix(limit))
+        }
+        guard let database else { return [] }
+
+        var statement: OpaquePointer?
+        guard sqlite3_prepare_v2(
+            database,
+            "SELECT candidates FROM cangjie WHERE code = ?",
+            -1,
+            &statement,
+            nil
+        ) == SQLITE_OK else {
+            return []
+        }
+        defer { sqlite3_finalize(statement) }
+
+        let transient = unsafeBitCast(-1, to: sqlite3_destructor_type.self)
+        sqlite3_bind_text(statement, 1, normalizedCode, -1, transient)
+        let candidates: [String]
+        if sqlite3_step(statement) == SQLITE_ROW,
+           let bytes = sqlite3_column_text(statement, 0)
+        {
+            candidates = String(cString: bytes).components(separatedBy: "\t")
+        } else {
+            candidates = []
+        }
+        store(candidates, for: cacheKey)
+        return Array(candidates.prefix(limit))
+    }
+
     func longestBilingualMatch(
         direction: BilingualDirection,
         keys: [String],

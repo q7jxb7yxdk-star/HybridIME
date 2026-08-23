@@ -60,7 +60,6 @@ final class KeyboardViewController: UIInputViewController {
     }
 
     private var decoder: CangjieDecoder?
-    private var decoderLoadingTask: Task<Void, Never>?
     private lazy var offlineLexicon = OfflineLexicon()
     private lazy var associationDictionary = KeyboardAssociationDictionary(
         lexicon: offlineLexicon
@@ -324,17 +323,10 @@ final class KeyboardViewController: UIInputViewController {
     }
 
     private func preloadDecoderIfNeeded() {
-        guard decoder == nil, decoderLoadingTask == nil else { return }
-        decoderLoadingTask = Task { [weak self] in
-            let decoder = await Task.detached(priority: .userInitiated) {
-                CangjieDecoder()
-            }.value
-            guard !Task.isCancelled, let self else { return }
-            self.decoder = decoder
-            self.decoderLoadingTask = nil
-            if !self.buffer.isEmpty {
-                self.refreshComposition()
-            }
+        guard decoder == nil else { return }
+        decoder = CangjieDecoder(lexicon: offlineLexicon)
+        if !buffer.isEmpty {
+            refreshComposition()
         }
     }
 

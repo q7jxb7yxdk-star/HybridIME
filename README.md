@@ -21,7 +21,7 @@ HybridIME 是一套以 Swift 開發的中英混合倉頡五代輸入工具，同
 - 中英文聯想候選與連續中文學習。
 - 依最近選擇提升智能候選；學習資料只寫入本機 SQLite。
 - 依中文／英文前文選擇全形或半形標點，並提供替代標點候選。
-- 以隨附的唯讀 SQLite 詞庫查詢雙語與聯想資料。
+- 以隨附的唯讀 SQLite 詞庫查詢倉頡、雙語與聯想資料。
 
 ### macOS（已實作）
 
@@ -54,7 +54,6 @@ HybridIME 是一套以 Swift 開發的中英混合倉頡五代輸入工具，同
 | iOS／iPadOS 部署目標 | `26.0` |
 | Swift 語言版本 | 建置設定為 `5.0` |
 | Xcode | 沒有工具版本檔或 CI 明確宣告最低版本；專案中繼資料由 Xcode 26.5／26.6 建立或更新，需使用能讀取 `object version 77` 並提供 SDK 26 的 Xcode |
-| Python | 只供建立及驗證靜態 SQLite 詞庫；版本未在儲存庫鎖定 |
 | 第三方套件 | 無 Swift Package、CocoaPods、Carthage、npm 或其他套件資訊清單／鎖定檔 |
 
 應用程式執行期使用 Apple 平台框架：AppKit、InputMethodKit、UIKit、SwiftUI、Foundation、CoreText 與系統 SQLite3。
@@ -137,8 +136,8 @@ v 女  w 田  x 難  y 卜  z 重
 ## 專案結構
 
 ```text
-HybridIME/                 macOS InputMethodKit 建置目標、倉頡資料及資料來源 TSV
-HybridIMEKeyboard/         iOS 自訂鍵盤、隨附 SQLite 詞庫及鍵盤資源
+HybridIME/                 macOS InputMethodKit 建置目標與可更新的字典／聯想來源 TSV
+HybridIMEKeyboard/         iOS 自訂鍵盤、兩平台共用的隨附 SQLite 詞庫及鍵盤資源
 HybridIMEiOS/              iOS／iPadOS 主程式與設定說明介面
 HybridIME.xcodeproj/       建置目標、建置設定與 schemes
 Scripts/                   資料生成、SQLite 驗證、獨立測試及發佈工具
@@ -151,19 +150,23 @@ Info.plist                 macOS InputMethodKit 套件設定
 
 儲存庫沒有 XCTest／UI 測試建置目標、格式化工具、程式碼檢查工具或 CI。`Scripts/` 下的測試是以 `swiftc` 編譯執行的離線測試工具；其存在只代表相關範圍已有測試，不代表任何版本的工作樹都已通過。
 
-靜態詞庫的原始資料一致性驗證：
+靜態詞庫的一致性驗證會以唯讀方式開啟 SQLite，將雙語與聯想資料逐列比對其來源；`cangjie` 是固定的 SQLite canonical source，不會由工具重建：
 
 ```sh
-python3 Scripts/verify_static_lexicon.py
+swiftc -parse-as-library -module-cache-path /tmp/hybridime-module-cache-verify \
+  Scripts/verify_static_lexicon.swift -lsqlite3 -o /tmp/hybridime-verify-static
+/tmp/hybridime-verify-static
 ```
 
-重新建立詞庫會覆寫已納入版本控制的 SQLite，並複製授權聲明；只有更新資料時才應執行：
+更新器只會在單一 SQLite transaction 中重新寫入 `association` 與 `bilingual`，並更新 `LexiconData` 的授權／聲明；它會在開始前驗證固定的 `cangjie` 表，絕不 drop、重建或修改它：
 
 ```sh
-python3 Scripts/build_static_lexicon.py
+swiftc -parse-as-library -module-cache-path /tmp/hybridime-module-cache-update \
+  Scripts/update_static_lexicon.swift -lsqlite3 -o /tmp/hybridime-update-static
+/tmp/hybridime-update-static
 ```
 
-本次文件任務的實際驗證結果記錄在[技術文件的測試章節](TECHNICAL_DOCUMENTATION.md#12-測試)。發佈、簽署、公證、安裝及外部執行期驗證不屬於一般開發驗證。
+實際驗證結果記錄在[技術文件的測試章節](TECHNICAL_DOCUMENTATION.md#12-測試)。本機 Apple Development 簽署與 macOS 安裝驗證會和一般建置、真實文字輸入、Developer ID 公證及發佈結果分開記錄。
 
 ## 已知限制
 
@@ -186,9 +189,8 @@ python3 Scripts/build_static_lexicon.py
 第三方資料的授權與歸屬分別位於：
 
 - `HybridIME/CangjieData/LICENSE-Rime-Cangjie.txt` 與 `HybridIME/CangjieData/NOTICE.txt`。
-- `HybridIMEKeyboard/CangjieData/LICENSE-Rime-Cangjie.txt` 與 `HybridIMEKeyboard/CangjieData/NOTICE-Rime-Cangjie.txt`，隨 iOS 執行期倉頡表提供。
 - `HybridIME/DictionaryData/LICENSE-CC-CEDICT.txt` 與 `HybridIME/DictionaryData/NOTICE-CC-CEDICT.txt`。
 - `HybridIME/AssociationData/LICENSE-Rime-Essay.txt`、`HybridIME/AssociationData/NOTICE-Rime-Essay.txt` 與 `HybridIME/AssociationData/NOTICE-Tatoeba-CC0.txt`。
-- `HybridIMEKeyboard/LexiconData/` 內隨附 SQLite 一併提供的對應授權／聲明文件。
+- `HybridIMEKeyboard/LexiconData/` 內隨附 SQLite 一併提供 Rime Cangjie、CC-CEDICT、Rime Essay 與 Tatoeba 的對應授權／聲明文件。
 
 詳細實作請參閱 [TECHNICAL_DOCUMENTATION.md](TECHNICAL_DOCUMENTATION.md)。

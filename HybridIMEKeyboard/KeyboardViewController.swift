@@ -93,6 +93,7 @@ final class KeyboardViewController: UIInputViewController {
     private var cursorHorizontalGestureStep = 0
     private var cursorVerticalGestureStep = 0
     private var cursorPreferredColumn = 0
+    private var deleteRepeatTimer: Timer?
     // 游標每移動一個字元所需的水平滑動距離（pt）；數值越小越靈敏。
     private let cursorMovementThreshold: CGFloat = 5
     // 每觸發一次上一行或下一行移動所需的垂直滑動距離（pt）；數值越小越靈敏。
@@ -164,6 +165,11 @@ final class KeyboardViewController: UIInputViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         preloadDecoderIfNeeded()
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        stopDeleteRepeat()
+        super.viewWillDisappear(animated)
     }
 
     override func textDidChange(_ textInput: UITextInput?) {
@@ -243,6 +249,7 @@ final class KeyboardViewController: UIInputViewController {
     }
 
     private func rebuildKeyboard() {
+        stopDeleteRepeat()
         keyboardStackView.arrangedSubviews.forEach { arrangedView in
             keyboardStackView.removeArrangedSubview(arrangedView)
             arrangedView.removeFromSuperview()
@@ -1008,6 +1015,14 @@ final class KeyboardViewController: UIInputViewController {
             UIAction { [weak self] _ in self?.deleteBackward() },
             for: .touchUpInside
         )
+        let deleteGesture = UILongPressGestureRecognizer(
+            target: self,
+            action: #selector(handleDeleteLongPress(_:))
+        )
+        deleteGesture.minimumPressDuration = 0.35
+        deleteGesture.allowableMovement = 24
+        deleteGesture.cancelsTouchesInView = true
+        button.addGestureRecognizer(deleteGesture)
         return button
     }
 
@@ -1266,6 +1281,39 @@ final class KeyboardViewController: UIInputViewController {
         }
         textDocumentProxy.deleteBackward()
         refreshComposition()
+    }
+
+    @objc
+    private func handleDeleteLongPress(_ gesture: UILongPressGestureRecognizer) {
+        switch gesture.state {
+        case .began:
+            stopDeleteRepeat()
+            deleteBackward()
+
+            let timer = Timer(
+                timeInterval: 0.08,
+                target: self,
+                selector: #selector(repeatDeleteBackward),
+                userInfo: nil,
+                repeats: true
+            )
+            deleteRepeatTimer = timer
+            RunLoop.main.add(timer, forMode: .common)
+        case .ended, .cancelled, .failed:
+            stopDeleteRepeat()
+        default:
+            break
+        }
+    }
+
+    @objc
+    private func repeatDeleteBackward() {
+        deleteBackward()
+    }
+
+    private func stopDeleteRepeat() {
+        deleteRepeatTimer?.invalidate()
+        deleteRepeatTimer = nil
     }
 
     private func commitSpace() {

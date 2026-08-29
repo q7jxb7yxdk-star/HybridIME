@@ -387,7 +387,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 20260821;
+				CURRENT_PROJECT_VERSION = 20260829;
 				DEVELOPMENT_TEAM = WX793X49GJ;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = HybridIMEKeyboard/Info.plist;
@@ -421,7 +421,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 20260821;
+				CURRENT_PROJECT_VERSION = 20260829;
 				DEVELOPMENT_TEAM = WX793X49GJ;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = HybridIMEKeyboard/Info.plist;

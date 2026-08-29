@@ -65,7 +65,7 @@ enum VerifyStaticLexicon {
             }
         }
         try require(candidateCount == 36_862, "cangjie candidate count")
-        try require(fingerprint == 0x7886_3379_9d57_cda5, "cangjie content fingerprint")
+        try require(fingerprint == 0x8ddd_0f42_69ef_c2d4, "cangjie content fingerprint")
     }
     fileprivate struct Failure: Error, CustomStringConvertible { let message: String; init(_ message: String) { self.message = message }; var description: String { message } }
 }

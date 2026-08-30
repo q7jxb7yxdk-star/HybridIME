@@ -120,11 +120,13 @@ flowchart LR
 
 1. `HybridIMEApp` 建立 `IMKServer`；`InputResources` 建立 `StaticLexicon`、詞典包裝層與聯想詞典，接著在分離的工作中載入倉頡。
 2. `InputMethodController.handle` 接受 `keyDown`；Command／Control／Option 與不支援的系統事件會返回宿主應用程式。
-3. ASCII 字母附加到記憶體中的緩衝區，並更新標記文字。
+3. ASCII 字母立即插入宿主應用程式，並附加到記憶體中的緩衝區；控制器另行追蹤其 UTF-16 範圍，不使用標記文字顯示英文組字。
 4. 最多五個字母會查詢倉頡；完整緩衝區也會查詢英譯中的 SQLite 項目。
 5. 每個倉頡候選最多可加入兩個中譯英結果，使用前方中文加目前候選的最長尾綴。
 6. 結果會去除重複、限制為十個，並可選擇依最近學習的候選重新排序。
-7. 提交透過 `IMKTextInput` 插入文字、清除組字，並可能開始聯想查詢。
+7. `1`–`0` 只在對應候選存在時攔截按鍵，並以 `IMKTextInput` 替換已追蹤範圍；沒有對應候選的數字交回宿主。
+8. `Return` 不提交候選，只清除目前組字狀態並交回宿主處理。
+9. 若 Safari URL 欄在已輸入字母後選取自動完成尾段，只要選取起點仍在追蹤範圍尾端，組字便會繼續；候選替換及 Delete 會一併處理該尾段。若游標、範圍或原文不再吻合，控制器會拒絕替換並重設狀態。
 
 在倉頡預載入完成前，原始英文仍可使用；倉頡結果為空。SQLite 包裝層會同步建立，因此可用的詞典結果不必等待分離的倉頡工作。
 
@@ -176,7 +178,7 @@ macOS `StaticLexicon` 以 `SQLITE_OPEN_FULLMUTEX` 唯讀開啟資料庫、啟用
 
 ### 平台控制器
 
-`InputMethodController` 是 macOS 組字與事件的負責者。`KeyboardViewController` 同時是 iOS UI 與狀態機的負責者，負責按鍵版面、候選、標點、聯想上下文、游標手勢、鍵盤切換、顏色及 Return 鍵標籤。大型 iOS 控制器是目前的耦合點。
+`InputMethodController` 是 macOS 組字與事件的負責者，並維護直接插入英文的追蹤範圍、Safari 自動完成尾段相容性及數字候選選取。`KeyboardViewController` 同時是 iOS UI 與狀態機的負責者，負責按鍵版面、候選、標點、聯想上下文、游標手勢、鍵盤切換、顏色及 Return 鍵標籤。大型 iOS 控制器是目前的耦合點。
 
 iOS 控制器固定建立以 `handleInputModeList(from:with:)` 為目標的地球鍵，並處理所有觸控事件；如此 iOS 能同時處理切換與長按顯示已啟用鍵盤清單，而不需因 `needsInputModeSwitchKey` 變化重建鍵盤。目前鍵盤 UI 不包含表情符號目錄、搜尋預留位置或表情符號頁面。
 

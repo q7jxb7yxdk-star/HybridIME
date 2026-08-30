@@ -9,6 +9,10 @@ final class InputMethodController: IMKInputController {
         let range: NSRange
     }
 
+    private struct DirectComposition {
+        let range: NSRange
+    }
+
     private enum CandidateAction {
         case commit(String)
         case rawCommit(String)
@@ -37,6 +41,7 @@ final class InputMethodController: IMKInputController {
     }
 
     private var buffer = ""
+    private var directComposition: DirectComposition?
     private var currentCandidates: [String] = []
     private var currentCandidateActions: [CandidateAction] = []
     private var smartPredictionIndex: Int?
@@ -83,15 +88,18 @@ final class InputMethodController: IMKInputController {
         }
 
         guard event.type == .keyDown else {
-            dismissPunctuationSelection()
+            if hasActiveComposition {
+                releaseCompositionForSystemTakeover()
+            }
             return false
         }
 
         let modifiers = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
         if !modifiers.intersection([.command, .control, .option]).isEmpty {
             learnedChineseContext = ""
-            dismissAssociation(clearContext: true)
-            dismissPunctuationSelection()
+            if hasActiveComposition {
+                releaseCompositionForSystemTakeover()
+            }
             return false
         }
 
@@ -108,15 +116,12 @@ final class InputMethodController: IMKInputController {
                 dismissPunctuationSelection()
                 return false
             }
-            guard !buffer.isEmpty || isSelectingAssociation else {
-                return false
+            if !buffer.isEmpty {
+                commitWithoutAssociations(buffer, to: sender)
+            } else if isSelectingAssociation {
+                dismissAssociation(clearContext: true)
             }
-            if !currentCandidateActions.isEmpty {
-                commitCandidate(at: 0, to: sender)
-            } else {
-                commitEnglish(to: sender)
-            }
-            return true
+            return false
         case 51:
             if isSelectingPunctuation {
                 dismissPunctuationSelection()
@@ -127,13 +132,7 @@ final class InputMethodController: IMKInputController {
                 return false
             }
             guard !buffer.isEmpty else { return false }
-            if isSelectingPunctuation {
-                clearComposition()
-                return true
-            }
-            buffer.removeLast()
-            refreshComposition(client: sender)
-            return true
+            return deleteLastDirectCharacter(from: sender)
         case 53:
             if isSelectingAssociation {
                 dismissAssociation(clearContext: true)
@@ -163,6 +162,7 @@ final class InputMethodController: IMKInputController {
 
         if
             let index = candidateIndex(for: event),
+            currentCandidateActions.indices.contains(index),
             !isNewPunctuationInput(event),
             !shouldContinuePunctuationInput(event),
             !isInvalidPunctuationCandidateIndex(index),
@@ -170,6 +170,19 @@ final class InputMethodController: IMKInputController {
         {
             commitCandidate(at: index, to: sender)
             return true
+        }
+        if
+            let index = candidateIndex(for: event),
+            !isSelectingPunctuation,
+            !currentCandidateActions.indices.contains(index),
+            !buffer.isEmpty || isSelectingAssociation
+        {
+            if !buffer.isEmpty {
+                commitWithoutAssociations(buffer, to: sender)
+            } else {
+                dismissAssociation(clearContext: true)
+            }
+            return false
         }
 
         if
@@ -225,8 +238,80 @@ final class InputMethodController: IMKInputController {
         dismissAssociation(clearContext: false)
         isSelectingPunctuation = false
         lastPassthroughPunctuationUsesFullWidth = nil
+        guard insertDirectCharacter(characters, into: sender) else {
+            return false
+        }
         buffer.append(characters)
         refreshComposition(client: sender)
+        return true
+    }
+
+    private func insertDirectCharacter(
+        _ text: String,
+        into sender: Any?
+    ) -> Bool {
+        guard let inputClient = sender as? IMKTextInput else { return false }
+
+        if !buffer.isEmpty, !directCompositionMatches(in: inputClient) {
+            resetState(updatingComposition: true)
+        }
+
+        let selection = inputClient.selectedRange()
+        guard selection.location != NSNotFound else { return false }
+
+        inputClient.insertText(
+            text,
+            replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
+        )
+        let insertedLength = text.utf16.count
+        if let directComposition {
+            self.directComposition = DirectComposition(
+                range: NSRange(
+                    location: directComposition.range.location,
+                    length: directComposition.range.length + insertedLength
+                )
+            )
+        } else {
+            directComposition = DirectComposition(
+                range: NSRange(
+                    location: selection.location,
+                    length: insertedLength
+                )
+            )
+        }
+        return true
+    }
+
+    private func deleteLastDirectCharacter(from sender: Any?) -> Bool {
+        guard
+            let inputClient = sender as? IMKTextInput,
+            let directComposition,
+            directCompositionMatches(in: inputClient),
+            let lastCharacter = buffer.last
+        else {
+            resetState(updatingComposition: true)
+            return false
+        }
+
+        let removedLength = String(lastCharacter).utf16.count
+        let deletionRange = NSRange(
+            location: NSMaxRange(directComposition.range) - removedLength,
+            length: removedLength + inputClient.selectedRange().length
+        )
+        inputClient.insertText("", replacementRange: deletionRange)
+        buffer.removeLast()
+
+        if buffer.isEmpty {
+            resetState(updatingComposition: true)
+        } else {
+            self.directComposition = DirectComposition(
+                range: NSRange(
+                    location: directComposition.range.location,
+                    length: directComposition.range.length - removedLength
+                )
+            )
+            refreshComposition(client: sender)
+        }
         return true
     }
 
@@ -368,7 +453,6 @@ final class InputMethodController: IMKInputController {
             availableCandidates: learnedChineseCandidates + [buffer]
         )
         applySmartPrediction(prediction)
-        updateComposition()
 
         if buffer.isEmpty {
             CandidateWindowController.shared.hide()
@@ -488,9 +572,10 @@ final class InputMethodController: IMKInputController {
 
         let markedRange = textClient.markedRange()
         let selection = textClient.selectedRange()
-        let compositionLocation = markedRange.location != NSNotFound
-            ? markedRange.location
-            : selection.location
+        let compositionLocation = directComposition?.range.location
+            ?? (markedRange.location != NSNotFound
+                ? markedRange.location
+                : selection.location)
         guard compositionLocation != NSNotFound, compositionLocation > 0 else {
             return ""
         }
@@ -568,6 +653,7 @@ final class InputMethodController: IMKInputController {
 
     private func resetState(updatingComposition: Bool) {
         buffer = ""
+        directComposition = nil
         currentCandidates = []
         currentCandidateActions = []
         smartPredictionIndex = nil
@@ -707,11 +793,11 @@ final class InputMethodController: IMKInputController {
             resetState(updatingComposition: false)
             return
         }
+        guard insertOrReplaceActiveComposition(with: text, to: sender) else {
+            resetState(updatingComposition: true)
+            return
+        }
         suppressAssociationsUntilNextInput = suppressingFollowingAssociations
-        (sender as? IMKTextInput)?.insertText(
-            text,
-            replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
-        )
         lastCommittedCharacter = text.last
         setNextPunctuationContext(from: text)
         learnCommittedText(text)
@@ -719,10 +805,10 @@ final class InputMethodController: IMKInputController {
     }
 
     private func commit(_ text: String, to sender: Any?) {
-        (sender as? IMKTextInput)?.insertText(
-            text,
-            replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
-        )
+        guard insertOrReplaceActiveComposition(with: text, to: sender) else {
+            resetState(updatingComposition: true)
+            return
+        }
         lastCommittedCharacter = text.last
         setNextPunctuationContext(from: text)
         learnCommittedText(text)
@@ -748,6 +834,54 @@ final class InputMethodController: IMKInputController {
         }
     }
 
+    private func insertOrReplaceActiveComposition(
+        with text: String,
+        to sender: Any?
+    ) -> Bool {
+        guard let inputClient = sender as? IMKTextInput else { return false }
+        guard !buffer.isEmpty else {
+            inputClient.insertText(
+                text,
+                replacementRange: NSRange(
+                    location: NSNotFound,
+                    length: NSNotFound
+                )
+            )
+            return true
+        }
+        guard
+            let directComposition,
+            directCompositionMatches(in: inputClient)
+        else {
+            return false
+        }
+        if text != buffer {
+            let selection = inputClient.selectedRange()
+            inputClient.insertText(
+                text,
+                replacementRange: NSRange(
+                    location: directComposition.range.location,
+                    length: directComposition.range.length + selection.length
+                )
+            )
+        }
+        return true
+    }
+
+    private func directCompositionMatches(in client: IMKTextInput) -> Bool {
+        guard let directComposition else { return false }
+        let selection = client.selectedRange()
+        guard
+            selection.location == NSMaxRange(directComposition.range)
+        else {
+            return false
+        }
+        let existingText = client.attributedSubstring(
+            from: directComposition.range
+        )?.string
+        return existingText == nil || existingText == buffer
+    }
+
     private func commitTranslation(
         _ text: String,
         replacingPrefixUTF16Length prefixLength: Int,
@@ -755,35 +889,40 @@ final class InputMethodController: IMKInputController {
     ) {
         guard
             prefixLength > 0,
-            let textClient = sender as? NSTextInputClient
+            let inputClient = sender as? IMKTextInput,
+            let directComposition,
+            directCompositionMatches(in: inputClient),
+            directComposition.range.location >= prefixLength
         else {
-            commit(text, to: sender)
+            if prefixLength == 0 {
+                commit(text, to: sender)
+            } else {
+                resetState(updatingComposition: true)
+            }
             return
         }
 
-        let markedRange = textClient.markedRange()
-        let selection = textClient.selectedRange()
-        let compositionLocation = markedRange.location != NSNotFound
-            ? markedRange.location
-            : selection.location
-        guard
-            compositionLocation != NSNotFound,
-            compositionLocation >= prefixLength
-        else {
-            commit(text, to: sender)
-            return
-        }
-
-        let compositionLength = markedRange.location != NSNotFound
-            ? markedRange.length
-            : 0
-        (sender as? IMKTextInput)?.insertText(
-            text,
-            replacementRange: NSRange(
-                location: compositionLocation - prefixLength,
-                length: prefixLength + compositionLength
-            )
+        let replacementRange = NSRange(
+            location: directComposition.range.location - prefixLength,
+            length: prefixLength + directComposition.range.length +
+                inputClient.selectedRange().length
         )
+        let compositionAndPrefixRange = NSRange(
+            location: directComposition.range.location - prefixLength,
+            length: prefixLength + directComposition.range.length
+        )
+        let existingText = inputClient.attributedSubstring(
+            from: compositionAndPrefixRange
+        )?.string
+        if let existingText,
+           existingText.utf16.count != compositionAndPrefixRange.length ||
+               !existingText.hasSuffix(buffer)
+        {
+            resetState(updatingComposition: true)
+            return
+        }
+
+        inputClient.insertText(text, replacementRange: replacementRange)
         lastCommittedCharacter = text.last
         setNextPunctuationContext(from: text)
         clearMarkedCompositionAfterCommit()
@@ -823,6 +962,7 @@ final class InputMethodController: IMKInputController {
 
     private func clearMarkedCompositionAfterCommit() {
         buffer = ""
+        directComposition = nil
         currentCandidates = []
         currentCandidateActions = []
         smartPredictionIndex = nil
@@ -962,6 +1102,7 @@ final class InputMethodController: IMKInputController {
         currentCandidateActions = currentCandidates.map(CandidateAction.commit)
         smartPredictionIndex = nil
         buffer = ""
+        directComposition = nil
         isSelectingPunctuation = true
         isSelectingAssociation = false
         let selection = client?.selectedRange()

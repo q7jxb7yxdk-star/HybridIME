@@ -197,7 +197,7 @@ final class InputMethodController: IMKInputController {
                     return false
                 }
             }
-            let forceFullWidth = punctuationFullWidthPreferenceForCurrentComposition()
+            let forceFullWidth: Bool? = buffer.isEmpty ? nil : false
             learnedChineseContext = ""
             dismissAssociation(clearContext: true)
             if !buffer.isEmpty {
@@ -690,15 +690,7 @@ final class InputMethodController: IMKInputController {
     }
 
     private func commitBeforePunctuation(to sender: Any?) {
-        if punctuationFullWidthPreferenceForCurrentComposition() == true {
-            commitCandidate(
-                at: 0,
-                to: sender,
-                showingAssociations: false
-            )
-        } else {
-            commitWithoutAssociations(buffer, to: sender)
-        }
+        commitWithoutAssociations(buffer, to: sender)
     }
 
     private func commitCandidate(
@@ -1193,18 +1185,6 @@ final class InputMethodController: IMKInputController {
             return punctuation.halfWidth
         }
         return punctuation.chineseDefault ?? punctuation.fullWidth
-    }
-
-    private func punctuationFullWidthPreferenceForCurrentComposition() -> Bool? {
-        guard !buffer.isEmpty else { return nil }
-        guard
-            let firstAction = currentCandidateActions.first,
-            case .commit(let text) = firstAction,
-            text.allSatisfy(isChinese)
-        else {
-            return false
-        }
-        return true
     }
 
     private func punctuationDisplayCandidates(

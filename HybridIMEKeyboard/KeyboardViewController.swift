@@ -95,9 +95,9 @@ final class KeyboardViewController: UIInputViewController {
     private var cursorPreferredColumn = 0
     private var deleteRepeatTimer: Timer?
     // 游標每移動一個字元所需的水平滑動距離（pt）；數值越小越靈敏。
-    private let cursorMovementThreshold: CGFloat = 5
+    private let cursorMovementThreshold: CGFloat = 10
     // 每觸發一次上一行或下一行移動所需的垂直滑動距離（pt）；數值越小越靈敏。
-    private let cursorVerticalMovementThreshold: CGFloat = 5
+    private let cursorVerticalMovementThreshold: CGFloat = 15
     // 找不到實際換行時，每次垂直移動所估算的字元數。數值越小則移動較短。
     private let cursorEstimatedCharactersPerLine = 10
     private let cursorFeedbackGenerator = UISelectionFeedbackGenerator()

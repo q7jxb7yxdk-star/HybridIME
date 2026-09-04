@@ -882,9 +882,11 @@ final class KeyboardViewController: UIInputViewController {
         pageButton.widthAnchor.constraint(equalToConstant: 52).isActive = true
         row.addArrangedSubview(pageButton)
 
-        let inputModeButton = makeInputModeButton()
-        inputModeButton.widthAnchor.constraint(equalToConstant: 44).isActive = true
-        row.addArrangedSubview(inputModeButton)
+        if needsInputModeSwitchKey {
+            let inputModeButton = makeInputModeButton()
+            inputModeButton.widthAnchor.constraint(equalToConstant: 44).isActive = true
+            row.addArrangedSubview(inputModeButton)
+        }
 
         let spaceButton = makeSpaceButton()
         row.addArrangedSubview(spaceButton)

@@ -181,7 +181,7 @@ macOS `StaticLexicon` 以 `SQLITE_OPEN_FULLMUTEX` 唯讀開啟資料庫、啟用
 
 `InputMethodController` 是 macOS 組字與事件的負責者，並維護直接插入英文的追蹤範圍、Safari 自動完成尾段相容性及數字候選選取。`KeyboardViewController` 同時是 iOS UI 與狀態機的負責者，負責按鍵版面、候選、標點、聯想上下文、游標手勢、鍵盤切換、顏色及 Return 鍵標籤。大型 iOS 控制器是目前的耦合點。
 
-iOS 控制器固定建立以 `handleInputModeList(from:with:)` 為目標的地球鍵，並處理所有觸控事件；如此 iOS 能同時處理切換與長按顯示已啟用鍵盤清單，而不需因 `needsInputModeSwitchKey` 變化重建鍵盤。目前鍵盤 UI 不包含表情符號目錄、搜尋預留位置或表情符號頁面。
+iOS 控制器在緊湊版面只於 `needsInputModeSwitchKey` 為 `true` 時建立自訂地球鍵；按鈕以 `handleInputModeList(from:with:)` 為目標並處理所有觸控事件，讓 iOS 同時處理切換與長按顯示已啟用鍵盤清單。Face ID iPhone 已由系統在 extension 下方提供地球鍵時，該屬性為 `false`，因此不會在鍵盤內容內重複建立。寬版 iPad 仍固定建立自訂地球鍵。目前鍵盤 UI 不包含表情符號目錄、搜尋預留位置或表情符號頁面。
 
 ### iOS 版面模式與替代符號
 
@@ -407,7 +407,7 @@ swiftc -module-cache-path /tmp/hybridime-module-cache-keyboard \
 - 靜態詞彙快取淘汰是 FIFO 而非 LRU，也沒有記憶體壓力回應。
 - macOS 資源預載入沒有就緒狀態、進度 UI 或重試。
 - iOS 替換依賴宿主上下文與立即插入／刪除行為，而非標記文字組字。
-- iOS 固定建立地球鍵，並將切換／長按選取交給 `handleInputModeList(from:with:)`；部分裝置也會在 extension 外顯示系統地球鍵，不同寬度、方向與已啟用鍵盤組合下的行為仍需持續驗證。
+- iOS 緊湊版面依 `needsInputModeSwitchKey` 決定是否建立地球鍵，並將自訂按鈕的切換／長按選取交給 `handleInputModeList(from:with:)`；寬版 iPad 仍固定建立自訂地球鍵，不同寬度、方向與已啟用鍵盤組合下的實際顯示仍需持續驗證。
 - iPad 在 700 點邊界的寬版版面切換、11 格幾何、堆疊符號標籤，以及 12 點替代符號輕掃預覽／提交互動，在模擬器與裝置上的視覺及行為仍未驗證。
 - iOS Delete 長按的 0.35 秒啟動門檻與 0.08 秒重複間隔尚未經實機驗證，仍需確認連續刪除速度與放開停止的手感。
 - iOS 垂直游標備援會估算每行十個字元，無法得知視覺換行。

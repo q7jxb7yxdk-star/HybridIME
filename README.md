@@ -46,7 +46,7 @@ HybridIME 是一套以 Swift 開發的中英混合倉頡五代輸入工具，同
 - 點按 Delete 刪除一個字元；長按 0.35 秒後會連續刪除，放開時停止。
 - 長按 Space 後水平／垂直拖曳游標，並提供選取回饋。
 - 延伸功能宣告 `RequestsOpenAccess=false`，離線詞典及學習不需要「允許完整取用」。
-- 底列固定顯示地球鍵，並使用 `handleInputModeList(from:with:)` 切換或長按選擇已啟用鍵盤。
+- 緊湊版面只在 `needsInputModeSwitchKey` 要求時顯示自訂地球鍵，並使用 `handleInputModeList(from:with:)` 切換或長按選擇已啟用鍵盤；Face ID iPhone 已由系統在鍵盤下方提供地球鍵時不會重複顯示。
 - 鍵盤根視圖保持透明，沿用 iOS 管理的鍵盤背景材質，讓內容區與系統地球／咪高峰區視覺一致。
 - SwiftUI 主程式提供加入與使用鍵盤、離線本機學習及第三方鍵盤系統限制的說明。
 - `HybridIMEKeyboard/PrivacyInfo.xcprivacy` 宣告不追蹤、不收集資料，以及 Shift 雙擊計時所需的 `SystemBootTime` 原因 `35F9.1`。
@@ -117,7 +117,7 @@ xcodebuild \
   build
 ```
 
-安裝主程式後，前往「設定 > 一般 > 鍵盤 > 鍵盤 > 新增鍵盤」，選擇 `HybridIMEKeyboard`。HybridIME 底列固定顯示地球鍵；點按可切換鍵盤，長按可選擇已啟用的鍵盤。
+安裝主程式後，前往「設定 > 一般 > 鍵盤 > 鍵盤 > 新增鍵盤」，選擇 `HybridIMEKeyboard`。若 HybridIME 底列顯示地球鍵，點按可切換鍵盤，長按可選擇已啟用的鍵盤；Face ID iPhone 則可使用鍵盤下方由系統提供的地球鍵。
 
 ## 基本輸入方式
 
@@ -181,7 +181,7 @@ swiftc -parse-as-library -module-cache-path /tmp/hybridime-module-cache-update \
 - Apple 沒有公開 macOS 內建倉頡解碼 API，碼表與候選次序不能保證完全一致。
 - macOS 候選視窗最多顯示十項，沒有翻頁；候選位置與中文詞組替換依賴宿主應用程式正確實作文字輸入 API。
 - iOS 先插入英文字碼再刪除替換；若宿主應用程式不提供足夠前後文、游標已移動或文字已改變，防護條件會拒絕替換。
-- iOS 鍵盤固定提供地球鍵；其在各種裝置、方向與多鍵盤組合下的行為仍需持續實機驗證。
+- iOS 緊湊版面依 `needsInputModeSwitchKey` 決定是否提供自訂地球鍵；系統地球鍵與自訂地球鍵在各種裝置、方向及多鍵盤組合下的實際顯示仍需持續實機驗證。
 - iPad 寬版配置、替代符號下滑門檻與預覽在不同裝置、方向及應用程式內的視覺與操作行為仍需模擬器／實機驗證。
 - 第三方鍵盤在安全文字欄位、電話／姓名電話鍵盤或宿主應用程式禁用延伸功能時會由系統鍵盤取代；本次未做裝置／多應用程式相容性驗證。
 - `Scripts/release.sh` 的前置檢查會讀取 `HybridIME` macOS scheme 的 Debug／Release 已解析建置設定，並硬性要求版本 `1.2.0`、組建編號 `20260821` 與部署目標 `26.0`。這只準備發佈流程，並不代表簽署、公證或發佈已完成。

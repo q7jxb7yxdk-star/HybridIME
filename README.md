@@ -47,6 +47,7 @@ HybridIME 是一套以 Swift 開發的中英混合倉頡五代輸入工具，同
 - 長按 Space 後水平／垂直拖曳游標，並提供選取回饋。
 - 延伸功能宣告 `RequestsOpenAccess=false`，離線詞典及學習不需要「允許完整取用」。
 - 緊湊版面只在 `needsInputModeSwitchKey` 要求時顯示自訂地球鍵，並使用 `handleInputModeList(from:with:)` 切換或長按選擇已啟用鍵盤；Face ID iPhone 已由系統在鍵盤下方提供地球鍵時不會重複顯示。
+- 控制器明確設定 `hasDictationKey=false`，不宣告自訂聽寫鍵，讓 iOS／iPadOS 在允許時管理及顯示系統咪高峰；實際顯示仍取決於系統聽寫設定、裝置、版面及目前 App。
 - 鍵盤根視圖保持透明，沿用 iOS 管理的鍵盤背景材質，讓內容區與系統地球／咪高峰區視覺一致。
 - SwiftUI 主程式提供加入與使用鍵盤、離線本機學習及第三方鍵盤系統限制的說明。
 - `HybridIMEKeyboard/PrivacyInfo.xcprivacy` 宣告不追蹤、不收集資料，以及 Shift 雙擊計時所需的 `SystemBootTime` 原因 `35F9.1`。

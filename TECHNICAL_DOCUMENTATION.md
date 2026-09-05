@@ -181,7 +181,7 @@ macOS `StaticLexicon` 以 `SQLITE_OPEN_FULLMUTEX` 唯讀開啟資料庫、啟用
 
 `InputMethodController` 是 macOS 組字與事件的負責者，並維護直接插入英文的追蹤範圍、Safari 自動完成尾段相容性及數字候選選取。`KeyboardViewController` 同時是 iOS UI 與狀態機的負責者，負責按鍵版面、候選、標點、聯想上下文、游標手勢、鍵盤切換、顏色及 Return 鍵標籤。大型 iOS 控制器是目前的耦合點。
 
-iOS 控制器在緊湊版面只於 `needsInputModeSwitchKey` 為 `true` 時建立自訂地球鍵；按鈕以 `handleInputModeList(from:with:)` 為目標並處理所有觸控事件，讓 iOS 同時處理切換與長按顯示已啟用鍵盤清單。Face ID iPhone 已由系統在 extension 下方提供地球鍵時，該屬性為 `false`，因此不會在鍵盤內容內重複建立。寬版 iPad 仍固定建立自訂地球鍵。目前鍵盤 UI 不包含表情符號目錄、搜尋預留位置或表情符號頁面。
+iOS 控制器在緊湊版面只於 `needsInputModeSwitchKey` 為 `true` 時建立自訂地球鍵；按鈕以 `handleInputModeList(from:with:)` 為目標並處理所有觸控事件，讓 iOS 同時處理切換與長按顯示已啟用鍵盤清單。Face ID iPhone 已由系統在 extension 下方提供地球鍵時，該屬性為 `false`，因此不會在鍵盤內容內重複建立。寬版 iPad 仍固定建立自訂地球鍵。控制器明確設定 `hasDictationKey=false`，不宣告自訂聽寫鍵，讓 iOS／iPadOS 在允許時自行管理及顯示系統咪高峰；實際顯示仍取決於系統聽寫設定、裝置、版面及目前 App。目前鍵盤 UI 不包含表情符號目錄、搜尋預留位置或表情符號頁面。
 
 ### iOS 版面模式與替代符號
 

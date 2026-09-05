@@ -146,6 +146,7 @@ final class KeyboardViewController: UIInputViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        hasDictationKey = false
         layoutMode = traitCollection.userInterfaceIdiom == .pad
             && traitCollection.horizontalSizeClass != .compact
             ? .wideIPad

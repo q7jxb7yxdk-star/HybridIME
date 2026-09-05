@@ -25,7 +25,7 @@ enum VerifyStaticLexicon {
         try require(queryText(database, "PRAGMA integrity_check") == "ok", "integrity_check")
         try require(queryInt(database, "PRAGMA user_version") == 2, "user_version")
         try require(queryTextColumn(database, "SELECT name FROM sqlite_schema WHERE type = 'table' ORDER BY rowid") == ["cangjie", "association", "bilingual"], "table order")
-        try require(queryInt(database, "SELECT count(*) FROM cangjie") == 33_319, "cangjie row count")
+        try require(queryInt(database, "SELECT count(*) FROM cangjie") == 33_318, "cangjie row count")
         let cangjieColumns = try queryRows(database, "PRAGMA table_info(cangjie)")
         try require(cangjieColumns.count == 2 && cangjieColumns[0]["name"] == "code" && cangjieColumns[0]["type"] == "TEXT" && cangjieColumns[0]["notnull"] == "1" && cangjieColumns[0]["pk"] == "1" && cangjieColumns[1]["name"] == "candidates" && cangjieColumns[1]["type"] == "TEXT" && cangjieColumns[1]["notnull"] == "1" && cangjieColumns[1]["pk"] == "0", "cangjie structure")
         try verifyCanonicalCangjie(database)
@@ -33,7 +33,7 @@ enum VerifyStaticLexicon {
         let sourceRoot = root.appendingPathComponent("HybridIME")
         try compare("association", expectedAssociations(sourceRoot), queryDictionary(database, "SELECT language, key, candidates FROM association"))
         try compare("bilingual", expectedBilingual(sourceRoot), queryDictionary(database, "SELECT direction, key, candidates FROM bilingual"))
-        print("Static lexicon: PASS (cangjie 33319, association and bilingual source-equal)")
+        print("Static lexicon: PASS (cangjie 33318, association and bilingual source-equal)")
     }
 
     private static func expectedAssociations(_ sourceRoot: URL) throws -> [String: String] { var expected: [String: String] = [:]; for (language, name) in [("0", "chinese-associations.tsv"), ("1", "english-associations.tsv")] { for fields in try rows(sourceRoot.appendingPathComponent("AssociationData/\(name)")) { guard fields.count >= 3, !fields.count.isMultiple(of: 2), Array(fields.dropFirst()).allSatisfy({ !$0.isEmpty }) else { throw Failure("invalid association row") }; expected[language + "\u{0}" + fields[0]] = Array(fields.dropFirst()).joined(separator: "\t") } }; return expected }
@@ -65,7 +65,7 @@ enum VerifyStaticLexicon {
             }
         }
         try require(candidateCount == 36_862, "cangjie candidate count")
-        try require(fingerprint == 0x8ddd_0f42_69ef_c2d4, "cangjie content fingerprint")
+        try require(fingerprint == 0xbbe2_c0b2_4139_27ec, "cangjie content fingerprint")
     }
     fileprivate struct Failure: Error, CustomStringConvertible { let message: String; init(_ message: String) { self.message = message }; var description: String { message } }
 }

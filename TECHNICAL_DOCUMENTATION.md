@@ -107,7 +107,7 @@ flowchart LR
 
 `Scripts/build_cedict_index.swift`、`Scripts/build_chinese_associations.swift` 與 `Scripts/build_english_associations.swift` 產生來源 TSV 索引。`Scripts/update_static_lexicon.swift` 會：
 
-1. 先驗證既有 SQLite 的完整性、`user_version=2`、固定表次序 `cangjie → association → bilingual`，以及 `cangjie` 的結構、33,319 筆資料、36,862 個候選與固定內容指紋。
+1. 先驗證既有 SQLite 的完整性、`user_version=2`、固定表次序 `cangjie → association → bilingual`，以及 `cangjie` 的結構、33,318 筆資料、36,862 個候選與固定內容指紋。
 2. 只在 transaction 中清除並重新寫入 `association(language, key, candidates)` 與 `bilingual(direction, key, candidates)`；絕不 drop、重建或修改 `cangjie`。
 3. 將英文鍵值正規化為小寫，保留來源候選順序，並套用 `HybridIME/DictionaryData/dictionary-overrides.tsv` 的 `add-e`、`add-z`、`replace-e`、`replace-z` 操作。
 4. 將 Rime Cangjie、CC-CEDICT、Rime Essay 與 Tatoeba 的授權／聲明更新至 `LexiconData/`。
@@ -372,10 +372,10 @@ swiftc -module-cache-path /tmp/hybridime-module-cache-keyboard \
 
 本次 schema 2 倉頡遷移已完成以下驗證：
 
-- `verify_static_lexicon.swift` 通過 `integrity_check`、`user_version=2`、`cangjie → association → bilingual` 表次序、固定 33,319 筆倉頡結構，以及雙語／聯想來源完全相等檢查；資料列分別為 33,319、244,887 及 177,594。
+- `verify_static_lexicon.swift` 通過 `integrity_check`、`user_version=2`、`cangjie → association → bilingual` 表次序、固定 33,318 筆倉頡結構，以及雙語／聯想來源完全相等檢查；資料列分別為 33,318、244,887 及 177,594。
 - 四個獨立 Swift 測試工具全部通過；靜態詞彙測試涵蓋倉頡大小寫正規化、候選順序與限制。
 - 未簽署 macOS Debug 及通用 iOS Simulator Debug 建置通過。兩個建置產品內的 SQLite 均回報 `integrity_check=ok`、schema 2、預期三表次序及 33,319 筆倉頡資料，並且不含 `hybrid-cangjie5.dict.tsv`。
-- arm64 macOS Debug 版本 1.2.0（組建編號 20260821）另以 Apple Development 簽署並安裝至 `~/Library/Input Methods/HybridIME.app`；安裝後 `codesign --verify --deep --strict` 通過，隨附 SQLite 與儲存庫版本的 SHA-256 相同，且仍回報 33,319 筆倉頡代碼與 36,862 個候選。
+- universal macOS Debug 版本 1.2.0（組建編號 20260821）另以 `Developer ID Application: Yan Yin Yu (WX793X49GJ)` 簽署並安裝至 `~/Library/Input Methods/HybridIME.app`；安裝後 `codesign --verify --deep --strict` 通過，隨附 SQLite 與儲存庫版本的 SHA-256 相同，且回報 33,318 筆倉頡代碼與 36,862 個候選。
 - 已安裝 App 重新註冊 LaunchServices、重啟 `TextInputMenuAgent` 並成功啟動 HybridIME 程序；最近的 InputMethodKit 日誌未出現錯誤或 `NO Endpoint`。這只驗證本機註冊與程序啟動，不代表真實文字輸入、候選呈現或提交行為已通過。
 - `git diff --check` 通過。
 

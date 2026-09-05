@@ -7,9 +7,9 @@ import Darwin
 @main
 enum UpdateStaticLexicon {
     private static let expectedTableOrder = ["cangjie", "association", "bilingual"]
-    private static let expectedCangjieRowCount: Int64 = 33_319
+    private static let expectedCangjieRowCount: Int64 = 33_318
     private static let expectedCangjieCandidateCount = 36_862
-    private static let expectedCangjieFingerprint: UInt64 = 0x8ddd_0f42_69ef_c2d4
+    private static let expectedCangjieFingerprint: UInt64 = 0xbbe2_c0b2_4139_27ec
     private static let sqliteTransient = unsafeBitCast(-1, to: sqlite3_destructor_type.self)
 
     static func main() {

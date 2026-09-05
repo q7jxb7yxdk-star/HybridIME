@@ -2,15 +2,15 @@
 # This file records confirmed macOS Cangjie differences incorporated in the canonical SQLite cangjie table.
 # It is documentation only; HybridIME does not load this file at runtime.
 # character	old_code	new_code
+面    mwyl    mwsl
+假    orye    orse
+非    lmyyy    lmsy
 怎	osp	hsp
-面	mwsl	mwyl
 黃	tmlc	tmwc
-作	oos	ohs
-盒	orbt	omrt
-拿	orq	omrq
-應	iogp	igp
-非	lmsy	lmyyy
-假	orse	orye
-樓	dllv	dlwv
-塊	ghui	ghi
+樓    dlwv    dllv
+拿	omrq	orq
+盒    omrt    orbt
+應	igp	iogp
+塊	ghi	ghui
 俾	ohwj	ohhj
+鱻    nfnff    nwfnf

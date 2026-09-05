@@ -103,18 +103,14 @@ final class KeyboardViewController: UIInputViewController {
     private let cursorEstimatedCharactersPerLine = 10
     private let cursorFeedbackGenerator = UISelectionFeedbackGenerator()
 
-    private var usesFlexibleKeyHeights: Bool {
-        layoutMode == .landscapePhone || layoutMode == .wideIPad
-    }
-
     private var keyboardHeight: CGFloat {
         switch layoutMode {
         case .compact:
-            260
+            traitCollection.userInterfaceIdiom == .phone ? 242 : 260
         case .landscapePhone:
-            180
+            187
         case .wideIPad:
-            isLandscapeInterfaceOrientation ? 428 : 340
+            isLandscapeInterfaceOrientation ? 353 : 265
         }
     }
 
@@ -248,10 +244,12 @@ final class KeyboardViewController: UIInputViewController {
         candidateArea.addArrangedSubview(compositionLabel)
         candidateArea.axis = .vertical
         candidateArea.spacing = 1
+        candidateArea.setContentCompressionResistancePriority(.required, for: .vertical)
 
         keyboardStackView.axis = .vertical
         keyboardStackView.distribution = .fill
         keyboardStackView.spacing = 7
+        keyboardStackView.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
 
         rootStack.addArrangedSubview(candidateArea)
         rootStack.addArrangedSubview(keyboardStackView)
@@ -267,7 +265,7 @@ final class KeyboardViewController: UIInputViewController {
         view.addSubview(cursorTrackpadOverlay)
 
         let heightConstraint = view.heightAnchor.constraint(equalToConstant: keyboardHeight)
-        heightConstraint.priority = .defaultHigh
+        heightConstraint.priority = .required
         heightConstraint.isActive = true
         keyboardHeightConstraint = heightConstraint
 
@@ -292,16 +290,10 @@ final class KeyboardViewController: UIInputViewController {
 
         candidateArea.isHidden = false
         keyboardHeightConstraint?.constant = keyboardHeight
-        keyboardStackView.distribution = usesFlexibleKeyHeights ? .fillEqually : .fill
-        if usesFlexibleKeyHeights {
-            compositionLabel.isHidden = true
-            keyboardStackView.spacing = 5
-            rootStack.spacing = 5
-        } else {
-            compositionLabel.isHidden = currentPage == .letters
-            keyboardStackView.spacing = currentPage == .letters ? 5 : 7
-            rootStack.spacing = currentPage == .letters ? 5 : 7
-        }
+        keyboardStackView.distribution = .fillEqually
+        compositionLabel.isHidden = true
+        keyboardStackView.spacing = 5
+        rootStack.spacing = 5
 
         switch currentPage {
         case .letters:
@@ -1204,9 +1196,11 @@ final class KeyboardViewController: UIInputViewController {
         button.layer.shadowRadius = 0.5
         button.layer.shadowOffset = CGSize(width: 0, height: 1)
         let heightConstraint = button.heightAnchor.constraint(equalToConstant: height)
-        if usesFlexibleKeyHeights {
-            heightConstraint.priority = UILayoutPriority(749)
-        }
+        heightConstraint.priority = UILayoutPriority(749)
+        button.setContentCompressionResistancePriority(
+            UILayoutPriority(748),
+            for: .vertical
+        )
         heightConstraint.isActive = true
         button.configurationUpdateHandler = { button in
             guard var configuration = button.configuration else { return }
@@ -1998,6 +1992,7 @@ final class KeyboardViewController: UIInputViewController {
                 }
 
             let button = UIButton(configuration: configuration)
+            button.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
             button.addAction(
                 UIAction { [weak self] _ in self?.selectCandidate(candidate) },
                 for: .touchUpInside

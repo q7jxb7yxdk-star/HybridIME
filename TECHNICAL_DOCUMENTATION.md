@@ -185,11 +185,11 @@ iOS 控制器在緊湊版面只於 `needsInputModeSwitchKey` 為 `true` 時建�
 
 ### iOS 版面模式與替代符號
 
-`KeyboardViewController` 在版面配置後，若裝置是 iPhone 且 window scene 的介面方向為橫向，便選取 `landscapePhone`；檢視尚未附著到 window 時，改以 `verticalSizeClass == .compact` 作暫時判斷。若裝置是 iPad、水平尺寸類別為 `regular` 且鍵盤檢視寬度至少 700 點，便選取 `wideIPad`；否則使用 `compact`。初始版面配置前，iPad 仍接受任何非 `compact` 的水平尺寸類別，接著由 `viewWillLayoutSubviews()` 依最終寬度重新協調。從同一裝置 Apple 內建倉頡截圖量得的整體可見高度為縱向 340 點、橫向 428 點；由於 iPadOS 會在第三方鍵盤自訂內容上方另加約 75 點的系統輸入輔助列，`wideIPad` 的自訂內容高度分別設為縱向 265 點與橫向 353 點。即使旋轉前後皆為 `wideIPad`，版面週期也會更新高度約束。iPhone 的 `compact` 縱向配置使用依最新同裝置、同宿主 App 截圖差值校準的 242 點，非寬版或浮動 iPad 的 `compact` 配置仍使用 260 點；`landscapePhone` 使用同一組截圖校準的 187 點。這些 iPhone 自訂內容高度連同系統管理區後，目標整體可見高度分別為縱向 335 點、橫向 207 點。所有版面均以低優先權的按鍵高度與 `.fillEqually` 列分配收納可用空間，避免固定 50 點按鍵連同候選列把鍵盤根視圖撐高。iPhone 緊湊版 Shift／Delete 在直向與橫向分別為 46／88 點寬，頁面鍵為 43／66 點寬，Return 為 93／138 點寬；高度不套用原生量度值，而是盡量填滿各列的可用高度。iPhone 橫向沿用緊湊版的 QWERTY、Shift、Delete、數字符號及底列位置，字母鍵將倉頡字根置左、英文字母置右，但保留原始字母的輸入與 Shift 行為，以及依 `needsInputModeSwitchKey` 決定的地球鍵。iPad 寬版則使用固定 11 格列；其字母列將 Delete 放在第一列、Return 放在第二列，並在第三列兩端放置 Shift，另有逗號與句號標點控制。
+`KeyboardViewController` 在版面配置後，若裝置是 iPhone 且 window scene 的介面方向為橫向，便選取 `landscapePhone`；檢視尚未附著到 window 時，改以 `verticalSizeClass == .compact` 作暫時判斷。若裝置是 iPad、水平尺寸類別為 `regular` 且鍵盤檢視寬度至少 700 點，便選取 `wideIPad`；否則使用 `compact`。初始版面配置前，iPad 仍接受任何非 `compact` 的水平尺寸類別，接著由 `viewWillLayoutSubviews()` 依最終寬度重新協調。從同一裝置 Apple 內建倉頡截圖量得的整體可見高度為縱向 340 點、橫向 428 點；由於 iPadOS 會在第三方鍵盤自訂內容上方另加約 75 點的系統輸入輔助列，`wideIPad` 的自訂內容高度分別設為縱向 265 點與橫向 353 點。即使旋轉前後皆為 `wideIPad`，版面週期也會更新高度約束。iPhone 的 `compact` 縱向配置使用依最新同裝置、同宿主 App 截圖差值校準的 242 點，非寬版或浮動 iPad 的 `compact` 配置仍使用 260 點；`landscapePhone` 使用同一組截圖校準的 187 點。這些 iPhone 自訂內容高度連同系統管理區後，目標整體可見高度分別為縱向 335 點、橫向 207 點。所有版面均以低優先權的按鍵高度與 `.fillEqually` 列分配收納可用空間，避免固定 50 點按鍵連同候選列把鍵盤根視圖撐高。iPhone 緊湊版 Shift／Delete 在直向與橫向分別為 46／88 點寬，頁面鍵為 43／66 點寬，Return 為 93／138 點寬；高度不套用原生量度值，而是盡量填滿各列的可用高度。iPhone 橫向沿用緊湊版的 QWERTY、Shift、Delete、數字符號及底列位置，字母鍵將倉頡字根置左、英文字母置右，但保留原始字母的輸入與 Shift 行為，以及依 `needsInputModeSwitchKey` 決定的地球鍵。iPad 寬版使用以 50 點高度基準建立的固定 11.25 格列：一般字母、數字、符號、左 Shift、逗號及句號各佔一格；Delete、Return 及右 Shift 各佔 1.25 格。第二列以 0.45 格開始並在尾端補 0.55 格，使九個字母鍵與第一、三列同寬。字母列將 Delete 放在第一列、Return 放在第二列，第三列兩端放置 Shift。
 
 候選捲動列固定為 38 點並保留在上述鍵盤總高度之內，而不是作為額外高度加入。候選區維持其高度；所有版面的按鍵堆疊與按鍵本身使用較低的垂直內容壓縮阻力，讓空間不足時由四列按鍵吸收壓縮，避免候選 placeholder 或候選按鈕的 intrinsic content size 推高根視圖。候選有無不會切換候選列的可見性，因此按鍵位置不會在開始組字時跳動。
 
-鍵盤根視圖使用透明且非不透明的 surface，讓 iOS 宿主提供的鍵盤背景材質延伸至自訂內容區，視覺上銜接由系統管理的底部地球／咪高峰區。按鍵與游標觸控板覆蓋層仍使用自己的動態顏色。系統底部區不屬於 extension，程式不能直接設定其顏色。
+鍵盤根視圖使用透明且非不透明的 surface，讓 iOS 宿主提供的鍵盤背景材質延伸至自訂內容區，視覺上銜接由系統管理的底部地球／咪高峰區。按鍵與游標觸控板覆蓋層仍使用自己的動態顏色。`keyboardAppearance` 明確要求 `.light` 或 `.dark` 時直接採用；`.default` 則讀取 keyboard window／window scene 的 `userInterfaceStyle`。控制器使用 iOS 17 的 `registerForTraitChanges([UITraitUserInterfaceStyle.self])` 在切換外觀時更新按鍵 configuration。Dark 以近黑背景和深灰鍵面、Light 以淺灰背景、白色字元鍵及較深控制鍵貼近原生英文鍵盤；這些公開 UIKit 色彩不是可取得的私有系統材質。系統底部區不屬於 extension，程式不能直接設定其顏色。
 
 寬版數字模式呈現上下堆疊的主要／替代配對：`@／¥`、`#／€`、`$／£`、`&／_`、`*／^`、`(／[`、`)／]`、`'／{`、`"／}`、`%／§`、`-／|`、`+／~`、`=／…`、`/／\\`、`;／<`、`:／>`、`,／!` 與 `.／?`。單指平移只有在向下位移達到 12 點且大於水平位移時才會選取替代符號。選取期間會隱藏堆疊標籤、顯示置中的替代預覽並反白按鍵；結束手勢會提交替代符號，取消則還原一般標籤。主要按鍵 `@`、`#`、`$`、`&`、`(`、`)`、`'`、`"` 與 `/` 使用零堆疊間距與邊緣內縮；其餘配對使用 -5 點堆疊間距與 2 點邊緣內縮。寬版字母標點控制也會將 `!` 與 `?` 作為逗號與句號的向下輕掃替代符號。
 
@@ -410,7 +410,7 @@ swiftc -module-cache-path /tmp/hybridime-module-cache-keyboard \
 - macOS 資源預載入沒有就緒狀態、進度 UI 或重試。
 - iOS 替換依賴宿主上下文與立即插入／刪除行為，而非標記文字組字。
 - iOS 緊湊版面依 `needsInputModeSwitchKey` 決定是否建立地球鍵，並將自訂按鈕的切換／長按選取交給 `handleInputModeList(from:with:)`；寬版 iPad 仍固定建立自訂地球鍵，不同寬度、方向與已啟用鍵盤組合下的實際顯示仍需持續驗證。
-- iPad 在 700 點邊界的寬版版面切換、11 格幾何、堆疊符號標籤，以及 12 點替代符號輕掃預覽／提交互動，在模擬器與裝置上的視覺及行為仍未驗證。
+- iPad 在 700 點邊界的寬版版面切換、11.25 格原生式幾何、Light／Dark 外觀、堆疊符號標籤，以及 12 點替代符號輕掃預覽／提交互動，在模擬器與裝置上的視覺及行為仍未驗證。
 - iOS Delete 長按的 0.35 秒啟動門檻與 0.08 秒重複間隔尚未經實機驗證，仍需確認連續刪除速度與放開停止的手感。
 - iOS 垂直游標備援會估算每行十個字元，無法得知視覺換行。
 - 沒有可清除學習資料的設定 UI；記錄數量沒有全域上限或修剪政策。

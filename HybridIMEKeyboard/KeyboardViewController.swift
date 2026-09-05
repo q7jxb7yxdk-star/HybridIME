@@ -126,6 +126,8 @@ final class KeyboardViewController: UIInputViewController {
         layoutMode == .landscapePhone ? 138 : 93
     }
 
+    private let wideIPadKeyHeight: CGFloat = 50
+
     private var isLandscapePhoneLayout: Bool {
         guard traitCollection.userInterfaceIdiom == .phone else { return false }
         return view.window?.windowScene != nil
@@ -184,6 +186,9 @@ final class KeyboardViewController: UIInputViewController {
         hasDictationKey = false
         layoutMode = initialLayoutMode()
         configureInterface()
+        registerForTraitChanges([UITraitUserInterfaceStyle.self]) { (self: Self, _) in
+            self.updateAppearance()
+        }
         rebuildKeyboard()
         hasBuiltKeyboard = true
         refreshComposition()
@@ -384,9 +389,13 @@ final class KeyboardViewController: UIInputViewController {
     }
 
     private func buildWideIPadLetterRows() {
-        let deleteButton = makeDeleteButton(height: 50)
+        let deleteButton = makeDeleteButton(height: wideIPadKeyHeight)
         keyboardStackView.addArrangedSubview(
-            makeWideIPadLetterRow(letterRows[0], trailingControls: [deleteButton])
+            makeWideIPadLetterRow(
+                letterRows[0],
+                trailingControls: [deleteButton],
+                trailingControlWidthMultipliers: [1.25]
+            )
         )
 
         let returnButton = makeReturnButton()
@@ -394,7 +403,9 @@ final class KeyboardViewController: UIInputViewController {
             makeWideIPadLetterRow(
                 letterRows[1],
                 trailingControls: [returnButton],
-                leadingSpacerCount: 1
+                leadingSpacerCount: 1,
+                trailingInsetInKeyWidths: 0.55,
+                trailingControlWidthMultipliers: [1.25]
             )
         )
 
@@ -406,7 +417,10 @@ final class KeyboardViewController: UIInputViewController {
             makeWideIPadLetterRow(
                 letterRows[2],
                 leadingControls: [leftShiftButton],
-                trailingControls: [commaButton, periodButton, rightShiftButton]
+                trailingControls: [rightShiftButton],
+                trailingKeyButtons: [commaButton, periodButton],
+                leadingControlWidthMultipliers: [1],
+                trailingControlWidthMultipliers: [1.25]
             )
         )
     }
@@ -444,7 +458,8 @@ final class KeyboardViewController: UIInputViewController {
             makeWideIPadSymbolRow(
                 wideIPadNumberSecondRow,
                 trailingControls: [returnButton],
-                leadingSpacerCount: 1
+                leadingSpacerCount: 1,
+                trailingInsetInKeyWidths: 0.55
             )
         )
 
@@ -468,7 +483,8 @@ final class KeyboardViewController: UIInputViewController {
             makeWideIPadCharacterRow(
                 alternateSecondRow,
                 trailingControls: [returnButton],
-                leadingSpacerCount: 1
+                leadingSpacerCount: 1,
+                trailingInsetInKeyWidths: 0.55
             )
         )
 
@@ -494,7 +510,11 @@ final class KeyboardViewController: UIInputViewController {
         _ keys: [String],
         leadingControls: [UIButton] = [],
         trailingControls: [UIButton] = [],
-        leadingSpacerCount: Int = 0
+        trailingKeyButtons: [UIButton] = [],
+        leadingSpacerCount: Int = 0,
+        trailingInsetInKeyWidths: CGFloat = 0,
+        leadingControlWidthMultipliers: [CGFloat] = [],
+        trailingControlWidthMultipliers: [CGFloat] = []
     ) -> UIView {
         let keyButtons = keys.map { key in
             let displayedKey = shiftState == .lowercased ? key : key.uppercased()
@@ -506,17 +526,21 @@ final class KeyboardViewController: UIInputViewController {
             return button
         }
         return makeWideIPadRow(
-            keyButtons: keyButtons,
+            keyButtons: keyButtons + trailingKeyButtons,
             leadingControls: leadingControls,
             trailingControls: trailingControls,
-            leadingSpacerCount: leadingSpacerCount
+            leadingInsetInKeyWidths: CGFloat(leadingSpacerCount) * 0.45,
+            trailingInsetInKeyWidths: trailingInsetInKeyWidths,
+            leadingControlWidthMultipliers: leadingControlWidthMultipliers,
+            trailingControlWidthMultipliers: trailingControlWidthMultipliers
         )
     }
 
     private func makeWideIPadCharacterRow(
         _ keys: [String],
         trailingControls: [UIButton],
-        leadingSpacerCount: Int = 0
+        leadingSpacerCount: Int = 0,
+        trailingInsetInKeyWidths: CGFloat = 0
     ) -> UIView {
         let keyButtons = keys.map { key in
             let button = makeKey(title: key, role: .character)
@@ -529,20 +553,25 @@ final class KeyboardViewController: UIInputViewController {
         return makeWideIPadRow(
             keyButtons: keyButtons,
             trailingControls: trailingControls,
-            leadingSpacerCount: leadingSpacerCount
+            leadingInsetInKeyWidths: CGFloat(leadingSpacerCount) * 0.45,
+            trailingInsetInKeyWidths: trailingInsetInKeyWidths,
+            trailingControlWidthMultipliers: [1.25]
         )
     }
 
     private func makeWideIPadSymbolRow(
         _ keys: [WideSymbolKey],
         trailingControls: [UIButton],
-        leadingSpacerCount: Int = 0
+        leadingSpacerCount: Int = 0,
+        trailingInsetInKeyWidths: CGFloat = 0
     ) -> UIView {
         let keyButtons = keys.map { makeWideIPadSymbolButton($0) }
         return makeWideIPadRow(
             keyButtons: keyButtons,
             trailingControls: trailingControls,
-            leadingSpacerCount: leadingSpacerCount
+            leadingInsetInKeyWidths: CGFloat(leadingSpacerCount) * 0.45,
+            trailingInsetInKeyWidths: trailingInsetInKeyWidths,
+            trailingControlWidthMultipliers: [1.25]
         )
     }
 
@@ -554,7 +583,8 @@ final class KeyboardViewController: UIInputViewController {
         let punctuationButtons = punctuationKeys.map { makeWidePunctuationButton($0) }
         return makeWideIPadRow(
             keyButtons: [pageButton] + punctuationButtons,
-            leadingSpacerCount: 2
+            leadingInsetInKeyWidths: 2,
+            trailingInsetInKeyWidths: 3
         )
     }
 
@@ -562,26 +592,69 @@ final class KeyboardViewController: UIInputViewController {
         keyButtons: [UIButton],
         leadingControls: [UIButton] = [],
         trailingControls: [UIButton] = [],
-        leadingSpacerCount: Int = 0
+        leadingInsetInKeyWidths: CGFloat = 0,
+        trailingInsetInKeyWidths: CGFloat = 0,
+        leadingControlWidthMultipliers: [CGFloat] = [],
+        trailingControlWidthMultipliers: [CGFloat] = []
     ) -> UIView {
         let row = UIStackView()
         row.axis = .horizontal
         row.spacing = 5
-        row.distribution = .fillEqually
+        row.distribution = .fill
 
-        let slotCount = 11
-        let occupiedSlotCount = leadingControls.count + keyButtons.count + trailingControls.count
-        let leadingSpacers = min(leadingSpacerCount, max(0, slotCount - occupiedSlotCount))
-        let trailingSpacers = max(0, slotCount - occupiedSlotCount - leadingSpacers)
+        // iPadOS keeps letter keys uniform, but gives Shift, Delete and Return
+        // about 1.25 key widths.  Its home row starts at a half-key inset rather
+        // than at a full invisible key slot.
+        guard let referenceKey = keyButtons.first else {
+            return wrap(row, horizontalInset: 0)
+        }
 
-        for _ in 0..<leadingSpacers {
-            row.addArrangedSubview(UIView())
+        let leadingInset = leadingInsetInKeyWidths > 0 ? UIView() : nil
+        let trailingInset = trailingInsetInKeyWidths > 0 ? UIView() : nil
+        if let leadingInset {
+            row.addArrangedSubview(leadingInset)
         }
         leadingControls.forEach { row.addArrangedSubview($0) }
         keyButtons.forEach { row.addArrangedSubview($0) }
         trailingControls.forEach { row.addArrangedSubview($0) }
-        for _ in 0..<trailingSpacers {
-            row.addArrangedSubview(UIView())
+        if let trailingInset {
+            row.addArrangedSubview(trailingInset)
+        }
+
+        // Activating cross-view constraints is safe only after every view has
+        // joined this stack view; otherwise UIKit terminates the extension.
+        if let leadingInset {
+            leadingInset.widthAnchor.constraint(
+                equalTo: referenceKey.widthAnchor,
+                multiplier: leadingInsetInKeyWidths
+            ).isActive = true
+        }
+        for keyButton in keyButtons.dropFirst() {
+            keyButton.widthAnchor.constraint(equalTo: referenceKey.widthAnchor).isActive = true
+        }
+        let resolvedLeadingMultipliers = leadingControlWidthMultipliers.count == leadingControls.count
+            ? leadingControlWidthMultipliers
+            : Array(repeating: 1, count: leadingControls.count)
+        let resolvedTrailingMultipliers = trailingControlWidthMultipliers.count == trailingControls.count
+            ? trailingControlWidthMultipliers
+            : Array(repeating: 1, count: trailingControls.count)
+        for (control, multiplier) in zip(leadingControls, resolvedLeadingMultipliers) {
+            control.widthAnchor.constraint(
+                equalTo: referenceKey.widthAnchor,
+                multiplier: multiplier
+            ).isActive = true
+        }
+        for (control, multiplier) in zip(trailingControls, resolvedTrailingMultipliers) {
+            control.widthAnchor.constraint(
+                equalTo: referenceKey.widthAnchor,
+                multiplier: multiplier
+            ).isActive = true
+        }
+        if let trailingInset {
+            trailingInset.widthAnchor.constraint(
+                equalTo: referenceKey.widthAnchor,
+                multiplier: trailingInsetInKeyWidths
+            ).isActive = true
         }
         return wrap(row, horizontalInset: 0)
     }
@@ -610,7 +683,7 @@ final class KeyboardViewController: UIInputViewController {
             configuration: configuration,
             normalColor: characterKeyColor,
             accessibilityLabel: "\(key.primary)，向下滑動輸入\(key.alternate)",
-            height: 42
+            height: wideIPadKeyHeight
         )
         button.addAction(
             UIAction { [weak self] _ in self?.enterSymbol(key.primary) },
@@ -755,7 +828,7 @@ final class KeyboardViewController: UIInputViewController {
             configuration: configuration,
             normalColor: characterKeyColor,
             accessibilityLabel: "\(key)，向下滑動或 Shift 輸入\(alternateKey)",
-            height: 42
+            height: wideIPadKeyHeight
         )
         button.addAction(
             UIAction { [weak self] _ in self?.enterWidePunctuation(key) },
@@ -1002,7 +1075,11 @@ final class KeyboardViewController: UIInputViewController {
     }
 
     private func makePageButton(title: String, destination: KeyboardPage) -> UIButton {
-        let pageButton = makeKey(title: title, role: .control, fontSize: 14)
+        let pageButton = makeKey(
+            title: title,
+            role: .control,
+            fontSize: layoutMode == .wideIPad ? 22 : 14
+        )
         pageButton.addAction(
             UIAction { [weak self] _ in self?.switchPage(to: destination) },
             for: .touchUpInside
@@ -1045,11 +1122,20 @@ final class KeyboardViewController: UIInputViewController {
     }
 
     private func makeReturnButton() -> UIButton {
-        let returnButton = makeKey(
-            title: returnKeyTitle,
-            role: .control,
-            fontSize: 14
-        )
+        let returnButton: UIButton
+        if returnKeyTitle == "return" {
+            returnButton = makeIconKey(
+                systemName: "return",
+                accessibilityLabel: "Return",
+                role: .control
+            )
+        } else {
+            returnButton = makeKey(
+                title: returnKeyTitle,
+                role: .control,
+                fontSize: layoutMode == .wideIPad ? 22 : 14
+            )
+        }
         returnButton.addAction(
             UIAction { [weak self] _ in self?.commitReturn() },
             for: .touchUpInside
@@ -1058,7 +1144,7 @@ final class KeyboardViewController: UIInputViewController {
         return returnButton
     }
 
-    private func makeDeleteButton(height: CGFloat = 42) -> UIButton {
+    private func makeDeleteButton(height: CGFloat? = nil) -> UIButton {
         let button = makeIconKey(
             systemName: "delete.left",
             accessibilityLabel: "刪除",
@@ -1084,18 +1170,21 @@ final class KeyboardViewController: UIInputViewController {
         title: String,
         role: KeyRole,
         fontSize: CGFloat = 21,
-        height: CGFloat = 42
+        height: CGFloat? = nil
     ) -> UIButton {
         var configuration = UIButton.Configuration.plain()
         configuration.title = title
         configuration.contentInsets = .zero
         configuration.baseForegroundColor = .label
         configuration.background.backgroundColor = keyColor(for: role)
-        configuration.background.cornerRadius = 5
+        configuration.background.cornerRadius = controlKeyCornerRadius(for: role)
         configuration.titleTextAttributesTransformer =
             UIConfigurationTextAttributesTransformer { attributes in
                 var attributes = attributes
-                attributes.font = .systemFont(ofSize: fontSize, weight: .regular)
+                attributes.font = .systemFont(
+                    ofSize: self.controlKeyFontSize(fontSize, for: role),
+                    weight: .regular
+                )
                 return attributes
             }
 
@@ -1103,7 +1192,7 @@ final class KeyboardViewController: UIInputViewController {
             configuration: configuration,
             normalColor: keyColor(for: role),
             accessibilityLabel: title,
-            height: height
+            height: height ?? defaultKeyHeight
         )
     }
 
@@ -1164,22 +1253,21 @@ final class KeyboardViewController: UIInputViewController {
         systemName: String,
         accessibilityLabel: String,
         role: KeyRole,
-        height: CGFloat = 42
+        height: CGFloat? = nil
     ) -> UIButton {
         var configuration = UIButton.Configuration.plain()
         configuration.image = UIImage(systemName: systemName)
         configuration.contentInsets = .zero
-        configuration.preferredSymbolConfigurationForImage =
-            UIImage.SymbolConfiguration(pointSize: 18, weight: .regular)
+        configuration.preferredSymbolConfigurationForImage = controlKeySymbolConfiguration(for: role)
         configuration.baseForegroundColor = .label
         configuration.background.backgroundColor = keyColor(for: role)
-        configuration.background.cornerRadius = 5
+        configuration.background.cornerRadius = controlKeyCornerRadius(for: role)
 
         return configuredButton(
             configuration: configuration,
             normalColor: keyColor(for: role),
             accessibilityLabel: accessibilityLabel,
-            height: height
+            height: height ?? defaultKeyHeight
         )
     }
 
@@ -1210,6 +1298,10 @@ final class KeyboardViewController: UIInputViewController {
             button.configuration = configuration
         }
         return button
+    }
+
+    private var defaultKeyHeight: CGFloat {
+        layoutMode == .wideIPad ? wideIPadKeyHeight : 42
     }
 
     private func wrap(
@@ -2003,14 +2095,46 @@ final class KeyboardViewController: UIInputViewController {
     }
 
     private func updateAppearance() {
-        let darkAppearance = textDocumentProxy.keyboardAppearance == .dark
-        view.overrideUserInterfaceStyle = darkAppearance ? .dark : .light
+        view.overrideUserInterfaceStyle = preferredKeyboardInterfaceStyle
         view.backgroundColor = .clear
+        cursorTrackpadOverlay.backgroundColor = keyboardBackgroundColor
+        refreshButtonAppearance(in: rootStack)
+    }
+
+    private var preferredKeyboardInterfaceStyle: UIUserInterfaceStyle {
+        switch textDocumentProxy.keyboardAppearance {
+        case .dark:
+            return .dark
+        case .light:
+            return .light
+        default:
+            let hostStyle = view.window?.windowScene?.screen.traitCollection.userInterfaceStyle
+                ?? view.window?.traitCollection.userInterfaceStyle
+                ?? traitCollection.userInterfaceStyle
+            return hostStyle == .dark ? .dark : .light
+        }
+    }
+
+    private func refreshButtonAppearance(in view: UIView) {
+        if let button = view as? UIButton {
+            button.setNeedsUpdateConfiguration()
+        }
+        view.subviews.forEach { self.refreshButtonAppearance(in: $0) }
     }
 
     private func updateReturnKeyTitle() {
         guard var configuration = returnButton?.configuration else { return }
-        configuration.title = returnKeyTitle
+        if returnKeyTitle == "return" {
+            configuration.title = nil
+            configuration.image = UIImage(systemName: "return")
+            configuration.preferredSymbolConfigurationForImage =
+                controlKeySymbolConfiguration(for: .control)
+            returnButton?.accessibilityLabel = "Return"
+        } else {
+            configuration.image = nil
+            configuration.title = returnKeyTitle
+            returnButton?.accessibilityLabel = returnKeyTitle
+        }
         returnButton?.configuration = configuration
     }
 
@@ -2044,10 +2168,25 @@ final class KeyboardViewController: UIInputViewController {
         }
     }
 
+    private func controlKeyCornerRadius(for role: KeyRole) -> CGFloat {
+        layoutMode == .wideIPad && role == .control ? 9 : 5
+    }
+
+    private func controlKeyFontSize(_ fontSize: CGFloat, for role: KeyRole) -> CGFloat {
+        layoutMode == .wideIPad && role == .control ? max(fontSize, 22) : fontSize
+    }
+
+    private func controlKeySymbolConfiguration(for role: KeyRole) -> UIImage.SymbolConfiguration {
+        UIImage.SymbolConfiguration(
+            pointSize: layoutMode == .wideIPad && role == .control ? 22 : 18,
+            weight: .regular
+        )
+    }
+
     private var keyboardBackgroundColor: UIColor {
         UIColor { traits in
             traits.userInterfaceStyle == .dark
-                ? UIColor(red: 0.15, green: 0.15, blue: 0.16, alpha: 1)
+                ? UIColor(red: 0.08, green: 0.08, blue: 0.09, alpha: 1)
                 : UIColor(red: 0.82, green: 0.83, blue: 0.86, alpha: 1)
         }
     }
@@ -2055,7 +2194,7 @@ final class KeyboardViewController: UIInputViewController {
     private var characterKeyColor: UIColor {
         UIColor { traits in
             traits.userInterfaceStyle == .dark
-                ? UIColor(red: 0.38, green: 0.38, blue: 0.40, alpha: 1)
+                ? UIColor(red: 0.23, green: 0.23, blue: 0.24, alpha: 1)
                 : .white
         }
     }
@@ -2063,7 +2202,7 @@ final class KeyboardViewController: UIInputViewController {
     private var controlKeyColor: UIColor {
         UIColor { traits in
             traits.userInterfaceStyle == .dark
-                ? UIColor(red: 0.25, green: 0.25, blue: 0.27, alpha: 1)
+                ? UIColor(red: 0.23, green: 0.23, blue: 0.24, alpha: 1)
                 : UIColor(red: 0.67, green: 0.69, blue: 0.72, alpha: 1)
         }
     }

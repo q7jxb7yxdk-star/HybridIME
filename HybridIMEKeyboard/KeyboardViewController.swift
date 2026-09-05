@@ -21,6 +21,7 @@ final class KeyboardViewController: UIInputViewController {
 
     private enum KeyboardLayoutMode: Equatable {
         case compact
+        case landscapePhone
         case wideIPad
     }
 
@@ -102,6 +103,44 @@ final class KeyboardViewController: UIInputViewController {
     private let cursorEstimatedCharactersPerLine = 10
     private let cursorFeedbackGenerator = UISelectionFeedbackGenerator()
 
+    private var usesFlexibleKeyHeights: Bool {
+        layoutMode == .landscapePhone || layoutMode == .wideIPad
+    }
+
+    private var keyboardHeight: CGFloat {
+        switch layoutMode {
+        case .compact:
+            260
+        case .landscapePhone:
+            180
+        case .wideIPad:
+            isLandscapeInterfaceOrientation ? 428 : 340
+        }
+    }
+
+    private var compactShiftDeleteKeyWidth: CGFloat {
+        layoutMode == .landscapePhone ? 88 : 46
+    }
+
+    private var compactPageKeyWidth: CGFloat {
+        layoutMode == .landscapePhone ? 66 : 43
+    }
+
+    private var compactReturnKeyWidth: CGFloat {
+        layoutMode == .landscapePhone ? 138 : 93
+    }
+
+    private var isLandscapePhoneLayout: Bool {
+        guard traitCollection.userInterfaceIdiom == .phone else { return false }
+        return view.window?.windowScene != nil
+            ? isLandscapeInterfaceOrientation
+            : traitCollection.verticalSizeClass == .compact
+    }
+
+    private var isLandscapeInterfaceOrientation: Bool {
+        view.window?.windowScene?.effectiveGeometry.interfaceOrientation.isLandscape ?? false
+    }
+
     private let letterRows: [[String]] = [
         ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p"],
         ["a", "s", "d", "f", "g", "h", "j", "k", "l"],
@@ -147,10 +186,7 @@ final class KeyboardViewController: UIInputViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         hasDictationKey = false
-        layoutMode = traitCollection.userInterfaceIdiom == .pad
-            && traitCollection.horizontalSizeClass != .compact
-            ? .wideIPad
-            : .compact
+        layoutMode = initialLayoutMode()
         configureInterface()
         rebuildKeyboard()
         hasBuiltKeyboard = true
@@ -230,9 +266,7 @@ final class KeyboardViewController: UIInputViewController {
         cursorTrackpadOverlay.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(cursorTrackpadOverlay)
 
-        let heightConstraint = view.heightAnchor.constraint(
-            equalToConstant: layoutMode == .wideIPad ? 353 : 260
-        )
+        let heightConstraint = view.heightAnchor.constraint(equalToConstant: keyboardHeight)
         heightConstraint.priority = .defaultHigh
         heightConstraint.isActive = true
         keyboardHeightConstraint = heightConstraint
@@ -257,9 +291,9 @@ final class KeyboardViewController: UIInputViewController {
         }
 
         candidateArea.isHidden = false
-        keyboardHeightConstraint?.constant = layoutMode == .wideIPad ? 353 : 260
-        keyboardStackView.distribution = layoutMode == .wideIPad ? .fillEqually : .fill
-        if layoutMode == .wideIPad {
+        keyboardHeightConstraint?.constant = keyboardHeight
+        keyboardStackView.distribution = usesFlexibleKeyHeights ? .fillEqually : .fill
+        if usesFlexibleKeyHeights {
             compositionLabel.isHidden = true
             keyboardStackView.spacing = 5
             rootStack.spacing = 5
@@ -315,7 +349,9 @@ final class KeyboardViewController: UIInputViewController {
 
     private func updateLayoutModeIfNeeded() {
         let nextMode: KeyboardLayoutMode
-        if traitCollection.userInterfaceIdiom == .pad,
+        if isLandscapePhoneLayout {
+            nextMode = .landscapePhone
+        } else if traitCollection.userInterfaceIdiom == .pad,
            traitCollection.horizontalSizeClass == .regular,
            view.bounds.width >= 700
         {
@@ -324,10 +360,27 @@ final class KeyboardViewController: UIInputViewController {
             nextMode = .compact
         }
 
-        guard layoutMode != nextMode else { return }
+        guard layoutMode != nextMode else {
+            let nextHeight = keyboardHeight
+            if keyboardHeightConstraint?.constant != nextHeight {
+                keyboardHeightConstraint?.constant = nextHeight
+            }
+            return
+        }
         layoutMode = nextMode
         guard hasBuiltKeyboard else { return }
         rebuildKeyboard()
+    }
+
+    private func initialLayoutMode() -> KeyboardLayoutMode {
+        if isLandscapePhoneLayout {
+            return .landscapePhone
+        }
+
+        return traitCollection.userInterfaceIdiom == .pad
+            && traitCollection.horizontalSizeClass != .compact
+            ? .wideIPad
+            : .compact
     }
 
     private func preloadDecoderIfNeeded() {
@@ -808,7 +861,9 @@ final class KeyboardViewController: UIInputViewController {
             UIAction { [weak self] _ in self?.toggleShift() },
             for: .touchUpInside
         )
-        shiftButton.widthAnchor.constraint(equalToConstant: 44).isActive = true
+        shiftButton.widthAnchor.constraint(
+            equalToConstant: compactShiftDeleteKeyWidth
+        ).isActive = true
         row.addArrangedSubview(shiftButton)
 
         var letterButtons: [UIButton] = []
@@ -825,7 +880,9 @@ final class KeyboardViewController: UIInputViewController {
         equalizeWidths(letterButtons)
 
         let deleteButton = makeDeleteButton(height: 50)
-        deleteButton.widthAnchor.constraint(equalToConstant: 44).isActive = true
+        deleteButton.widthAnchor.constraint(
+            equalToConstant: compactShiftDeleteKeyWidth
+        ).isActive = true
         row.addArrangedSubview(deleteButton)
         return wrap(row, horizontalInset: 0)
     }
@@ -844,7 +901,7 @@ final class KeyboardViewController: UIInputViewController {
             UIAction { [weak self] _ in self?.switchPage(to: destination) },
             for: .touchUpInside
         )
-        pageButton.widthAnchor.constraint(equalToConstant: 54).isActive = true
+        pageButton.widthAnchor.constraint(equalToConstant: compactPageKeyWidth).isActive = true
         row.addArrangedSubview(pageButton)
 
         var punctuationButtons: [UIButton] = []
@@ -860,7 +917,9 @@ final class KeyboardViewController: UIInputViewController {
         equalizeWidths(punctuationButtons)
 
         let deleteButton = makeDeleteButton()
-        deleteButton.widthAnchor.constraint(equalToConstant: 44).isActive = true
+        deleteButton.widthAnchor.constraint(
+            equalToConstant: compactShiftDeleteKeyWidth
+        ).isActive = true
         row.addArrangedSubview(deleteButton)
         return wrap(row, horizontalInset: 0)
     }
@@ -880,7 +939,7 @@ final class KeyboardViewController: UIInputViewController {
             ? KeyboardPage.numbers
             : KeyboardPage.letters
         let pageButton = makePageButton(title: pageTitle, destination: pageDestination)
-        pageButton.widthAnchor.constraint(equalToConstant: 52).isActive = true
+        pageButton.widthAnchor.constraint(equalToConstant: compactPageKeyWidth).isActive = true
         row.addArrangedSubview(pageButton)
 
         if needsInputModeSwitchKey {
@@ -893,7 +952,7 @@ final class KeyboardViewController: UIInputViewController {
         row.addArrangedSubview(spaceButton)
 
         let returnButton = makeReturnButton()
-        returnButton.widthAnchor.constraint(equalToConstant: 70).isActive = true
+        returnButton.widthAnchor.constraint(equalToConstant: compactReturnKeyWidth).isActive = true
         row.addArrangedSubview(returnButton)
 
         return wrap(row, horizontalInset: 0)
@@ -1073,22 +1132,30 @@ final class KeyboardViewController: UIInputViewController {
             height: 50
         )
 
+        let isLandscapePhone = layoutMode == .landscapePhone
+
         let rootLabel = UILabel()
         rootLabel.text = root
-        rootLabel.font = .systemFont(ofSize: 21, weight: .regular)
+        rootLabel.font = .systemFont(
+            ofSize: isLandscapePhone ? 17 : 21,
+            weight: .regular
+        )
         rootLabel.textColor = .label
         rootLabel.textAlignment = .center
 
         let letterLabel = UILabel()
         letterLabel.text = displayedLetter
-        letterLabel.font = .systemFont(ofSize: 21, weight: .regular)
+        letterLabel.font = .systemFont(
+            ofSize: isLandscapePhone ? 16 : 21,
+            weight: .regular
+        )
         letterLabel.textColor = .secondaryLabel
         letterLabel.textAlignment = .center
 
         let labels = UIStackView(arrangedSubviews: [rootLabel, letterLabel])
-        labels.axis = .vertical
+        labels.axis = isLandscapePhone ? .horizontal : .vertical
         labels.alignment = .center
-        labels.spacing = -6
+        labels.spacing = isLandscapePhone ? 2 : -6
         labels.isUserInteractionEnabled = false
         labels.translatesAutoresizingMaskIntoConstraints = false
         button.addSubview(labels)
@@ -1137,7 +1204,7 @@ final class KeyboardViewController: UIInputViewController {
         button.layer.shadowRadius = 0.5
         button.layer.shadowOffset = CGSize(width: 0, height: 1)
         let heightConstraint = button.heightAnchor.constraint(equalToConstant: height)
-        if layoutMode == .wideIPad {
+        if usesFlexibleKeyHeights {
             heightConstraint.priority = UILayoutPriority(749)
         }
         heightConstraint.isActive = true

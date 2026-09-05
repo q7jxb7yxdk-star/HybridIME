@@ -185,7 +185,7 @@ iOS 控制器在緊湊版面只於 `needsInputModeSwitchKey` 為 `true` 時建�
 
 ### iOS 版面模式與替代符號
 
-`KeyboardViewController` 在版面配置後，若裝置是 iPad、水平尺寸類別為 `regular` 且鍵盤檢視寬度至少 700 點，便選取 `wideIPad`；否則使用 `compact`。初始的版面配置前選擇接受任何非 `compact` 的 iPad 水平尺寸類別，接著由 `viewWillLayoutSubviews()` 依最終寬度重新協調。寬版模式使用 353 點鍵盤高度、等比分配各列以及固定的 11 格列；`compact` 模式使用 260 點。寬版字母列將 Delete 放在第一列、Return 放在第二列，並在第三列兩端放置 Shift，另有逗號與句號標點控制。
+`KeyboardViewController` 在版面配置後，若裝置是 iPhone 且 window scene 的介面方向為橫向，便選取 `landscapePhone`；檢視尚未附著到 window 時，改以 `verticalSizeClass == .compact` 作暫時判斷。若裝置是 iPad、水平尺寸類別為 `regular` 且鍵盤檢視寬度至少 700 點，便選取 `wideIPad`；否則使用 `compact`。初始版面配置前，iPad 仍接受任何非 `compact` 的水平尺寸類別，接著由 `viewWillLayoutSubviews()` 依最終寬度重新協調。`wideIPad` 使用從同一裝置 Apple 內建倉頡截圖量度的方向專屬高度：縱向 340 點、橫向 428 點；即使旋轉前後皆為 `wideIPad`，版面週期也會更新高度約束。`compact` 使用 260 點；`landscapePhone` 使用從同裝置 Apple 內建倉頡截圖量度的 180 點自訂內容高度，並以低優先權的按鍵高度與 `.fillEqually` 列分配收納可用空間。iPhone 緊湊版 Shift／Delete 在直向與橫向分別為 46／88 點寬，頁面鍵為 43／66 點寬，Return 為 93／138 點寬；高度不套用原生量度值，而是盡量填滿各列的可用高度。iPhone 橫向沿用緊湊版的 QWERTY、Shift、Delete、數字符號及底列位置，字母鍵將倉頡字根置左、英文字母置右，但保留原始字母的輸入與 Shift 行為，以及依 `needsInputModeSwitchKey` 決定的地球鍵。iPad 寬版則使用固定 11 格列；其字母列將 Delete 放在第一列、Return 放在第二列，並在第三列兩端放置 Shift，另有逗號與句號標點控制。
 
 鍵盤根視圖使用透明且非不透明的 surface，讓 iOS 宿主提供的鍵盤背景材質延伸至自訂內容區，視覺上銜接由系統管理的底部地球／咪高峰區。按鍵與游標觸控板覆蓋層仍使用自己的動態顏色。系統底部區不屬於 extension，程式不能直接設定其顏色。
 

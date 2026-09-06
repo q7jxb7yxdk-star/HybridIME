@@ -90,6 +90,7 @@ final class KeyboardViewController: UIInputViewController {
     private var currentPage = KeyboardPage.letters
     private var shiftState = ShiftState.lowercased
     private var lastShiftTapTime: TimeInterval = 0
+    private var isAwaitingSecondSpace = false
     private var cursorGestureStartPoint = CGPoint.zero
     private var cursorHorizontalGestureStep = 0
     private var cursorVerticalGestureStep = 0
@@ -1473,6 +1474,23 @@ final class KeyboardViewController: UIInputViewController {
     }
 
     private func commitSpace() {
+        if shiftState == .lowercased,
+           buffer.isEmpty,
+           pendingPunctuationSelection == nil,
+           isAwaitingSecondSpace,
+           textDocumentProxy.documentContextBeforeInput?.hasSuffix(" ") == true
+        {
+            let useFullWidth = PunctuationStrategy.usesFullWidth(
+                before: textDocumentProxy.documentContextBeforeInput
+            ) ?? false
+            textDocumentProxy.deleteBackward()
+            resetCompositionState()
+            textDocumentProxy.insertText(useFullWidth ? "。" : ".")
+            refreshComposition()
+            return
+        }
+
+        isAwaitingSecondSpace = false
         if shiftState != .lowercased {
             let typedCode = buffer
             if !typedCode.isEmpty {
@@ -1498,6 +1516,7 @@ final class KeyboardViewController: UIInputViewController {
             } else {
                 resetCompositionState()
                 textDocumentProxy.insertText(" ")
+                isAwaitingSecondSpace = true
                 refreshComposition()
             }
             return
@@ -1507,6 +1526,7 @@ final class KeyboardViewController: UIInputViewController {
             let typedCode = buffer
             textDocumentProxy.insertText(" ")
             finishCommittedText(typedCode)
+            isAwaitingSecondSpace = true
             return
         }
         if let learnedCandidate,
@@ -1519,10 +1539,12 @@ final class KeyboardViewController: UIInputViewController {
         if !typedCode.isEmpty {
             textDocumentProxy.insertText(" ")
             finishCommittedText(typedCode)
+            isAwaitingSecondSpace = true
             return
         }
         resetCompositionState()
         textDocumentProxy.insertText(" ")
+        isAwaitingSecondSpace = true
         refreshComposition()
     }
 
@@ -1745,6 +1767,7 @@ final class KeyboardViewController: UIInputViewController {
     }
 
     private func resetCompositionState() {
+        isAwaitingSecondSpace = false
         buffer = ""
         currentCandidates = []
         currentCandidateActions = []
@@ -1983,6 +2006,7 @@ final class KeyboardViewController: UIInputViewController {
     }
 
     private func clearActiveComposition() {
+        isAwaitingSecondSpace = false
         buffer = ""
         currentCandidates = []
         currentCandidateActions = []

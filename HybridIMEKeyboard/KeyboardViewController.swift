@@ -184,6 +184,7 @@ final class KeyboardViewController: UIInputViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        NSLog("HybridIMEKeyboard viewDidLoad")
         hasDictationKey = false
         layoutMode = initialLayoutMode()
         configureInterface()
@@ -201,13 +202,10 @@ final class KeyboardViewController: UIInputViewController {
         updateLayoutModeIfNeeded()
     }
 
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        preloadDecoderIfNeeded()
-    }
-
     override func viewWillDisappear(_ animated: Bool) {
+        NSLog("HybridIMEKeyboard viewWillDisappear")
         stopDeleteRepeat()
+        resetCompositionState()
         super.viewWillDisappear(animated)
     }
 
@@ -381,12 +379,11 @@ final class KeyboardViewController: UIInputViewController {
             : .compact
     }
 
-    private func preloadDecoderIfNeeded() {
+    private func loadDecoderIfNeeded() {
         guard decoder == nil else { return }
+        NSLog("HybridIMEKeyboard loading decoder")
         decoder = CangjieDecoder(lexicon: offlineLexicon)
-        if !buffer.isEmpty {
-            refreshComposition()
-        }
+        NSLog("HybridIMEKeyboard loaded decoder")
     }
 
     private func buildWideIPadLetterRows() {
@@ -1357,6 +1354,7 @@ final class KeyboardViewController: UIInputViewController {
     }
 
     private func enterLetter(_ key: String) {
+        loadDecoderIfNeeded()
         if pendingPunctuationSelection != nil {
             resetCompositionState()
         }

@@ -49,6 +49,7 @@ HybridIME 是一套以 Swift 開發的中英混合倉頡五代輸入工具，同
 - 在沒有組字時連按兩次 Space，第二擊會將第一個由鍵盤插入且仍位於游標前的空格換成句點；最近實際提交的非空白字元為中文時輸出 `。`，英文或無法判定時輸出 `.`，不保留空格。
 - 長按 Space 後水平／垂直拖曳游標，並提供選取回饋。
 - 延伸功能宣告 `RequestsOpenAccess=false`，離線詞典及學習不需要「允許完整取用」。
+- 為降低 Xcode 覆蓋安裝或系統重載已啟用鍵盤時的啟動工作，倉頡 decoder 與唯讀詞典會延後至首次輸入英文字母才建立；extension 消失時會清除暫存組字狀態。`NSLog` 只記錄 extension 生命週期與 decoder 載入，不記錄輸入內容或候選。
 - 緊湊版面只在 `needsInputModeSwitchKey` 要求時顯示自訂地球鍵，並使用 `handleInputModeList(from:with:)` 切換或長按選擇已啟用鍵盤；Face ID iPhone 已由系統在鍵盤下方提供地球鍵時不會重複顯示。
 - 控制器明確設定 `hasDictationKey=false`，不宣告自訂聽寫鍵，讓 iOS／iPadOS 在允許時管理及顯示系統咪高峰；實際顯示仍取決於系統聽寫設定、裝置、版面及目前 App。
 - 鍵盤根視圖保持透明，沿用 iOS 管理的鍵盤背景材質，讓內容區與系統地球／咪高峰區視覺一致。
@@ -187,6 +188,7 @@ swiftc -parse-as-library -module-cache-path /tmp/hybridime-module-cache-update \
 - macOS 候選視窗最多顯示十項，沒有翻頁；候選位置與中文詞組替換依賴宿主應用程式正確實作文字輸入 API。
 - iOS 先插入英文字碼再刪除替換；若宿主應用程式不提供足夠前後文、游標已移動或文字已改變，防護條件會拒絕替換。
 - iOS 緊湊版面依 `needsInputModeSwitchKey` 決定是否提供自訂地球鍵；系統地球鍵與自訂地球鍵在各種裝置、方向及多鍵盤組合下的實際顯示仍需持續實機驗證。
+- 已啟用 HybridIME 時以 Xcode 覆蓋安裝後的 keyboard extension 終止／重載行為尚未完成實機驗證；應以 `HybridIMEKeyboard`、`keyboardd` 與 `extensionkitd` 的 crash／Console 診斷，分辨系統重載與延伸功能問題。
 - iPhone 在本次量度裝置上使用縱向 242 點、橫向 187 點自訂內容高度；這些值來自同一裝置與宿主 App 的 HybridIME／Apple 內建倉頡截圖差值，無公開 API 可讀取或保證在其他裝置及宿主 App 同步原生高度，其按鍵比例、字根／英文標籤與地球鍵仍需實機驗證。
 - iPad 寬版配置、原生式按鍵格線、Light／Dark 外觀、替代符號下滑門檻與預覽在不同裝置、方向及應用程式內的視覺與操作行為仍需模擬器／實機驗證。
 - 第三方鍵盤在安全文字欄位、電話／姓名電話鍵盤或宿主應用程式禁用延伸功能時會由系統鍵盤取代；本次未做裝置／多應用程式相容性驗證。

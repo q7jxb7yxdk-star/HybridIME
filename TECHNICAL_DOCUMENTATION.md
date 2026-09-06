@@ -185,7 +185,7 @@ macOS `StaticLexicon` 以 `SQLITE_OPEN_FULLMUTEX` 唯讀開啟資料庫、啟用
 
 iOS 控制器在緊湊版面只於 `needsInputModeSwitchKey` 為 `true` 時建立自訂地球鍵；按鈕以 `handleInputModeList(from:with:)` 為目標並處理所有觸控事件，讓 iOS 同時處理切換與長按顯示已啟用鍵盤清單。Face ID iPhone 已由系統在 extension 下方提供地球鍵時，該屬性為 `false`，因此不會在鍵盤內容內重複建立。寬版 iPad 仍固定建立自訂地球鍵。控制器明確設定 `hasDictationKey=false`，不宣告自訂聽寫鍵，讓 iOS／iPadOS 在允許時自行管理及顯示系統咪高峰；實際顯示仍取決於系統聽寫設定、裝置、版面及目前 App。目前鍵盤 UI 不包含表情符號目錄、搜尋預留位置或表情符號頁面。
 
-`KeyboardViewController` 不會在 `viewDidAppear` 預載 `CangjieDecoder` 或因此開啟 `OfflineLexicon`；首次 `enterLetter(_:)` 才建立 decoder，避免 Xcode 覆蓋安裝或 iOS 終止並重載已啟用 extension 的啟動階段同步開啟詞庫。`viewWillDisappear(_:)` 停止 Delete repeat 並只清除控制器的暫存組字狀態，不會寫入、刪除或遷移學習 SQLite。診斷用 `NSLog` 僅記錄 `viewDidLoad`、`viewWillDisappear` 與 decoder 開始／完成載入，絕不記錄輸入、候選或宿主文字。這是降低啟動工作及協助定位的措施；沒有 crash report 或實機重現結果，不能據此宣稱已修復覆蓋安裝期間的系統終止。
+`KeyboardViewController` 不會在 `viewDidAppear` 預載 `CangjieDecoder` 或因此開啟 `OfflineLexicon`；首次 `enterLetter(_:)` 才建立 decoder，避免 Xcode 覆蓋安裝或 iOS 終止並重載已啟用 extension 的啟動階段同步開啟詞庫。`viewWillDisappear(_:)` 停止 Delete repeat 並只清除控制器的暫存組字狀態，不會寫入、刪除或遷移學習 SQLite。這是降低啟動工作的措施；一次重新安裝後 keyboard 可正常使用，但沒有 crash report 或跨裝置重現結果，不能據此宣稱已完整覆蓋所有系統終止情況。
 
 ### iOS 版面模式與替代符號
 

@@ -184,7 +184,6 @@ final class KeyboardViewController: UIInputViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        NSLog("HybridIMEKeyboard viewDidLoad")
         hasDictationKey = false
         layoutMode = initialLayoutMode()
         configureInterface()
@@ -203,7 +202,6 @@ final class KeyboardViewController: UIInputViewController {
     }
 
     override func viewWillDisappear(_ animated: Bool) {
-        NSLog("HybridIMEKeyboard viewWillDisappear")
         stopDeleteRepeat()
         resetCompositionState()
         super.viewWillDisappear(animated)
@@ -381,9 +379,7 @@ final class KeyboardViewController: UIInputViewController {
 
     private func loadDecoderIfNeeded() {
         guard decoder == nil else { return }
-        NSLog("HybridIMEKeyboard loading decoder")
         decoder = CangjieDecoder(lexicon: offlineLexicon)
-        NSLog("HybridIMEKeyboard loaded decoder")
     }
 
     private func buildWideIPadLetterRows() {

@@ -2,6 +2,116 @@ import UIKit
 
 @MainActor
 final class KeyboardViewController: UIInputViewController {
+    private final class KeyPreviewView: UIView {
+        private let shapeLayer = CAShapeLayer()
+        private let titleLabel = UILabel()
+        private let subtitleLabel = UILabel()
+        private let labels = UIStackView()
+
+        override init(frame: CGRect) {
+            super.init(frame: frame)
+            isUserInteractionEnabled = false
+            layer.shadowColor = UIColor.black.cgColor
+            layer.shadowOpacity = 0.22
+            layer.shadowRadius = 1.5
+            layer.shadowOffset = CGSize(width: 0, height: 1)
+
+            shapeLayer.fillColor = UIColor.systemBackground.cgColor
+            layer.insertSublayer(shapeLayer, at: 0)
+
+            titleLabel.textColor = .label
+            titleLabel.textAlignment = .center
+            subtitleLabel.font = .systemFont(ofSize: 32, weight: .regular)
+            subtitleLabel.textColor = .secondaryLabel
+            subtitleLabel.textAlignment = .center
+
+            labels.axis = .vertical
+            labels.alignment = .center
+            labels.spacing = -8
+            labels.isUserInteractionEnabled = false
+            labels.translatesAutoresizingMaskIntoConstraints = false
+            labels.addArrangedSubview(titleLabel)
+            labels.addArrangedSubview(subtitleLabel)
+            addSubview(labels)
+            NSLayoutConstraint.activate([
+                labels.centerXAnchor.constraint(equalTo: centerXAnchor),
+                labels.centerYAnchor.constraint(equalTo: topAnchor, constant: 33),
+                labels.leadingAnchor.constraint(greaterThanOrEqualTo: leadingAnchor, constant: 4),
+                labels.trailingAnchor.constraint(lessThanOrEqualTo: trailingAnchor, constant: -4),
+            ])
+        }
+
+        required init?(coder: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
+        }
+
+        func show(
+            title: String,
+            subtitle: String?,
+            sourceSize: CGSize,
+            usesHorizontalLabels: Bool
+        ) {
+            titleLabel.text = title
+            subtitleLabel.text = subtitle
+            subtitleLabel.isHidden = subtitle == nil
+            labels.axis = subtitle != nil && usesHorizontalLabels ? .horizontal : .vertical
+            labels.spacing = subtitle != nil && usesHorizontalLabels ? 2 : -8
+            titleLabel.font = .systemFont(
+                ofSize: subtitle == nil ? 31 : (usesHorizontalLabels ? 22 : 32),
+                weight: .regular
+            )
+            subtitleLabel.font = .systemFont(
+                ofSize: usesHorizontalLabels ? 22 : 32,
+                weight: .regular
+            )
+            let stemWidth = min(sourceSize.width, bounds.width - 20)
+            let stemLeft = (bounds.width - stemWidth) / 2
+            let stemTop = bounds.height - sourceSize.height
+            let cornerRadius: CGFloat = 17
+            let path = UIBezierPath()
+            path.move(to: CGPoint(x: cornerRadius, y: 0))
+            path.addLine(to: CGPoint(x: bounds.width - cornerRadius, y: 0))
+            path.addQuadCurve(
+                to: CGPoint(x: bounds.width, y: cornerRadius),
+                controlPoint: CGPoint(x: bounds.width, y: 0)
+            )
+            path.addLine(to: CGPoint(x: bounds.width, y: stemTop - cornerRadius))
+            path.addQuadCurve(
+                to: CGPoint(x: bounds.width - cornerRadius, y: stemTop),
+                controlPoint: CGPoint(x: bounds.width, y: stemTop)
+            )
+            path.addLine(to: CGPoint(x: stemLeft + stemWidth, y: stemTop))
+            path.addLine(to: CGPoint(x: stemLeft + stemWidth, y: bounds.height - cornerRadius))
+            path.addQuadCurve(
+                to: CGPoint(x: stemLeft + stemWidth - cornerRadius, y: bounds.height),
+                controlPoint: CGPoint(x: stemLeft + stemWidth, y: bounds.height)
+            )
+            path.addLine(to: CGPoint(x: stemLeft + cornerRadius, y: bounds.height))
+            path.addQuadCurve(
+                to: CGPoint(x: stemLeft, y: bounds.height - cornerRadius),
+                controlPoint: CGPoint(x: stemLeft, y: bounds.height)
+            )
+            path.addLine(to: CGPoint(x: stemLeft, y: stemTop))
+            path.addLine(to: CGPoint(x: cornerRadius, y: stemTop))
+            path.addQuadCurve(
+                to: CGPoint(x: 0, y: stemTop - cornerRadius),
+                controlPoint: CGPoint(x: 0, y: stemTop)
+            )
+            path.addLine(to: CGPoint(x: 0, y: cornerRadius))
+            path.addQuadCurve(
+                to: CGPoint(x: cornerRadius, y: 0),
+                controlPoint: CGPoint(x: 0, y: 0)
+            )
+            path.close()
+            shapeLayer.path = path.cgPath
+        }
+
+        override func layoutSubviews() {
+            super.layoutSubviews()
+            shapeLayer.frame = bounds
+        }
+    }
+
     private enum KeyboardPage {
         case letters
         case numbers
@@ -72,6 +182,7 @@ final class KeyboardViewController: UIInputViewController {
     private let keyboardStackView = UIStackView()
     private let rootStack = UIStackView()
     private let cursorTrackpadOverlay = UIView()
+    private let keyPreview = KeyPreviewView()
 
     private var returnButton: UIButton?
     private weak var spaceButton: UIButton?
@@ -266,6 +377,9 @@ final class KeyboardViewController: UIInputViewController {
         cursorTrackpadOverlay.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(cursorTrackpadOverlay)
 
+        keyPreview.isHidden = true
+        view.addSubview(keyPreview)
+
         let heightConstraint = view.heightAnchor.constraint(equalToConstant: keyboardHeight)
         heightConstraint.priority = .required
         heightConstraint.isActive = true
@@ -285,6 +399,7 @@ final class KeyboardViewController: UIInputViewController {
 
     private func rebuildKeyboard() {
         stopDeleteRepeat()
+        hideKeyPreview()
         keyboardStackView.arrangedSubviews.forEach { arrangedView in
             keyboardStackView.removeArrangedSubview(arrangedView)
             arrangedView.removeFromSuperview()
@@ -490,6 +605,7 @@ final class KeyboardViewController: UIInputViewController {
                 UIAction { [weak self] _ in self?.enterSymbol(key) },
                 for: .touchUpInside
             )
+            installKeyPreview(on: button, title: key)
             return button
         }
         let trailingPageButton = makePageButton(title: "123", destination: .numbers)
@@ -542,6 +658,7 @@ final class KeyboardViewController: UIInputViewController {
                 UIAction { [weak self] _ in self?.enterSymbol(key) },
                 for: .touchUpInside
             )
+            installKeyPreview(on: button, title: key)
             return button
         }
         return makeWideIPadRow(
@@ -720,6 +837,8 @@ final class KeyboardViewController: UIInputViewController {
             ),
         ])
 
+        installKeyPreview(on: button, title: key.primary)
+
         installAlternateFlick(
             on: button,
             alternate: key.alternate
@@ -800,6 +919,7 @@ final class KeyboardViewController: UIInputViewController {
                 UIAction { [weak self] _ in self?.enterSymbol(key) },
                 for: .touchUpInside
             )
+            installKeyPreview(on: button, title: key)
             return button
         }
 
@@ -810,6 +930,7 @@ final class KeyboardViewController: UIInputViewController {
                 UIAction { [weak self] _ in self?.enterWidePunctuation(alternateKey) },
                 for: .touchUpInside
             )
+            installKeyPreview(on: button, title: alternateKey)
             return button
         }
 
@@ -856,6 +977,8 @@ final class KeyboardViewController: UIInputViewController {
             labels.bottomAnchor.constraint(lessThanOrEqualTo: button.bottomAnchor, constant: -2),
         ])
 
+        installKeyPreview(on: button, title: key)
+
         installAlternateFlick(
             on: button,
             alternate: alternateKey
@@ -888,6 +1011,9 @@ final class KeyboardViewController: UIInputViewController {
             let button = usesShift
                 ? makeLetterKey(letter: key, displayedLetter: displayedKey)
                 : makeKey(title: displayedKey, role: .character)
+            if !usesShift {
+                installKeyPreview(on: button, title: displayedKey)
+            }
             button.addAction(
                 UIAction { [weak self] _ in
                     if usesShift {
@@ -970,6 +1096,7 @@ final class KeyboardViewController: UIInputViewController {
                 UIAction { [weak self] _ in self?.enterSymbol(key) },
                 for: .touchUpInside
             )
+            installKeyPreview(on: button, title: key)
             row.addArrangedSubview(button)
             punctuationButtons.append(button)
         }
@@ -986,6 +1113,10 @@ final class KeyboardViewController: UIInputViewController {
     private func makeBottomRow() -> UIView {
         if layoutMode == .wideIPad {
             return makeWideIPadBottomRow()
+        }
+
+        if !needsInputModeSwitchKey {
+            return makeCenteredCompactBottomRow()
         }
 
         let row = UIStackView()
@@ -1010,11 +1141,87 @@ final class KeyboardViewController: UIInputViewController {
         let spaceButton = makeSpaceButton()
         row.addArrangedSubview(spaceButton)
 
+        for punctuation in [",", "."] {
+            let button = makeKey(title: punctuation, role: .character)
+            button.addAction(
+                UIAction { [weak self] _ in self?.enterSymbol(punctuation) },
+                for: .touchUpInside
+            )
+            installKeyPreview(on: button, title: punctuation)
+            button.widthAnchor.constraint(
+                equalToConstant: compactPageKeyWidth
+            ).isActive = true
+            row.addArrangedSubview(button)
+        }
+
         let returnButton = makeReturnButton()
         returnButton.widthAnchor.constraint(equalToConstant: compactReturnKeyWidth).isActive = true
         row.addArrangedSubview(returnButton)
 
         return wrap(row, horizontalInset: 0)
+    }
+
+    private func makeCenteredCompactBottomRow() -> UIView {
+        let row = UIView()
+
+        let pageTitle = currentPage == .letters ? "123" : "ABC"
+        let pageDestination = currentPage == .letters
+            ? KeyboardPage.numbers
+            : KeyboardPage.letters
+        let pageButton = makePageButton(title: pageTitle, destination: pageDestination)
+
+        let commaButton = makeKey(title: ",", role: .character)
+        commaButton.addAction(
+            UIAction { [weak self] _ in self?.enterSymbol(",") },
+            for: .touchUpInside
+        )
+        installKeyPreview(on: commaButton, title: ",")
+
+        let spaceButton = makeSpaceButton(minimumWidth: 44)
+
+        let periodButton = makeKey(title: ".", role: .character)
+        periodButton.addAction(
+            UIAction { [weak self] _ in self?.enterSymbol(".") },
+            for: .touchUpInside
+        )
+        installKeyPreview(on: periodButton, title: ".")
+
+        let returnButton = makeReturnButton()
+
+        let buttons = [pageButton, commaButton, spaceButton, periodButton, returnButton]
+        buttons.forEach {
+            $0.translatesAutoresizingMaskIntoConstraints = false
+            row.addSubview($0)
+        }
+
+        NSLayoutConstraint.activate([
+            pageButton.leadingAnchor.constraint(equalTo: row.leadingAnchor),
+            pageButton.topAnchor.constraint(equalTo: row.topAnchor),
+            pageButton.bottomAnchor.constraint(equalTo: row.bottomAnchor),
+            pageButton.widthAnchor.constraint(equalToConstant: compactPageKeyWidth),
+
+            commaButton.leadingAnchor.constraint(equalTo: pageButton.trailingAnchor, constant: 5),
+            commaButton.topAnchor.constraint(equalTo: row.topAnchor),
+            commaButton.bottomAnchor.constraint(equalTo: row.bottomAnchor),
+            commaButton.widthAnchor.constraint(equalToConstant: compactPageKeyWidth),
+
+            spaceButton.leadingAnchor.constraint(equalTo: commaButton.trailingAnchor, constant: 5),
+            spaceButton.trailingAnchor.constraint(equalTo: periodButton.leadingAnchor, constant: -5),
+            spaceButton.topAnchor.constraint(equalTo: row.topAnchor),
+            spaceButton.bottomAnchor.constraint(equalTo: row.bottomAnchor),
+
+            returnButton.trailingAnchor.constraint(equalTo: row.trailingAnchor),
+            returnButton.topAnchor.constraint(equalTo: row.topAnchor),
+            returnButton.bottomAnchor.constraint(equalTo: row.bottomAnchor),
+            returnButton.widthAnchor.constraint(equalToConstant: compactPageKeyWidth),
+
+            periodButton.trailingAnchor.constraint(equalTo: returnButton.leadingAnchor, constant: -5),
+            periodButton.topAnchor.constraint(equalTo: row.topAnchor),
+            periodButton.bottomAnchor.constraint(equalTo: row.bottomAnchor),
+            periodButton.widthAnchor.constraint(equalToConstant: compactPageKeyWidth),
+        ])
+
+        return row
     }
 
     private func makeWideIPadBottomRow() -> UIView {
@@ -1095,7 +1302,7 @@ final class KeyboardViewController: UIInputViewController {
         return inputModeButton
     }
 
-    private func makeSpaceButton() -> UIButton {
+    private func makeSpaceButton(minimumWidth: CGFloat = 105) -> UIButton {
         let spaceButton = makeKey(title: "HybridIME", role: .character, fontSize: 16)
         spaceButton.accessibilityLabel = "空格"
         spaceButton.addAction(
@@ -1110,26 +1317,19 @@ final class KeyboardViewController: UIInputViewController {
         cursorGesture.allowableMovement = 24
         cursorGesture.cancelsTouchesInView = true
         spaceButton.addGestureRecognizer(cursorGesture)
-        spaceButton.widthAnchor.constraint(greaterThanOrEqualToConstant: 105).isActive = true
+        spaceButton.widthAnchor.constraint(
+            greaterThanOrEqualToConstant: minimumWidth
+        ).isActive = true
         self.spaceButton = spaceButton
         return spaceButton
     }
 
     private func makeReturnButton() -> UIButton {
-        let returnButton: UIButton
-        if returnKeyTitle == "return" {
-            returnButton = makeIconKey(
-                systemName: "return",
-                accessibilityLabel: "Return",
-                role: .control
-            )
-        } else {
-            returnButton = makeKey(
-                title: returnKeyTitle,
-                role: .control,
-                fontSize: layoutMode == .wideIPad ? 22 : 14
-            )
-        }
+        let returnButton = makeIconKey(
+            systemName: "arrow.turn.down.left",
+            accessibilityLabel: "Return",
+            role: .control
+        )
         returnButton.addAction(
             UIAction { [weak self] _ in self?.commitReturn() },
             for: .touchUpInside
@@ -1171,7 +1371,7 @@ final class KeyboardViewController: UIInputViewController {
         configuration.contentInsets = .zero
         configuration.baseForegroundColor = .label
         configuration.background.backgroundColor = keyColor(for: role)
-        configuration.background.cornerRadius = controlKeyCornerRadius(for: role)
+        configuration   .background.cornerRadius = controlKeyCornerRadius(for: role)
         configuration.titleTextAttributesTransformer =
             UIConfigurationTextAttributesTransformer { attributes in
                 var attributes = attributes
@@ -1240,7 +1440,61 @@ final class KeyboardViewController: UIInputViewController {
             labels.topAnchor.constraint(greaterThanOrEqualTo: button.topAnchor, constant: 2),
             labels.bottomAnchor.constraint(lessThanOrEqualTo: button.bottomAnchor, constant: -2),
         ])
+        installKeyPreview(on: button, title: root, subtitle: displayedLetter)
         return button
+    }
+
+    private func installKeyPreview(
+        on button: UIButton,
+        title: String,
+        subtitle: String? = nil
+    ) {
+        button.addAction(
+            UIAction { [weak self, weak button] _ in
+                guard let button else { return }
+                self?.showKeyPreview(for: button, title: title, subtitle: subtitle)
+            },
+            for: .touchDown
+        )
+        button.addTarget(
+            self,
+            action: #selector(hideKeyPreview),
+            for: [.touchUpInside, .touchUpOutside, .touchCancel, .touchDragExit]
+        )
+    }
+
+    private func showKeyPreview(for button: UIButton, title: String, subtitle: String?) {
+        let sourceFrame = button.convert(button.bounds, to: view)
+        let previewWidth: CGFloat
+        if layoutMode == .landscapePhone {
+            previewWidth = min(max(sourceFrame.width * 1.45, 46), 78)
+        } else {
+            previewWidth = min(max(sourceFrame.width * 1.55, 60), 102)
+        }
+        let previewHeight = sourceFrame.height + 66
+        let previewX = min(
+            max(sourceFrame.midX - previewWidth / 2, 3),
+            view.bounds.width - previewWidth - 3
+        )
+        keyPreview.frame = CGRect(
+            x: previewX,
+            y: max(0, sourceFrame.maxY - previewHeight),
+            width: previewWidth,
+            height: previewHeight
+        )
+        keyPreview.show(
+            title: title,
+            subtitle: subtitle,
+            sourceSize: sourceFrame.size,
+            usesHorizontalLabels: layoutMode == .landscapePhone
+        )
+        keyPreview.isHidden = false
+        view.bringSubviewToFront(keyPreview)
+    }
+
+    @objc
+    private func hideKeyPreview() {
+        keyPreview.isHidden = true
     }
 
     private func makeIconKey(
@@ -2142,37 +2396,12 @@ final class KeyboardViewController: UIInputViewController {
 
     private func updateReturnKeyTitle() {
         guard var configuration = returnButton?.configuration else { return }
-        if returnKeyTitle == "return" {
-            configuration.title = nil
-            configuration.image = UIImage(systemName: "return")
-            configuration.preferredSymbolConfigurationForImage =
-                controlKeySymbolConfiguration(for: .control)
-            returnButton?.accessibilityLabel = "Return"
-        } else {
-            configuration.image = nil
-            configuration.title = returnKeyTitle
-            returnButton?.accessibilityLabel = returnKeyTitle
-        }
+        configuration.title = nil
+        configuration.image = UIImage(systemName: "arrow.turn.down.left")
+        configuration.preferredSymbolConfigurationForImage =
+            controlKeySymbolConfiguration(for: .control)
+        returnButton?.accessibilityLabel = "Return"
         returnButton?.configuration = configuration
-    }
-
-    private var returnKeyTitle: String {
-        switch textDocumentProxy.returnKeyType {
-        case .go:
-            "前往"
-        case .search:
-            "搜尋"
-        case .send:
-            "傳送"
-        case .done:
-            "完成"
-        case .next:
-            "下一步"
-        case .continue:
-            "繼續"
-        default:
-            "return"
-        }
     }
 
     private var shiftSymbolName: String {

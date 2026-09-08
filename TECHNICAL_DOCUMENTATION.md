@@ -197,7 +197,7 @@ iOS 控制器在緊湊版面只於 `needsInputModeSwitchKey` 為 `true` 時建�
 
 候選捲動列固定為 38 點並保留在上述鍵盤總高度之內，而不是作為額外高度加入。候選區維持其高度；所有版面的按鍵堆疊與按鍵本身使用較低的垂直內容壓縮阻力，讓空間不足時由四列按鍵吸收壓縮，避免候選 placeholder 或候選按鈕的 intrinsic content size 推高根視圖。候選有無不會切換候選列的可見性，因此按鍵位置不會在開始組字時跳動。
 
-鍵盤根視圖使用透明且非不透明的 surface，讓 iOS 宿主提供的鍵盤背景材質延伸至自訂內容區，視覺上銜接由系統管理的底部地球／咪高峰區。按鍵與游標觸控板覆蓋層仍使用自己的動態顏色。`keyboardAppearance` 明確要求 `.light` 或 `.dark` 時直接採用；`.default` 則讀取 keyboard window／window scene 的 `userInterfaceStyle`。控制器使用 iOS 17 的 `registerForTraitChanges([UITraitUserInterfaceStyle.self])` 在切換外觀時更新按鍵 configuration。Dark 以近黑背景和深灰鍵面、Light 以淺灰背景、白色字元鍵及較深控制鍵貼近原生英文鍵盤；這些公開 UIKit 色彩不是可取得的私有系統材質。系統底部區不屬於 extension，程式不能直接設定其顏色。
+鍵盤根視圖使用透明且非不透明的 surface，讓 iOS 宿主提供的鍵盤背景材質延伸至自訂內容區，視覺上銜接由系統管理的底部地球／咪高峰區。按鍵與游標觸控板覆蓋層仍使用自己的動態顏色。根視圖的 `overrideUserInterfaceStyle` 維持 `.unspecified`，不直接採用個別宿主文字欄的 `keyboardAppearance`，而是繼承 iOS 提供給鍵盤 extension 的 `userInterfaceStyle`；這避免 WhatsApp 與 Obsidian 等宿主在相同系統外觀下令 HybridIME 顯示不同鍵色，而原生鍵盤維持同色。控制器使用 iOS 17 的 `registerForTraitChanges([UITraitUserInterfaceStyle.self])` 在切換外觀時更新按鍵 configuration。Dark 以近黑背景和深灰鍵面、Light 以淺灰背景、白色字元鍵及較深控制鍵貼近原生英文鍵盤；這些公開 UIKit 色彩不是可取得的私有系統材質。系統底部區不屬於 extension，程式不能直接設定其顏色。
 
 寬版數字模式呈現上下堆疊的主要／替代配對：`@／¥`、`#／€`、`$／£`、`&／_`、`*／^`、`(／[`、`)／]`、`'／{`、`"／}`、`%／§`、`-／|`、`+／~`、`=／…`、`/／\\`、`;／<`、`:／>`、`,／!` 與 `.／?`。單指平移只有在向下位移達到 12 點且大於水平位移時才會選取替代符號。選取期間會隱藏堆疊標籤、顯示置中的替代預覽並反白按鍵；結束手勢會提交替代符號，取消則還原一般標籤。主要按鍵 `@`、`#`、`$`、`&`、`(`、`)`、`'`、`"` 與 `/` 使用零堆疊間距與邊緣內縮；其餘配對使用 -5 點堆疊間距與 2 點邊緣內縮。寬版字母標點控制也會將 `!` 與 `?` 作為逗號與句號的向下輕掃替代符號。
 

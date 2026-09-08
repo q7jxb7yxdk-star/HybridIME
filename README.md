@@ -55,7 +55,7 @@ HybridIME 是一套以 Swift 開發的中英混合倉頡五代輸入工具，同
 - iPhone 沒有自訂地球鍵時，底列為 `123／ABC`、`,`、填滿可用寬度的 Space、`.`、Return；左右控制鍵等寬，Space 位於中間。Return 一律顯示向左折返箭頭圖示；有自訂地球鍵時保留既有 fallback 底列。
 - 控制器明確設定 `hasDictationKey=false`，不宣告自訂聽寫鍵，讓 iOS／iPadOS 在允許時管理及顯示系統咪高峰；實際顯示仍取決於系統聽寫設定、裝置、版面及目前 App。
 - 鍵盤根視圖保持透明，沿用 iOS 管理的鍵盤背景材質，讓內容區與系統地球／咪高峰區視覺一致。
-- 鍵盤按鍵外觀遵從宿主明確指定的 `keyboardAppearance`；未指定時，跟隨 keyboard window 的 Light／Dark trait，並在系統外觀切換時更新按鍵 configuration。Dark 使用近黑面板與深灰鍵面，Light 使用淺灰面板、白色字元鍵與較深控制鍵；這些是以公開 UIKit 動態色彩貼近原生鍵盤的實作，並非私有系統材質。
+- 鍵盤按鍵不強制採用個別宿主文字欄的 `keyboardAppearance`，而是繼承 iOS 提供給鍵盤 extension 的 Light／Dark trait，並在系統外觀切換時更新按鍵 configuration，避免同一系統外觀下因 App 而出現與原生鍵盤不同的鍵色。Dark 使用近黑面板與深灰鍵面，Light 使用淺灰面板、白色字元鍵與較深控制鍵；這些是以公開 UIKit 動態色彩貼近原生鍵盤的實作，並非私有系統材質。
 - SwiftUI 主程式提供加入與使用鍵盤、離線本機學習及第三方鍵盤系統限制的說明。
 - `HybridIMEKeyboard/PrivacyInfo.xcprivacy` 宣告不追蹤、不收集資料，以及 Shift 雙擊計時所需的 `SystemBootTime` 原因 `35F9.1`。
 

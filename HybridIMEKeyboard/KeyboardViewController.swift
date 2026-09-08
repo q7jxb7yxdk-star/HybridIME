@@ -2367,24 +2367,10 @@ final class KeyboardViewController: UIInputViewController {
     }
 
     private func updateAppearance() {
-        view.overrideUserInterfaceStyle = preferredKeyboardInterfaceStyle
+        view.overrideUserInterfaceStyle = .unspecified
         view.backgroundColor = .clear
         cursorTrackpadOverlay.backgroundColor = keyboardBackgroundColor
         refreshButtonAppearance(in: rootStack)
-    }
-
-    private var preferredKeyboardInterfaceStyle: UIUserInterfaceStyle {
-        switch textDocumentProxy.keyboardAppearance {
-        case .dark:
-            return .dark
-        case .light:
-            return .light
-        default:
-            let hostStyle = view.window?.windowScene?.screen.traitCollection.userInterfaceStyle
-                ?? view.window?.traitCollection.userInterfaceStyle
-                ?? traitCollection.userInterfaceStyle
-            return hostStyle == .dark ? .dark : .light
-        }
     }
 
     private func refreshButtonAppearance(in view: UIView) {

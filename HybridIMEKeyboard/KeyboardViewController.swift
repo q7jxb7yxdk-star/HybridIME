@@ -181,7 +181,6 @@ final class KeyboardViewController: UIInputViewController {
     private let candidateArea = UIStackView()
     private let keyboardStackView = UIStackView()
     private let rootStack = UIStackView()
-    private let cursorTrackpadOverlay = UIView()
     private let keyPreview = KeyPreviewView()
 
     private var returnButton: UIButton?
@@ -202,6 +201,8 @@ final class KeyboardViewController: UIInputViewController {
     private var shiftState = ShiftState.lowercased
     private var lastShiftTapTime: TimeInterval = 0
     private var isAwaitingSecondSpace = false
+    private var isCursorTrackpadAppearanceActive = false
+    private var cursorTrackpadLabelVisibility: [ObjectIdentifier: Bool] = [:]
     private var cursorGestureStartPoint = CGPoint.zero
     private var cursorHorizontalGestureStep = 0
     private var cursorVerticalGestureStep = 0
@@ -314,6 +315,7 @@ final class KeyboardViewController: UIInputViewController {
 
     override func viewWillDisappear(_ animated: Bool) {
         stopDeleteRepeat()
+        setCursorTrackpadAppearance(active: false)
         resetCompositionState()
         super.viewWillDisappear(animated)
     }
@@ -371,12 +373,6 @@ final class KeyboardViewController: UIInputViewController {
         rootStack.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(rootStack)
 
-        cursorTrackpadOverlay.backgroundColor = keyboardBackgroundColor
-        cursorTrackpadOverlay.isUserInteractionEnabled = false
-        cursorTrackpadOverlay.isHidden = true
-        cursorTrackpadOverlay.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(cursorTrackpadOverlay)
-
         keyPreview.isHidden = true
         view.addSubview(keyPreview)
 
@@ -390,15 +386,12 @@ final class KeyboardViewController: UIInputViewController {
             rootStack.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -3),
             rootStack.topAnchor.constraint(equalTo: view.topAnchor, constant: 5),
             rootStack.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -5),
-            cursorTrackpadOverlay.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            cursorTrackpadOverlay.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            cursorTrackpadOverlay.topAnchor.constraint(equalTo: view.topAnchor),
-            cursorTrackpadOverlay.bottomAnchor.constraint(equalTo: view.bottomAnchor),
         ])
     }
 
     private func rebuildKeyboard() {
         stopDeleteRepeat()
+        setCursorTrackpadAppearance(active: false)
         hideKeyPreview()
         keyboardStackView.arrangedSubviews.forEach { arrangedView in
             keyboardStackView.removeArrangedSubview(arrangedView)
@@ -1525,6 +1518,7 @@ final class KeyboardViewController: UIInputViewController {
         accessibilityLabel: String,
         height: CGFloat
     ) -> UIButton {
+        let normalForegroundColor = configuration.baseForegroundColor
         let button = UIButton(configuration: configuration)
         button.accessibilityLabel = accessibilityLabel
         button.layer.shadowColor = UIColor.black.cgColor
@@ -1538,11 +1532,17 @@ final class KeyboardViewController: UIInputViewController {
             for: .vertical
         )
         heightConstraint.isActive = true
-        button.configurationUpdateHandler = { button in
+        button.configurationUpdateHandler = { [weak self] button in
             guard var configuration = button.configuration else { return }
-            configuration.background.backgroundColor = button.isHighlighted
-                ? UIColor.systemGray2
-                : normalColor
+            if let self, self.isCursorTrackpadAppearanceActive {
+                configuration.baseForegroundColor = .clear
+                configuration.background.backgroundColor = self.cursorTrackpadKeyColor
+            } else {
+                configuration.baseForegroundColor = normalForegroundColor
+                configuration.background.backgroundColor = button.isHighlighted
+                    ? UIColor.systemGray2
+                    : normalColor
+            }
             button.configuration = configuration
         }
         return button
@@ -1808,7 +1808,7 @@ final class KeyboardViewController: UIInputViewController {
             cursorPreferredColumn = currentCursorColumn
             resetCompositionState()
             refreshComposition()
-            setCursorTrackpadMode(active: true)
+            setCursorTrackpadAppearance(active: true)
             updateSpaceButtonTitle("移動游標", accessibilityLabel: "移動游標")
             cursorFeedbackGenerator.prepare()
         case .changed:
@@ -1846,8 +1846,8 @@ final class KeyboardViewController: UIInputViewController {
             cursorHorizontalGestureStep = 0
             cursorVerticalGestureStep = 0
             cursorPreferredColumn = 0
-            setCursorTrackpadMode(active: false)
             updateSpaceButtonTitle("HybridIME", accessibilityLabel: "空格")
+            setCursorTrackpadAppearance(active: false)
         default:
             break
         }
@@ -1855,11 +1855,35 @@ final class KeyboardViewController: UIInputViewController {
         spaceButton.isHighlighted = gesture.state == .began || gesture.state == .changed
     }
 
-    private func setCursorTrackpadMode(active: Bool) {
-        cursorTrackpadOverlay.isHidden = !active
-        cursorTrackpadOverlay.alpha = active ? 0.94 : 0
+    private func setCursorTrackpadAppearance(active: Bool) {
+        guard isCursorTrackpadAppearanceActive != active else { return }
+
+        isCursorTrackpadAppearanceActive = active
         if active {
-            view.bringSubviewToFront(cursorTrackpadOverlay)
+            hideKeyPreview()
+        }
+        updateCursorTrackpadLabelVisibility(in: keyboardStackView, hidden: active)
+        if !active {
+            cursorTrackpadLabelVisibility.removeAll()
+        }
+        refreshButtonAppearance(in: keyboardStackView)
+    }
+
+    private func updateCursorTrackpadLabelVisibility(
+        in view: UIView,
+        hidden: Bool
+    ) {
+        if let label = view as? UILabel {
+            let identifier = ObjectIdentifier(label)
+            if hidden {
+                cursorTrackpadLabelVisibility[identifier] = label.isHidden
+                label.isHidden = true
+            } else if let wasHidden = cursorTrackpadLabelVisibility[identifier] {
+                label.isHidden = wasHidden
+            }
+        }
+        view.subviews.forEach {
+            updateCursorTrackpadLabelVisibility(in: $0, hidden: hidden)
         }
     }
 
@@ -2369,7 +2393,6 @@ final class KeyboardViewController: UIInputViewController {
     private func updateAppearance() {
         view.overrideUserInterfaceStyle = .unspecified
         view.backgroundColor = .clear
-        cursorTrackpadOverlay.backgroundColor = keyboardBackgroundColor
         refreshButtonAppearance(in: rootStack)
     }
 
@@ -2421,6 +2444,14 @@ final class KeyboardViewController: UIInputViewController {
             traits.userInterfaceStyle == .dark
                 ? UIColor(red: 0.08, green: 0.08, blue: 0.09, alpha: 1)
                 : UIColor(red: 0.82, green: 0.83, blue: 0.86, alpha: 1)
+        }
+    }
+
+    private var cursorTrackpadKeyColor: UIColor {
+        UIColor { traits in
+            traits.userInterfaceStyle == .dark
+                ? UIColor(red: 0.18, green: 0.18, blue: 0.19, alpha: 1)
+                : UIColor(red: 0.94, green: 0.94, blue: 0.95, alpha: 1)
         }
     }
 

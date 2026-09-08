@@ -2,8 +2,8 @@
 
 set -euo pipefail
 
-readonly HYBRIDIME_VERSION="1.2.0"
-readonly HYBRIDIME_BUILD="20260821"
+readonly HYBRIDIME_VERSION="1.3.0"
+readonly HYBRIDIME_BUILD="20260908"
 readonly HYBRIDIME_DEPLOYMENT_TARGET="26.0"
 readonly HYBRIDIME_TEAM_ID="WX793X49GJ"
 readonly HYBRIDIME_BUNDLE_ID="com.sunny.inputmethod.hybridime"

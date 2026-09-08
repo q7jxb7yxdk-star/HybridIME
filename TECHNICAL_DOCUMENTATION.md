@@ -276,9 +276,9 @@ macOS 立即插入預設標點候選並記錄其範圍，在替換前驗證用�
 
 | 建置目標 | 產品 | 套件識別碼 | 部署目標 | 版本 |
 | --- | --- | --- | --- | --- |
-| `HybridIME` | macOS 應用程式／輸入法 | `com.sunny.inputmethod.hybridime` | macOS 26.0 | 1.2.0（組建編號 20260821） |
-| `HybridIMEiOS` | iOS／iPadOS 應用程式 | `com.sunny.inputmethod.hybridime.ios` | iOS 26.0 | 1.2.0（組建編號 20260821） |
-| `HybridIMEKeyboard` | 鍵盤延伸功能 | `com.sunny.inputmethod.hybridime.ios.keyboard` | iOS 26.0 | 1.2.0（組建編號 20260821） |
+| `HybridIME` | macOS 應用程式／輸入法 | `com.sunny.inputmethod.hybridime` | macOS 26.0 | 1.3.0（組建編號 20260908） |
+| `HybridIMEiOS` | iOS／iPadOS 應用程式 | `com.sunny.inputmethod.hybridime.ios` | iOS 26.0 | 1.3.0（組建編號 20260908） |
+| `HybridIMEKeyboard` | 鍵盤延伸功能 | `com.sunny.inputmethod.hybridime.ios.keyboard` | iOS 26.0 | 1.3.0（組建編號 20260908） |
 
 所有建置目標都將 Swift 語言版本設定為 5.0。專案沒有 `.xcconfig`、`.swift-version`、`.xcode-version`、CI 矩陣或套件鎖定檔。中繼資料記錄以 Xcode 26.5／26.6 建立或升級，但這不是正式的最低 Xcode 宣告。
 
@@ -302,7 +302,7 @@ macOS 立即插入預設標點候選並記錄其範圍，在替換前驗證用�
 
 執行期原始碼不會讀取環境變數。`Scripts/release.sh` 辨識 `HYBRIDIME_NOTARY_PROFILE`、`HYBRIDIME_RESUME_AFTER_APP_NOTARIZATION` 與 `HYBRIDIME_RELEASE_ROOT_OVERRIDE`；這些是僅供發行使用的控制項。公證設定檔會命名一個 Keychain 項目，不得將其記錄為秘密值。
 
-發行腳本解析 `HybridIME` macOS scheme 的 Debug 與 Release 建置設定，除非兩者都使用版本 `1.2.0`、組建編號 `20260821`、部署目標 `26.0`，以及預期的 macOS 建置目標與套件識別碼，否則會硬停止。此預檢不會執行或證明簽署、公證、封裝釘選或發佈。
+發行腳本解析 `HybridIME` macOS scheme 的 Debug 與 Release 建置設定，除非兩者都使用版本 `1.3.0`、組建編號 `20260908`、部署目標 `26.0`，以及預期的 macOS 建置目標與套件識別碼，否則會硬停止。此預檢不會執行或證明簽署、公證、封裝釘選或發佈。
 
 ## 10. 錯誤處理與記錄
 
@@ -424,7 +424,7 @@ swiftc -module-cache-path /tmp/hybridime-module-cache-keyboard \
 - 沒有可清除學習資料的設定 UI；記錄數量沒有全域上限或修剪政策。
 - SQLite 執行錯誤大多靜默處理，除初始結構建立外沒有遷移。
 - 沒有設定 XCTest、UI 測試、CI、靜態檢查、格式化工具、效能測試或延伸功能記憶體預算測試。
-- 當解析後 macOS `HybridIME` scheme 的 Debug 或 Release 設定偏離版本 `1.2.0`、組建編號 `20260821`、部署目標 `26.0`、預期建置目標或套件識別碼時，`Scripts/release.sh` 會硬停止。
+- 當解析後 macOS `HybridIME` scheme 的 Debug 或 Release 設定偏離版本 `1.3.0`、組建編號 `20260908`、部署目標 `26.0`、預期建置目標或套件識別碼時，`Scripts/release.sh` 會硬停止。
 - 專案簽署包含特定擁有者的開發團隊；在其他開發者選取自己的團隊前，檢出內容的可攜性會降低。
 - 儲存庫沒有全專案的原始碼授權。
 

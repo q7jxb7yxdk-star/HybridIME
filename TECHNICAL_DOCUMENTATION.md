@@ -161,7 +161,9 @@ Delete 按鈕的點按動作會呼叫一次 `deleteBackward()`。長按手勢在
 
 此套件是經典的 InputMethodKit 應用程式，而不是文字輸入應用程式延伸功能。`LSUIElement=true` 與 `LSBackgroundOnly=false` 都是刻意設定。啟動時不會呼叫 `TISRegisterInputSource` 或自行啟用。
 
-僅憑建置輸出無法驗證已安裝的輸入來源。對於已安裝、已選取但沒有回應的已簽署應用程式，請檢查統一日誌中是否有 `NO Endpoint` 或無法辨識的 `InputMethodConnectionName`。開發環境的復原順序如下：
+macOS 控制器以 `IMKTextInput.insertText` 直接插入字母，並用 `directComposition` 記錄宿主內可替換的 UTF-16 範圍；它不以 InputMethodKit marked text 保存這段組字。清除候選、標點、聯想或系統接管狀態時不需呼叫 `updateComposition()`。`composedString(_:)` 仍實作 InputMethodKit 協定，並明確把 Swift `String` 橋接為 `NSString`；這符合 SDK 所述可回傳 `NSString` 或 `NSAttributedString` 的介面契約。
+
+僅憑建置輸出無法驗證已安裝的輸入來源。對於已安裝、已選取但沒有回應的已簽署應用程式，先檢查 `~/Library/Logs/DiagnosticReports/HybridIME-*.ips` 是否有程序崩潰，再檢查統一日誌中是否有 `NO Endpoint`、無法辨識的 `InputMethodConnectionName`，或 `com.apple.inputmethodkit.setxpcendpoint`／`getxpcendpoint` 是否成功建立連線。開發環境的復原順序如下：
 
 ```sh
 /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister \
@@ -377,6 +379,15 @@ swiftc -module-cache-path /tmp/hybridime-module-cache-keyboard \
 ```
 
 ### 本次工作已驗證
+
+2026-09-10 的 macOS InputMethodKit crash 修正與本機安裝完成以下驗證：
+
+- 已安裝的 1.2.0（組建編號 20260830）曾在系統接管組字狀態時以 `EXC_BREAKPOINT / SIGTRAP` 崩潰；堆疊為 `swift_unknownObjectRetain → composedString(_:) → updateComposition() → resetState → releaseCompositionForSystemTakeover → handle(_:client:)`。
+- macOS 直接插字架構已移除所有 `updateComposition()` 呼叫，`resetState` 保留原有 buffer、直接組字範圍、候選、標點、聯想與候選視窗清理，`composedString(_:)` 改為明確回傳 `NSString`。
+- 目前工作樹的 universal macOS Release 1.3.0（組建編號 20260908）以 `Developer ID Application: Yan Yin Yu (WX793X49GJ)` archive 成功；`codesign --verify --deep --strict` 通過，包含 arm64 與 x86_64，執行檔 SHA-256 為 `0365529ed25e0f729b0f6c133fdb19d90c26d714ec4fc2ec97e86772a6ebc093`。
+- archive 及正式安裝 app 的版本、套件識別碼、`InputMethodConnectionName`、controller class 與執行檔雜湊一致；隨附 SQLite 通過 `integrity_check=ok`、schema 2，且與儲存庫 canonical SQLite 的 SHA-256 相同。
+- 修正版已安裝至 `~/Library/Input Methods/HybridIME.app`，重新註冊 LaunchServices、重啟 `TextInputMenuAgent` 並啟動新程序；統一日誌確認 set/get XPC endpoint 連線建立，安裝後沒有產生新的 HybridIME crash report。
+- 上述結果證明本次建置、簽署、安裝、註冊及 endpoint 建立成功，不代表真實文字用戶端的按鍵輸入、候選呈現、提交或原崩潰操作序列已完成驗證。
 
 本次 schema 2 倉頡遷移已完成以下驗證：
 

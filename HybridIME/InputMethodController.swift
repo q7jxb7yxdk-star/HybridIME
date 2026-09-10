@@ -74,7 +74,7 @@ final class InputMethodController: IMKInputController {
 
     override func handle(_ event: NSEvent!, client sender: Any!) -> Bool {
         guard let event else {
-            resetState(updatingComposition: false)
+            resetState()
             return false
         }
 
@@ -253,7 +253,7 @@ final class InputMethodController: IMKInputController {
         guard let inputClient = sender as? IMKTextInput else { return false }
 
         if !buffer.isEmpty, !directCompositionMatches(in: inputClient) {
-            resetState(updatingComposition: true)
+            resetState()
         }
 
         let selection = inputClient.selectedRange()
@@ -289,7 +289,7 @@ final class InputMethodController: IMKInputController {
             directCompositionMatches(in: inputClient),
             let lastCharacter = buffer.last
         else {
-            resetState(updatingComposition: true)
+            resetState()
             return false
         }
 
@@ -302,7 +302,7 @@ final class InputMethodController: IMKInputController {
         buffer.removeLast()
 
         if buffer.isEmpty {
-            resetState(updatingComposition: true)
+            resetState()
         } else {
             self.directComposition = DirectComposition(
                 range: NSRange(
@@ -409,12 +409,12 @@ final class InputMethodController: IMKInputController {
     }
 
     override func deactivateServer(_ sender: Any!) {
-        resetState(updatingComposition: false)
+        resetState()
         super.deactivateServer(sender)
     }
 
     override func composedString(_ sender: Any!) -> Any! {
-        buffer
+        buffer as NSString
     }
 
     override func originalString(_ sender: Any!) -> NSAttributedString! {
@@ -596,11 +596,11 @@ final class InputMethodController: IMKInputController {
     }
 
     private func clearComposition() {
-        resetState(updatingComposition: true)
+        resetState()
     }
 
     private func cancelCompositionPreservingFocus() {
-        resetState(updatingComposition: true)
+        resetState()
     }
 
     private func shouldReleaseCompositionForSystemKey(_ event: NSEvent) -> Bool {
@@ -624,7 +624,7 @@ final class InputMethodController: IMKInputController {
     }
 
     private func releaseCompositionForSystemTakeover() {
-        resetState(updatingComposition: true)
+        resetState()
     }
 
     private func registerLifecycleObserversIfNeeded() {
@@ -648,10 +648,10 @@ final class InputMethodController: IMKInputController {
 
     private func releaseCompositionForExternalSessionChange() {
         guard hasActiveComposition else { return }
-        resetState(updatingComposition: true)
+        resetState()
     }
 
-    private func resetState(updatingComposition: Bool) {
+    private func resetState() {
         buffer = ""
         directComposition = nil
         currentCandidates = []
@@ -663,9 +663,6 @@ final class InputMethodController: IMKInputController {
         associationContext = ""
         associationLanguage = nil
         learnedChineseContext = ""
-        if updatingComposition {
-            updateComposition()
-        }
         CandidateWindowController.shared.hide()
     }
 
@@ -782,23 +779,23 @@ final class InputMethodController: IMKInputController {
         suppressingFollowingAssociations: Bool = false
     ) {
         guard !text.isEmpty else {
-            resetState(updatingComposition: false)
+            resetState()
             return
         }
         guard insertOrReplaceActiveComposition(with: text, to: sender) else {
-            resetState(updatingComposition: true)
+            resetState()
             return
         }
         suppressAssociationsUntilNextInput = suppressingFollowingAssociations
         lastCommittedCharacter = text.last
         setNextPunctuationContext(from: text)
         learnCommittedText(text)
-        resetState(updatingComposition: true)
+        resetState()
     }
 
     private func commit(_ text: String, to sender: Any?) {
         guard insertOrReplaceActiveComposition(with: text, to: sender) else {
-            resetState(updatingComposition: true)
+            resetState()
             return
         }
         lastCommittedCharacter = text.last
@@ -889,7 +886,7 @@ final class InputMethodController: IMKInputController {
             if prefixLength == 0 {
                 commit(text, to: sender)
             } else {
-                resetState(updatingComposition: true)
+                resetState()
             }
             return
         }
@@ -910,7 +907,7 @@ final class InputMethodController: IMKInputController {
            existingText.utf16.count != compositionAndPrefixRange.length ||
                !existingText.hasSuffix(buffer)
         {
-            resetState(updatingComposition: true)
+            resetState()
             return
         }
 
@@ -961,7 +958,6 @@ final class InputMethodController: IMKInputController {
         isSelectingPunctuation = false
         pendingPunctuationReplacement = nil
         isSelectingAssociation = false
-        updateComposition()
     }
 
     private func showAssociations(

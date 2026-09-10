@@ -108,7 +108,9 @@ xcodebuild \
 
 要使用輸入法，需把已適當簽署的 `HybridIME.app` 放入 `~/Library/Input Methods/`，再從「系統設定 > 鍵盤 > 文字輸入」加入「中英混合輸入法」。建置成功只證明產物可建立，不證明已安裝的應用程式、LaunchServices 註冊或 InputMethodKit 端點正常。
 
-若已安裝版本出現「已選取但沒有輸入反應」，請參閱[技術文件的 InputMethodKit 診斷](TECHNICAL_DOCUMENTATION.md#macos-inputmethodkit-生命週期)。
+若已安裝版本出現「已選取但沒有輸入反應」，請先檢查 `~/Library/Logs/DiagnosticReports/` 是否有新的 `HybridIME-*.ips`，再參閱[技術文件的 InputMethodKit 診斷](TECHNICAL_DOCUMENTATION.md#macos-inputmethodkit-生命週期)，檢查註冊與 XPC endpoint。
+
+macOS 控制器會以 `IMKTextInput.insertText` 直接插入並自行追蹤可替換範圍，不以 InputMethodKit marked text 保存字母組字。狀態清理不會呼叫 `updateComposition()`；`composedString(_:)` 只保留作為 InputMethodKit 協定介面，並明確回傳 `NSString`。
 
 ### iOS／iPadOS
 
@@ -179,7 +181,7 @@ swiftc -parse-as-library -module-cache-path /tmp/hybridime-module-cache-update \
 /tmp/hybridime-update-static
 ```
 
-實際驗證結果記錄在[技術文件的測試章節](TECHNICAL_DOCUMENTATION.md#12-測試)。本機 Apple Development 簽署與 macOS 安裝驗證會和一般建置、真實文字輸入、Developer ID 公證及發佈結果分開記錄。
+實際驗證結果記錄在[技術文件的測試章節](TECHNICAL_DOCUMENTATION.md#12-測試)。本機 Developer ID 簽署與 macOS 安裝驗證會和一般建置、真實文字輸入、公證及發佈結果分開記錄。
 
 ## 已知限制
 

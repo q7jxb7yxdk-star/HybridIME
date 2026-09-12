@@ -122,7 +122,7 @@ enum PunctuationStrategy {
             candidates = [String(character), String(fullWidth)]
             chineseDefault = String(character)
         case ".":
-            candidates = [".", "。", "⋯⋯"]
+            candidates = [".", "…", "•", "。", "⋯⋯"]
             chineseDefault = nil
         case ",":
             candidates = [",", "，", "、"]

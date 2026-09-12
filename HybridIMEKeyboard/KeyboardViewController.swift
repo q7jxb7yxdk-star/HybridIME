@@ -151,7 +151,7 @@ final class KeyboardViewController: UIInputViewController {
     }
 
     private enum CandidateAction {
-        case cangjie(String)
+        case cangjie(String, code: String)
         case raw(String)
         case dictionary(String)
         case translation(String, replacingPrefixCharacterCount: Int)
@@ -159,7 +159,7 @@ final class KeyboardViewController: UIInputViewController {
 
         var text: String {
             switch self {
-            case .cangjie(let text),
+            case .cangjie(let text, _),
                  .raw(let text),
                  .dictionary(let text),
                  .translation(let text, _):
@@ -1977,9 +1977,9 @@ final class KeyboardViewController: UIInputViewController {
         else { return }
 
         switch currentCandidateActions[index] {
-        case .cangjie(let text):
+        case .cangjie(let text, let code):
             SmartCandidateRanker.shared.record(
-                code: buffer,
+                code: code,
                 candidate: text
             )
             _ = replaceTypedCode(with: text, showingAssociations: true)
@@ -2061,9 +2061,22 @@ final class KeyboardViewController: UIInputViewController {
             return
         }
 
-        let cangjieCandidates = buffer.count <= 5
-            ? decoder?.candidates(for: buffer, limit: 10) ?? []
+        let hasCangjieCode = buffer.count <= 5
+        let staticCangjieCandidates = hasCangjieCode
+            ? decoder?.candidates(for: buffer, limit: .max) ?? []
             : []
+        let rankedCangjieCandidates = SmartCandidateRanker.shared.rankedCandidates(
+            code: buffer,
+            candidates: staticCangjieCandidates,
+            rootCandidate: hasCangjieCode
+                ? decoder?.rootCandidate(for: buffer)
+                : nil,
+            limit: .max
+        )
+        let cangjieCandidates = decoder?.visibleCandidates(
+            rankedCangjieCandidates,
+            limit: 10
+        ) ?? []
         let dictionaryCandidates = offlineLexicon.chineseCandidates(
             for: buffer,
             limit: 10
@@ -2076,8 +2089,8 @@ final class KeyboardViewController: UIInputViewController {
         let prediction = SmartCandidateRanker.shared.prediction(
             code: buffer,
             availableCandidates: buffer.isEmpty
-                ? cangjieCandidates
-                : cangjieCandidates + [buffer]
+                ? cangjieCandidates.map(\.text)
+                : cangjieCandidates.map(\.text) + [buffer]
         )
         learnedCandidate = prediction?.candidate
         if let learnedCandidate {
@@ -2085,7 +2098,7 @@ final class KeyboardViewController: UIInputViewController {
                 actions.removeAll { $0.text == buffer }
                 actions.insert(.raw(buffer), at: 0)
             } else if let index = actions.firstIndex(where: { action in
-                if case .cangjie(let text) = action {
+                if case .cangjie(let text, _) = action {
                     return text == learnedCandidate
                 }
                 return false
@@ -2106,10 +2119,11 @@ final class KeyboardViewController: UIInputViewController {
 
     private func candidateActions(
         dictionaryCandidates: [String],
-        cangjieCandidates: [String],
+        cangjieCandidates: [CangjieCandidate],
         limit: Int
     ) -> [CandidateAction] {
         var result: [CandidateAction] = []
+        var translations: [CandidateAction] = []
         var seen: Set<String> = []
 
         func append(_ action: CandidateAction) {
@@ -2121,13 +2135,13 @@ final class KeyboardViewController: UIInputViewController {
 
         let precedingChinese = chineseTextBeforeComposition()
         for candidate in cangjieCandidates where result.count < limit {
-            append(.cangjie(candidate))
+            append(.cangjie(candidate.text, code: candidate.code))
             let lookup = longestTranslationLookup(
                 precedingChinese: precedingChinese,
-                candidate: candidate
+                candidate: candidate.text
             )
             for translation in lookup.translations.prefix(2) {
-                append(
+                translations.append(
                     .translation(
                         translation,
                         replacingPrefixCharacterCount: lookup.prefix.count
@@ -2135,6 +2149,7 @@ final class KeyboardViewController: UIInputViewController {
                 )
             }
         }
+        translations.forEach { append($0) }
         for candidate in dictionaryCandidates {
             append(.dictionary(candidate))
         }

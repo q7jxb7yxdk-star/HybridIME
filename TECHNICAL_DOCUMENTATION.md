@@ -84,11 +84,12 @@ flowchart LR
 | `HybridIME/StaticLexicon.swift` | macOS 唯讀 SQLite 倉頡／雙語／聯想查詢 |
 | `HybridIME/BilingualDictionary.swift` | macOS 雙語詞彙查詢的領域包裝層 |
 | `HybridIME/AssociationDictionary.swift` | macOS 靜態與學習聯想的合併／排序 |
-| `HybridIME/SmartCandidateRanker.swift` | macOS 最近使用智慧候選選擇 |
+| `HybridIME/SmartCandidateRanker.swift` | macOS 依使用次數、最近時間與詞庫順序排列智慧候選 |
 | `HybridIME/UserLearningStore.swift` | macOS 可寫入的 SQLite 學習結構 |
 | `HybridIMEKeyboard/KeyboardViewController.swift` | iOS 鍵盤 UI、文字代理操作與組字狀態 |
 | `HybridIMEKeyboard/OfflineLexicon.swift` | iOS 具有限制快取的唯讀 SQLite 倉頡／雙語／聯想查詢 |
 | `HybridIMEKeyboard/KeyboardAssociationDictionary.swift` | iOS 聯想合併／排序 |
+| `HybridIMEKeyboard/SmartCandidateRanker.swift` | iOS 依使用次數、最近時間與詞庫順序排列智慧候選 |
 | `HybridIMEKeyboard/KeyboardUserLearningStore.swift` | iOS 可寫入的 SQLite 學習結構 |
 | `HybridIMEKeyboard/PunctuationStrategy.swift` | iOS 標點定義、上下文與顯示標籤 |
 | `HybridIMEKeyboard/PrivacyInfo.xcprivacy` | 鍵盤延伸功能隱私權資訊清單：不追蹤／無收集資料，以及 SystemBootTime 理由 `35F9.1` |
@@ -121,9 +122,9 @@ flowchart LR
 1. `HybridIMEApp` 建立 `IMKServer`；`InputResources` 建立 `StaticLexicon`、詞典包裝層與聯想詞典，接著在分離的工作中載入倉頡。
 2. `InputMethodController.handle` 接受 `keyDown`；Command／Control／Option 與不支援的系統事件會返回宿主應用程式。
 3. ASCII 字母立即插入宿主應用程式，並附加到記憶體中的緩衝區；控制器另行追蹤其 UTF-16 範圍，不使用標記文字顯示英文組字。
-4. 最多五個字母會查詢倉頡；完整緩衝區也會查詢英譯中的 SQLite 項目。
-5. 每個倉頡候選最多可加入兩個中譯英結果，使用前方中文加目前候選的最長尾綴。
-6. 結果會去除重複、限制為十個，並可選擇依最近學習的候選重新排序。
+4. 最多五個字母會按小寫字典序查詢完整碼以緩衝區開頭的倉頡資料列；候選以明確 eager 迴圈依序去重，保留資料列內次序與真實完整碼，完整緩衝區也會查詢英譯中的 SQLite 項目。
+5. 倉頡候選完成排序後才加入中譯英結果；翻譯使用前方中文加目前候選的最長尾綴。
+6. 結果會去除重複並限制為十個；單碼固定以字根字為首。多碼有已學習 descendant 時依學習分數排序；沒有學習結果時，若目前輸入本身有完整碼便由完整碼候選開始，只有沒有完整碼但仍有 descendant 時才加入首字根 fallback。完全沒有倉頡 prefix 的英文不加入字根候選。
 7. `1`–`0` 只在對應候選存在時攔截按鍵，並以 `IMKTextInput` 替換已追蹤範圍；沒有對應候選的數字交回宿主。
 8. `Return` 不提交候選，只清除目前組字狀態並交回宿主處理。
 9. 若 Safari URL 欄在已輸入字母後選取自動完成尾段，只要選取起點仍在追蹤範圍尾端，組字便會繼續；候選替換及 Delete 會一併處理該尾段。若游標、範圍或原文不再吻合，控制器會拒絕替換並重設狀態。
@@ -205,7 +206,7 @@ iOS 控制器在緊湊版面只於 `needsInputModeSwitchKey` 為 `true` 時建�
 
 ## 6. 資料模型與狀態管理
 
-重要的暫時狀態包括緩衝區文字、候選動作陣列、選取的聯想上下文、標點替換中繼資料，以及最近使用的預測。兩個控制器都將 UI 狀態限制在主 actor／平台主執行緒。
+重要的暫時狀態包括緩衝區文字、候選動作陣列、選取的聯想上下文、標點替換中繼資料，以及智慧排序標記。兩個控制器都將 UI 狀態限制在主 actor／平台主執行緒。
 
 候選動作保留行為邊界：
 
@@ -223,11 +224,11 @@ iOS 控制器在緊湊版面只於 `needsInputModeSwitchKey` 為 `true` 時建�
 
 macOS 與 iOS 儲存庫各自建立：
 
-- `smart_candidate(code, candidate, last_used)`.
+- `smart_candidate(code, candidate, selection_count, last_used)`；既有 schema 1 資料會原位升級至 schema 2，舊列的次數保守回填為 1。
 - `association_selection(language, context, candidate, selection_count, last_selected)`.
 - `learned_chinese(context, candidate, position)`.
 
-它們使用 WAL、`synchronous=NORMAL`、`SQLITE_OPEN_FULLMUTEX` 與結構版本 `1`。檔案命名為 `hybridime-user-learning.sqlite3`，位於建置目標容器的使用者域 Application Support `HybridIME/` 目錄下。
+它們使用 WAL、`synchronous=NORMAL`、`SQLITE_OPEN_FULLMUTEX` 與結構版本 `2`。檔案命名為 `hybridime-user-learning.sqlite3`，位於建置目標容器的使用者域 Application Support `HybridIME/` 目錄下。
 
 沒有從舊版 `UserDefaults` 智慧／聯想鍵值遷移的機制，也沒有跨建置目標的 App Group。因此 macOS 與鍵盤的學習資料維持分離。由於靜態詞彙在程序存續期間不可變，因此沒有快取失效處理。
 
@@ -241,7 +242,7 @@ macOS 與 iOS 儲存庫各自建立：
 
 ### 智慧候選排序
 
-正規化的小寫代碼對應到帶有時間戳記的候選選擇。預測掃描最新記錄，選取仍存在於目前允許候選中的第一個值。這是以最近使用為基礎，不是機率、百分比或具上下文的語言模型。
+正規化的小寫完整碼對應到選取次數與最後使用時間。查詢某個輸入 prefix 時，同一字在 descendant 完整碼下的次數以總和合併，最後使用時間取最大值，再依總次數及最近時間遞減排列。單碼的字根字固定在首位；二至五碼若已有學習 descendant，便由學習排序決定前列候選。沒有學習結果時，完整碼候選優先於 fallback；只有查不到目前完整碼、但仍存在 descendant 時才加入首字根。完全沒有倉頡完整碼或 descendant 的輸入不產生字根候選，因此 `good` 只進入英中字典，而未學習的 `qwlj` 由完整碼「擇」開始。其餘未使用候選按完整碼字典序及 canonical 資料列內順序排列。每個候選動作保存真實完整碼，選取 prefix 候選不會把當前短 buffer 寫成新的學習碼。翻譯及詞典候選排在倉頡候選之後；詞典候選及 canonical 倉頡資料不受學習資料修改。這不是機率、百分比或具上下文的語言模型。
 
 透過 macOS `Shift + Space`，或 iOS 非小寫 Shift 狀態加 Space 選擇原始英文時，會以保持大小寫的原始字串取代該代碼的所有學習候選。
 
@@ -338,6 +339,7 @@ Xcode 專案沒有測試建置目標。測試涵蓋由獨立腳本提供：
 | 測試工具 | 涵蓋範圍 | 外部服務 |
 | --- | --- | --- |
 | `Scripts/test_static_lexicon.swift` | 倉頡候選順序／限制、雙語查詢、批次最長比對、中文／英文聯想測試資料 | 無 |
+| `Scripts/test_cangjie_decoder.swift` | 倉頡 prefix 解碼、完整碼保存、去重與候選上限 | 無；唯讀隨附 DB |
 | `Scripts/test_user_learning_store.swift` | macOS 學習結構與讀寫行為 | 無；暫存 SQLite |
 | `Scripts/test_mac_dictionary.swift` | macOS 詞彙 + 聯想整合與學習重新排序 | 無；暫存 SQLite |
 | `Scripts/test_keyboard_user_learning_store.swift` | iOS 學習結構、替換與完整性 | 無；暫存 SQLite |
@@ -355,8 +357,17 @@ swiftc -module-cache-path /tmp/hybridime-module-cache-static \
   -lsqlite3 -o /tmp/hybridime-test-static
 /tmp/hybridime-test-static HybridIMEKeyboard/LexiconData/hybridime-lexicon.sqlite3
 
+swiftc -O -module-cache-path /tmp/hybridime-module-cache-decoder \
+  HybridIME/StaticLexicon.swift HybridIME/UserLearningStore.swift \
+  HybridIME/SmartCandidateRanker.swift HybridIME/CangjieDecoder.swift \
+  Scripts/test_cangjie_decoder.swift \
+  -lsqlite3 -o /tmp/hybridime-test-decoder
+/tmp/hybridime-test-decoder \
+  HybridIMEKeyboard/LexiconData/hybridime-lexicon.sqlite3
+
 swiftc -module-cache-path /tmp/hybridime-module-cache-learning \
-  HybridIME/UserLearningStore.swift Scripts/test_user_learning_store.swift \
+  HybridIME/UserLearningStore.swift HybridIME/SmartCandidateRanker.swift \
+  Scripts/test_user_learning_store.swift \
   -lsqlite3 -o /tmp/hybridime-test-learning
 /tmp/hybridime-test-learning
 
@@ -373,6 +384,7 @@ swiftc \
 
 swiftc -module-cache-path /tmp/hybridime-module-cache-keyboard \
   HybridIMEKeyboard/KeyboardUserLearningStore.swift \
+  HybridIMEKeyboard/SmartCandidateRanker.swift \
   Scripts/test_keyboard_user_learning_store.swift \
   -lsqlite3 -o /tmp/hybridime-test-keyboard-learning
 /tmp/hybridime-test-keyboard-learning
@@ -384,10 +396,18 @@ swiftc -module-cache-path /tmp/hybridime-module-cache-keyboard \
 
 - 已安裝的 1.2.0（組建編號 20260830）曾在系統接管組字狀態時以 `EXC_BREAKPOINT / SIGTRAP` 崩潰；堆疊為 `swift_unknownObjectRetain → composedString(_:) → updateComposition() → resetState → releaseCompositionForSystemTakeover → handle(_:client:)`。
 - macOS 直接插字架構已移除所有 `updateComposition()` 呼叫，`resetState` 保留原有 buffer、直接組字範圍、候選、標點、聯想與候選視窗清理，`composedString(_:)` 改為明確回傳 `NSString`。
-- 目前工作樹的 universal macOS Release 1.3.0（組建編號 20260908）以 `Developer ID Application: Yan Yin Yu (WX793X49GJ)` archive 成功；`codesign --verify --deep --strict` 通過，包含 arm64 與 x86_64，執行檔 SHA-256 為 `0365529ed25e0f729b0f6c133fdb19d90c26d714ec4fc2ec97e86772a6ebc093`。
+- 2026-09-10 當時的 universal macOS Release 1.3.0（組建編號 20260908）以 `Developer ID Application: Yan Yin Yu (WX793X49GJ)` archive 成功；`codesign --verify --deep --strict` 通過，包含 arm64 與 x86_64，執行檔 SHA-256 為 `0365529ed25e0f729b0f6c133fdb19d90c26d714ec4fc2ec97e86772a6ebc093`。
 - archive 及正式安裝 app 的版本、套件識別碼、`InputMethodConnectionName`、controller class 與執行檔雜湊一致；隨附 SQLite 通過 `integrity_check=ok`、schema 2，且與儲存庫 canonical SQLite 的 SHA-256 相同。
 - 修正版已安裝至 `~/Library/Input Methods/HybridIME.app`，重新註冊 LaunchServices、重啟 `TextInputMenuAgent` 並啟動新程序；統一日誌確認 set/get XPC endpoint 連線建立，安裝後沒有產生新的 HybridIME crash report。
 - 上述結果證明本次建置、簽署、安裝、註冊及 endpoint 建立成功，不代表真實文字用戶端的按鍵輸入、候選呈現、提交或原崩潰操作序列已完成驗證。
+
+2026-09-12 的 prefix 候選與本機安裝完成以下驗證：
+
+- `StaticLexicon` 的索引 range 查詢在執行中的 macOS 輸入法分別為 `e` 取得 1,693 筆、`eb` 取得 87 筆、`ebc` 取得 8 筆、`ebcn` 取得 1 筆；解碼器改用 eager 迴圈後不再於 Release 路徑遺失結果。
+- 經使用者在真實文字欄輸入後，限定診斷版的候選視窗收到 `e → 水、測…`、`eb → 測、深、㳉…`、`ebc → 測、深、瀃、濺、浫、浻、滘、瀴…`、`ebcn → 測…`；這是候選資料送達視窗的證據，不等同於所有宿主應用程式的顯示與提交驗證。
+- `good` 空 prefix 不注入 `g → 土`，以及未學習完整碼 `qwlj → 擇` 不注入 `q → 手`，均由 macOS 與鍵盤版 `-O` 排序回歸測試覆蓋；純 descendant 的 `ebc` 仍保留首字根 fallback。
+- `test_static_lexicon.swift`、`test_cangjie_decoder.swift`、`test_user_learning_store.swift` 與 `test_keyboard_user_learning_store.swift` 均以 `-O` 通過；`git diff --check`、Swift 語法檢查及診斷字串移除檢查通過。
+- 移除診斷碼後的 universal macOS Release 1.3.0（組建編號 20260908）以 Developer ID archive 並安裝成功；archive 與安裝執行檔 SHA-256 均為 `767eb221ea731e7c917e43a38c21723d5e2d53eab0aa75fbd56b5caf4b9f81d2`，簽署嚴格驗證、arm64／x86_64 架構及隨附 SQLite `integrity_check=ok`／schema 2 均通過。安裝後程序成功啟動且沒有新的 HybridIME crash report；乾淨版的 `good`／`qwlj` 畫面仍需使用者手動確認。
 
 本次 schema 2 倉頡遷移已完成以下驗證：
 
@@ -446,7 +466,7 @@ swiftc -module-cache-path /tmp/hybridime-module-cache-keyboard \
 - **固定倉頡 canonical table：**有順序的倉頡資料只保存在版本控制的 SQLite `cangjie` 表；更新工具拒絕修改它，避免意外重排或重建候選。
 - **失敗即拒絕的文字替換：**範圍／尾綴防護寧可拒絕替換，也不在狀態過期後刪除宿主內容。
 - **平台配接器分離：**InputMethodKit 與 `UITextDocumentProxy` 具有不同的生命週期與文字編輯契約；目前的重複實作讓差異保持明確，但增加維護成本。
-- **以最近使用為基礎的學習：**可預測的最近選擇行為比不透明的統計模型簡單，但不使用周遭語言上下文。
+- **以頻率及最近使用為基礎的學習：**可預測的次數／時間排序比不透明的統計模型簡單，但不使用周遭語言上下文。
 - **啟動時不自動註冊 macOS：**安裝與文字輸入註冊保持外部處理，因此每次啟動都不會嘗試啟用輸入來源。
 - **發行預檢在偏移時停止：**版本、識別碼、資源、簽章與公證檢查設計為在發佈不一致成品前先失敗。
 

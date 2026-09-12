@@ -14,6 +14,7 @@ final class InputMethodController: IMKInputController {
     }
 
     private enum CandidateAction {
+        case cangjie(String, code: String)
         case commit(String)
         case rawCommit(String)
         case dictionaryCommit(String)
@@ -22,7 +23,8 @@ final class InputMethodController: IMKInputController {
 
         var text: String {
             switch self {
-            case .commit(let text),
+            case .cangjie(let text, _),
+                 .commit(let text),
                  .rawCommit(let text),
                  .dictionaryCommit(let text),
                  .translate(let text, _):
@@ -373,7 +375,7 @@ final class InputMethodController: IMKInputController {
         guard smartPredictionIndex == 0 else { return false }
         guard currentCandidateActions.indices.contains(0) else { return false }
         switch currentCandidateActions[0] {
-        case .commit(let text):
+        case .cangjie(let text, _), .commit(let text):
             return text.allSatisfy(isChinese)
         default:
             return false
@@ -384,7 +386,7 @@ final class InputMethodController: IMKInputController {
         guard !isSelectingPunctuation else { return false }
         guard !buffer.isEmpty else { return false }
         return !currentCandidateActions.contains { action in
-            if case .commit(let text) = action {
+            if case .cangjie(let text, _) = action {
                 return text.allSatisfy(isChinese)
             }
             return false
@@ -429,12 +431,25 @@ final class InputMethodController: IMKInputController {
             for: buffer,
             limit: 10
         ) ?? []
-        let cangjieCandidates = buffer.count <= 5
+        let hasCangjieCode = buffer.count <= 5
+        let staticCangjieCandidates = hasCangjieCode
             ? cangjieDecoder?.candidates(
                 for: buffer.lowercased(),
-                limit: 10
+                limit: .max
             ) ?? []
             : []
+        let rankedCangjieCandidates = smartCandidateRanker.rankedCandidates(
+            code: buffer,
+            candidates: staticCangjieCandidates,
+            rootCandidate: hasCangjieCode
+                ? cangjieDecoder?.rootCandidate(for: buffer)
+                : nil,
+            limit: .max
+        )
+        let cangjieCandidates = cangjieDecoder?.visibleCandidates(
+            rankedCangjieCandidates,
+            limit: 10
+        ) ?? []
         currentCandidateActions = candidateActions(
             dictionaryCandidates: dictionaryCandidates,
             cangjieCandidates: cangjieCandidates,
@@ -443,7 +458,7 @@ final class InputMethodController: IMKInputController {
         )
         currentCandidates = currentCandidateActions.map(\.text)
         let learnedChineseCandidates: [String] = currentCandidateActions.compactMap {
-            guard case .commit(let text) = $0, text.allSatisfy(isChinese) else {
+            guard case .cangjie(let text, _) = $0, text.allSatisfy(isChinese) else {
                 return nil
             }
             return text
@@ -501,11 +516,12 @@ final class InputMethodController: IMKInputController {
 
     private func candidateActions(
         dictionaryCandidates: [String],
-        cangjieCandidates: [String],
+        cangjieCandidates: [CangjieCandidate],
         client: IMKTextInput?,
         limit: Int
     ) -> [CandidateAction] {
         var result: [CandidateAction] = []
+        var translations: [CandidateAction] = []
         var seen: Set<String> = []
 
         func append(_ action: CandidateAction) {
@@ -517,14 +533,14 @@ final class InputMethodController: IMKInputController {
 
         let precedingChinese = chineseTextBeforeComposition(in: client)
         for candidate in cangjieCandidates where result.count < limit {
-            append(.commit(candidate))
+            append(.cangjie(candidate.text, code: candidate.code))
 
             let lookup = longestTranslationLookup(
                 precedingChinese: precedingChinese,
-                candidate: candidate
+                candidate: candidate.text
             )
             for translation in lookup.translations.prefix(2) {
-                append(
+                translations.append(
                     .translate(
                         translation,
                         replacingPrefixUTF16Length: lookup.prefix.utf16.count
@@ -532,6 +548,7 @@ final class InputMethodController: IMKInputController {
                 )
             }
         }
+        translations.forEach { append($0) }
         for candidate in dictionaryCandidates {
             append(.dictionaryCommit(candidate))
         }
@@ -711,6 +728,13 @@ final class InputMethodController: IMKInputController {
             return
         }
         switch currentCandidateActions[index] {
+        case .cangjie(let text, let code):
+            recordSmartSelection(text, code: code)
+            if showingAssociations {
+                commit(text, to: sender)
+            } else {
+                commitWithoutAssociations(text, to: sender)
+            }
         case .commit(let text):
             recordSmartSelection(text)
             if showingAssociations {
@@ -744,6 +768,10 @@ final class InputMethodController: IMKInputController {
     }
 
     private func recordSmartSelection(_ candidate: String) {
+        recordSmartSelection(candidate, code: buffer)
+    }
+
+    private func recordSmartSelection(_ candidate: String, code: String) {
         guard
             !isSelectingPunctuation,
             !isSelectingAssociation,
@@ -753,7 +781,7 @@ final class InputMethodController: IMKInputController {
             return
         }
         smartCandidateRanker.record(
-            code: buffer,
+            code: code,
             candidate: candidate
         )
     }

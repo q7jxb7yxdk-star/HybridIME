@@ -31,9 +31,11 @@ final class KeyboardUserLearningStore {
         )
         execute(
             """
-            INSERT INTO smart_candidate(code, candidate, last_used)
-            VALUES (?, ?, ?)
-            ON CONFLICT(code, candidate) DO UPDATE SET last_used = excluded.last_used
+            INSERT INTO smart_candidate(code, candidate, selection_count, last_used)
+            VALUES (?, ?, 1, ?)
+            ON CONFLICT(code, candidate) DO UPDATE SET
+                selection_count = smart_candidate.selection_count + 1,
+                last_used = excluded.last_used
             """,
             strings: [normalizedCode, candidate],
             double: timestamp
@@ -53,24 +55,90 @@ final class KeyboardUserLearningStore {
             strings: [normalizedCode]
         )
         execute(
-            "INSERT INTO smart_candidate(code, candidate, last_used) VALUES (?, ?, ?)",
+            """
+            INSERT INTO smart_candidate(code, candidate, selection_count, last_used)
+            VALUES (?, ?, 1, ?)
+            """,
             strings: [normalizedCode, candidate],
             double: timestamp
         )
     }
 
-    func smartCandidates(code: String) -> [(candidate: String, lastUsed: Double)] {
+    func smartCandidates(
+        code: String
+    ) -> [(candidate: String, selectionCount: Int, lastUsed: Double)] {
         let normalizedCode = code.lowercased()
         guard !normalizedCode.isEmpty else { return [] }
         return queryRows(
             """
-            SELECT candidate, last_used FROM smart_candidate
-            WHERE code = ? ORDER BY last_used DESC, candidate ASC
+            SELECT candidate, selection_count, last_used FROM smart_candidate
+            WHERE code = ?
+            ORDER BY selection_count DESC, last_used DESC, candidate ASC
             """,
             strings: [normalizedCode]
-        ).compactMap { row in
-            guard row.count == 2, let timestamp = Double(row[1]) else { return nil }
-            return (row[0], timestamp)
+        ).compactMap { row -> (
+            candidate: String,
+            selectionCount: Int,
+            lastUsed: Double
+        )? in
+            guard
+                row.count == 3,
+                let selectionCount = Int(row[1]),
+                let timestamp = Double(row[2])
+            else { return nil }
+            return (row[0], selectionCount, timestamp)
+        }
+    }
+
+    func smartCandidates(
+        codePrefix: String
+    ) -> [(candidate: String, code: String, selectionCount: Int, lastUsed: Double)] {
+        let normalizedPrefix = codePrefix.lowercased()
+        guard !normalizedPrefix.isEmpty else { return [] }
+        return queryRows(
+            """
+            SELECT candidate, code, selection_count, last_used
+            FROM smart_candidate
+            WHERE code >= ? AND code < ?
+            ORDER BY selection_count DESC, last_used DESC, code ASC, candidate ASC
+            """,
+            strings: [normalizedPrefix, normalizedPrefix + "{"]
+        ).compactMap { row -> (
+            candidate: String,
+            code: String,
+            selectionCount: Int,
+            lastUsed: Double
+        )? in
+            guard
+                row.count == 4,
+                let selectionCount = Int(row[2]),
+                let lastUsed = Double(row[3])
+            else { return nil }
+            return (row[0], row[1], selectionCount, lastUsed)
+        }.reduce(
+            into: [String: (
+                candidate: String,
+                code: String,
+                selectionCount: Int,
+                lastUsed: Double
+            )]()
+        ) { result, row in
+            if var existing = result[row.candidate] {
+                existing.selectionCount += row.selectionCount
+                existing.lastUsed = max(existing.lastUsed, row.lastUsed)
+                result[row.candidate] = existing
+            } else {
+                result[row.candidate] = row
+            }
+        }.values.sorted {
+            if $0.selectionCount != $1.selectionCount {
+                return $0.selectionCount > $1.selectionCount
+            }
+            if $0.lastUsed != $1.lastUsed {
+                return $0.lastUsed > $1.lastUsed
+            }
+            if $0.code != $1.code { return $0.code < $1.code }
+            return $0.candidate < $1.candidate
         }
     }
 
@@ -176,12 +244,14 @@ final class KeyboardUserLearningStore {
     }
 
     private func createSchema() {
+        sqlite3_exec(database, "BEGIN IMMEDIATE", nil, nil, nil)
         sqlite3_exec(
             database,
             """
             CREATE TABLE IF NOT EXISTS smart_candidate (
                 code TEXT NOT NULL,
                 candidate TEXT NOT NULL,
+                selection_count INTEGER NOT NULL DEFAULT 1,
                 last_used REAL NOT NULL,
                 PRIMARY KEY(code, candidate)
             ) WITHOUT ROWID;
@@ -199,12 +269,31 @@ final class KeyboardUserLearningStore {
                 position INTEGER NOT NULL,
                 PRIMARY KEY(context, candidate)
             ) WITHOUT ROWID;
-            PRAGMA user_version = 1;
             """,
             nil,
             nil,
             nil
         )
+        if !tableColumns("smart_candidate").contains("selection_count") {
+            sqlite3_exec(
+                database,
+                """
+                ALTER TABLE smart_candidate
+                ADD COLUMN selection_count INTEGER NOT NULL DEFAULT 1
+                """,
+                nil,
+                nil,
+                nil
+            )
+        }
+        sqlite3_exec(database, "PRAGMA user_version = 2", nil, nil, nil)
+        sqlite3_exec(database, "COMMIT", nil, nil, nil)
+    }
+
+    private func tableColumns(_ table: String) -> Set<String> {
+        Set(queryRows("PRAGMA table_info(\(table))", strings: []).compactMap { row in
+            row.count > 1 ? row[1] : nil
+        })
     }
 
     private func nextTimestamp(

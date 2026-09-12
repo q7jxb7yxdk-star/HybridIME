@@ -16,14 +16,36 @@ struct CangjieDecoder: @unchecked Sendable {
     }
 
     @MainActor
-    func candidates(for code: String, limit: Int = 10) -> [String] {
+    func candidates(for code: String, limit: Int = 10) -> [CangjieCandidate] {
         guard limit > 0 else { return [] }
-        return Array(
-            lexicon.cangjieCandidates(for: code, limit: .max)
-                .lazy
-                .filter(Self.hasGlyph)
-                .prefix(limit)
-        )
+        let staticCandidates = lexicon.cangjieCandidates(codePrefix: code)
+        var result: [CangjieCandidate] = []
+        var seen: Set<String> = []
+        for candidate in staticCandidates {
+            guard seen.insert(candidate.text).inserted else { continue }
+            result.append(
+                CangjieCandidate(text: candidate.text, code: candidate.code)
+            )
+            if result.count == limit { break }
+        }
+        return result
+    }
+
+    @MainActor
+    func visibleCandidates(
+        _ candidates: [CangjieCandidate],
+        limit: Int
+    ) -> [CangjieCandidate] {
+        guard limit > 0 else { return [] }
+        return Array(candidates.lazy.filter { Self.hasGlyph(for: $0.text) }.prefix(limit))
+    }
+
+    @MainActor
+    func rootCandidate(for code: String) -> CangjieCandidate? {
+        guard let root = code.lowercased().first else { return nil }
+        return lexicon.cangjieCandidates(for: String(root), limit: .max)
+            .first(where: Self.hasGlyph)
+            .map { CangjieCandidate(text: $0, code: String(root)) }
     }
 
     private static func hasGlyph(for character: String) -> Bool {

@@ -28,6 +28,9 @@ final class StaticLexicon: @unchecked Sendable {
     private var cache: [CacheKey: [String]] = [:]
     private var cacheOrder: [CacheKey] = []
     private let cacheLimit = 256
+    private var cangjiePrefixCache: [String: [(code: String, text: String)]] = [:]
+    private var cangjiePrefixCacheOrder: [String] = []
+    private let cangjiePrefixCacheLimit = 16
 
     init(bundle: Bundle = .main) {
         openDatabase(at: Self.resourceURL(in: bundle))
@@ -111,6 +114,69 @@ final class StaticLexicon: @unchecked Sendable {
         }
         store(candidates, for: cacheKey)
         return Array(candidates.prefix(limit))
+    }
+
+    func cangjieCandidates(codePrefix: String) -> [(code: String, text: String)] {
+        let normalizedPrefix = codePrefix.lowercased()
+        guard !normalizedPrefix.isEmpty else { return [] }
+
+        lock.lock()
+        defer { lock.unlock() }
+
+        if let cached = cangjiePrefixCache[normalizedPrefix] {
+            return cached
+        }
+        guard let database else { return [] }
+
+        var statement: OpaquePointer?
+        guard sqlite3_prepare_v2(
+            database,
+            """
+            SELECT code, candidates FROM cangjie
+            WHERE code >= ? AND code < ? ORDER BY code ASC
+            """,
+            -1,
+            &statement,
+            nil
+        ) == SQLITE_OK else {
+            return []
+        }
+        defer { sqlite3_finalize(statement) }
+
+        let lowerBound = normalizedPrefix
+        let upperBound = normalizedPrefix + "{"
+        let transient = unsafeBitCast(-1, to: sqlite3_destructor_type.self)
+        let lowerBoundResult = lowerBound.withCString {
+            sqlite3_bind_text(statement, 1, $0, -1, transient)
+        }
+        let upperBoundResult = upperBound.withCString {
+            sqlite3_bind_text(statement, 2, $0, -1, transient)
+        }
+        guard lowerBoundResult == SQLITE_OK, upperBoundResult == SQLITE_OK else {
+            return []
+        }
+        var result: [(code: String, text: String)] = []
+        var stepResult = sqlite3_step(statement)
+        while stepResult == SQLITE_ROW {
+            guard
+                let codeBytes = sqlite3_column_text(statement, 0),
+                let candidateBytes = sqlite3_column_text(statement, 1)
+            else { break }
+            let code = String(cString: codeBytes)
+            result.append(contentsOf: String(cString: candidateBytes)
+                .components(separatedBy: "\t")
+                .map { (code: code, text: $0) })
+            stepResult = sqlite3_step(statement)
+        }
+        if cangjiePrefixCache[normalizedPrefix] == nil {
+            cangjiePrefixCacheOrder.append(normalizedPrefix)
+        }
+        cangjiePrefixCache[normalizedPrefix] = result
+        while cangjiePrefixCacheOrder.count > cangjiePrefixCacheLimit {
+            let removed = cangjiePrefixCacheOrder.removeFirst()
+            cangjiePrefixCache.removeValue(forKey: removed)
+        }
+        return result
     }
 
     func longestBilingualMatch(

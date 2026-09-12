@@ -18,6 +18,24 @@ enum StaticLexiconTest {
             lexicon.cangjieCandidates(code: "a", limit: 1) == ["日"],
             "Cangjie lookup limit"
         )
+        let ePrefix = lexicon.cangjieCandidates(codePrefix: "E")
+        try require(
+            ePrefix.first?.code == "e" && ePrefix.first?.text == "水",
+            "one-root prefix starts with the exact root row"
+        )
+        let ebPrefix = lexicon.cangjieCandidates(codePrefix: "eb")
+        try require(
+            ebPrefix.first?.code == "eb"
+                && ebPrefix.first?.text == "㳉"
+                && ebPrefix.contains { $0.code == "ebcn" && $0.text == "測" },
+            "multi-root prefix preserves code order and full codes"
+        )
+        try require(
+            lexicon.cangjieCandidates(codePrefix: "ebc").count == 8
+                && lexicon.cangjieCandidates(codePrefix: "ebcn")
+                    .map(\.text) == ["測"],
+            "three- and four-root prefix lookup"
+        )
         try require(
             lexicon.bilingualCandidates(
                 direction: .englishToChinese,

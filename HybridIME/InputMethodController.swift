@@ -162,6 +162,13 @@ final class InputMethodController: IMKInputController {
             return false
         }
 
+        // Spreadsheet clients use the raw equals key event to enter formula mode.
+        // Direct insertion bypasses that command when no composition is active.
+        if event.characters == "=", !hasActiveComposition {
+            learnedChineseContext = ""
+            return false
+        }
+
         if
             let index = candidateIndex(for: event),
             currentCandidateActions.indices.contains(index),

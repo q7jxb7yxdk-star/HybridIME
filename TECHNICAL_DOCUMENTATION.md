@@ -120,7 +120,7 @@ flowchart LR
 ### macOS 輸入流程
 
 1. `HybridIMEApp` 建立 `IMKServer`；`InputResources` 建立 `StaticLexicon`、詞典包裝層與聯想詞典，接著在分離的工作中載入倉頡。
-2. `InputMethodController.handle` 接受 `keyDown`；Command／Control／Option 與不支援的系統事件會返回宿主應用程式。
+2. `InputMethodController.handle` 接受 `keyDown`；Command／Control／Option 與不支援的系統事件會返回宿主應用程式。完全沒有組字或候選狀態時，`=` 也會返回宿主，保留 Google Sheets 等介面用原始按鍵進入公式模式的能力。
 3. ASCII 字母立即插入宿主應用程式，並附加到記憶體中的緩衝區；控制器另行追蹤其 UTF-16 範圍，不使用標記文字顯示英文組字。
 4. 最多五個字母會按小寫字典序查詢完整碼以緩衝區開頭的倉頡資料列；候選以明確 eager 迴圈依序去重，保留資料列內次序與真實完整碼，完整緩衝區也會查詢英譯中的 SQLite 項目。
 5. 倉頡候選完成排序後才加入中譯英結果；翻譯使用前方中文加目前候選的最長尾綴。
@@ -163,6 +163,8 @@ Delete 按鈕的點按動作會呼叫一次 `deleteBackward()`。長按手勢在
 此套件是經典的 InputMethodKit 應用程式，而不是文字輸入應用程式延伸功能。`LSUIElement=true` 與 `LSBackgroundOnly=false` 都是刻意設定。啟動時不會呼叫 `TISRegisterInputSource` 或自行啟用。
 
 macOS 控制器以 `IMKTextInput.insertText` 直接插入字母，並用 `directComposition` 記錄宿主內可替換的 UTF-16 範圍；它不以 InputMethodKit marked text 保存這段組字。清除候選、標點、聯想或系統接管狀態時不需呼叫 `updateComposition()`。`composedString(_:)` 仍實作 InputMethodKit 協定，並明確把 Swift `String` 橋接為 `NSString`；這符合 SDK 所述可回傳 `NSString` 或 `NSAttributedString` 的介面契約。
+
+標點通常由控制器以 `insertText` 插入並回傳已處理。Google Sheets 在只選取、尚未編輯儲存格時，必須收到原始 `=` key-down 才會進入公式模式；直接插入同一字元不具有相同語義。因此系統按鍵處理後會在 `event.characters == "=" && !hasActiveComposition` 時清除已學習中文上下文並回傳未處理。這只放行完全空閒狀態的 `=`；已有字母組字、標點候選或聯想候選時，仍沿用原本的提交與 `=`／`＝` 候選流程。
 
 僅憑建置輸出無法驗證已安裝的輸入來源。對於已安裝、已選取但沒有回應的已簽署應用程式，先檢查 `~/Library/Logs/DiagnosticReports/HybridIME-*.ips` 是否有程序崩潰，再檢查統一日誌中是否有 `NO Endpoint`、無法辨識的 `InputMethodConnectionName`，或 `com.apple.inputmethodkit.setxpcendpoint`／`getxpcendpoint` 是否成功建立連線。開發環境的復原順序如下：
 
@@ -391,6 +393,14 @@ swiftc -module-cache-path /tmp/hybridime-module-cache-keyboard \
 ```
 
 ### 本次工作已驗證
+
+2026-09-12 的 Google Sheets `=` 相容性修正與本機安裝完成以下驗證：
+
+- `InputMethodController.handle` 在 `event.characters == "="` 且沒有任何 active composition 時回傳 `false`，其餘標點及組字中的 `=`／`＝` 候選路徑維持不變。
+- `xcrun swiftc -parse HybridIME/InputMethodController.swift` 與 `git diff --check` 通過；修正只新增於 macOS `InputMethodController.swift`。
+- universal macOS Release 1.4.0（組建編號 20260912）以 `Developer ID Application: Yan Yin Yu (WX793X49GJ)` archive 成功；嚴格 codesign、arm64／x86_64、套件與 InputMethodKit metadata，以及隨附 SQLite `integrity_check=ok`／schema 2 均通過。
+- 正式安裝 app 與 archive 的執行檔 SHA-256 均為 `e95b94fd8c84246b08ce3f04c58c713bb7147ae3741f86865cf1f2968f5f4129`；舊版 1.3.0（組建編號 20260908）已移至 `~/Library/Application Support/HybridIME Installer Backups/`，沒有移動或修改使用者學習資料庫。
+- 新版已重新註冊 LaunchServices、重啟 `TextInputMenuAgent` 並由正式路徑啟動；InputMethodKit `setxpcendpoint` 已建立，且沒有新的 HybridIME crash report。當時系統選取的是美式鍵盤，因此這些結果不證明 Google Sheets 的實際公式輸入；仍需切回 HybridIME，單擊儲存格後輸入 `=` 手動確認。
 
 2026-09-10 的 macOS InputMethodKit crash 修正與本機安裝完成以下驗證：
 

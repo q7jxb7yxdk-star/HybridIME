@@ -1376,6 +1376,15 @@ final class InputMethodController: IMKInputController {
         candidates: [String],
         chineseDefault: String?
     )? {
+        switch character {
+        case "'", "‘":
+            return ("‘", "‘", ["‘", "'", "`"], "‘")
+        case "\"", "“":
+            return ("“", "“", ["“", "\""], "“")
+        default:
+            break
+        }
+
         let fullWidthByHalfWidth: [Character: Character] = [
             "!": "！", "\"": "＂", "#": "＃", "$": "＄",
             "%": "％", "&": "＆", "'": "＇", "(": "（",

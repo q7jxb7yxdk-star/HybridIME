@@ -98,6 +98,25 @@ enum PunctuationStrategy {
     }
 
     private static func definition(for character: Character) -> PunctuationDefinition? {
+        switch character {
+        case "'", "‘":
+            return PunctuationDefinition(
+                halfWidth: "‘",
+                fullWidth: "‘",
+                candidates: ["‘", "'", "`"],
+                chineseDefault: "‘"
+            )
+        case "\"", "“":
+            return PunctuationDefinition(
+                halfWidth: "“",
+                fullWidth: "“",
+                candidates: ["“", "\""],
+                chineseDefault: "“"
+            )
+        default:
+            break
+        }
+
         let fullWidthByHalfWidth: [Character: Character] = [
             "!": "！", "\"": "＂", "#": "＃", "$": "＄",
             "%": "％", "&": "＆", "'": "＇", "(": "（",

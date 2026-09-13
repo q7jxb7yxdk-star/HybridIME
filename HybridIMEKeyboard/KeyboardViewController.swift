@@ -260,7 +260,7 @@ final class KeyboardViewController: UIInputViewController {
 
     private let numberRows = [
         ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"],
-        ["-", "/", ":", ";", "(", ")", "$", "&", "@", "\""],
+        ["-", "/", ":", ";", "(", ")", "$", "&", "@", "“"],
     ]
 
     private let symbolRows = [
@@ -268,7 +268,7 @@ final class KeyboardViewController: UIInputViewController {
         ["_", "\\", "|", "~", "<", ">", "€", "£", "¥", "•"],
     ]
 
-    private let punctuationKeys = [".", ",", "?", "!", "'"]
+    private let punctuationKeys = [".", ",", "?", "!", "‘"]
 
     private let wideIPadNumberSecondRow: [WideSymbolKey] = [
         .init(primary: "@", alternate: "¥"),
@@ -278,8 +278,8 @@ final class KeyboardViewController: UIInputViewController {
         .init(primary: "*", alternate: "^"),
         .init(primary: "(", alternate: "["),
         .init(primary: ")", alternate: "]"),
-        .init(primary: "'", alternate: "{"),
-        .init(primary: "\"", alternate: "}"),
+        .init(primary: "‘", alternate: "{"),
+        .init(primary: "“", alternate: "}"),
     ]
 
     private let wideIPadNumberThirdRow: [WideSymbolKey] = [
@@ -806,7 +806,7 @@ final class KeyboardViewController: UIInputViewController {
         primaryLabel.textColor = .label
         primaryLabel.textAlignment = .center
 
-        let usesLooserLabelSpacing = ["@", "#", "$", "&", "(", ")", "'", "\"", "/"]
+        let usesLooserLabelSpacing = ["@", "#", "$", "&", "(", ")", "‘", "“", "/"]
             .contains(key.primary)
         let labelEdgeInset: CGFloat = usesLooserLabelSpacing ? 0 : 2
         let labels = UIStackView(arrangedSubviews: [alternateLabel, primaryLabel])

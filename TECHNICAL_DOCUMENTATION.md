@@ -204,7 +204,7 @@ iOS 控制器在緊湊版面只於 `needsInputModeSwitchKey` 為 `true` 時建�
 
 鍵盤根視圖使用透明且非不透明的 surface，讓 iOS 宿主提供的鍵盤背景材質延伸至自訂內容區，視覺上銜接由系統管理的底部地球／咪高峰區。按鍵使用自己的動態顏色。根視圖的 `overrideUserInterfaceStyle` 維持 `.unspecified`，不直接採用個別宿主文字欄的 `keyboardAppearance`，而是繼承 iOS 提供給鍵盤 extension 的 `userInterfaceStyle`；這避免 WhatsApp 與 Obsidian 等宿主在相同系統外觀下令 HybridIME 顯示不同鍵色，而原生鍵盤維持同色。控制器使用 iOS 17 的 `registerForTraitChanges([UITraitUserInterfaceStyle.self])` 在切換外觀時更新按鍵 configuration。Dark 以近黑背景和深灰鍵面、Light 以淺灰背景、白色字元鍵及較深控制鍵貼近原生英文鍵盤；這些公開 UIKit 色彩不是可取得的私有系統材質。系統底部區不屬於 extension，程式不能直接設定其顏色。
 
-寬版數字模式呈現上下堆疊的主要／替代配對：`@／¥`、`#／€`、`$／£`、`&／_`、`*／^`、`(／[`、`)／]`、`'／{`、`"／}`、`%／§`、`-／|`、`+／~`、`=／…`、`/／\\`、`;／<`、`:／>`、`,／!` 與 `.／?`。單指平移只有在向下位移達到 12 點且大於水平位移時才會選取替代符號。選取期間會隱藏堆疊標籤、顯示置中的替代預覽並反白按鍵；結束手勢會提交替代符號，取消則還原一般標籤。主要按鍵 `@`、`#`、`$`、`&`、`(`、`)`、`'`、`"` 與 `/` 使用零堆疊間距與邊緣內縮；其餘配對使用 -5 點堆疊間距與 2 點邊緣內縮。寬版字母標點控制也會將 `!` 與 `?` 作為逗號與句號的向下輕掃替代符號。
+寬版數字模式呈現上下堆疊的主要／替代配對：`@／¥`、`#／€`、`$／£`、`&／_`、`*／^`、`(／[`、`)／]`、`‘／{`、`“／}`、`%／§`、`-／|`、`+／~`、`=／…`、`/／\\`、`;／<`、`:／>`、`,／!` 與 `.／?`。單指平移只有在向下位移達到 12 點且大於水平位移時才會選取替代符號。選取期間會隱藏堆疊標籤、顯示置中的替代預覽並反白按鍵；結束手勢會提交替代符號，取消則還原一般標籤。主要按鍵 `@`、`#`、`$`、`&`、`(`、`)`、`‘`、`“` 與 `/` 使用零堆疊間距與邊緣內縮；其餘配對使用 -5 點堆疊間距與 2 點邊緣內縮。寬版字母標點控制也會將 `!` 與 `?` 作為逗號與句號的向下輕掃替代符號。
 
 ## 6. 資料模型與狀態管理
 
@@ -251,6 +251,8 @@ macOS 與 iOS 儲存庫各自建立：
 ### 標點
 
 兩個平台都從最近實際提交的非空白字元判定上下文，遇到句末標點即停止。macOS 尚未選取候選的直接英文固定使用半形標點，不會因候選區存在中文字而轉換。中文字元涵蓋常見的 CJK 統一表意文字、相容表意文字與擴充純量範圍。在中文上下文中，某些字元刻意優先維持半形；貨幣、斜線、括號與箭頭替代符號使用固定候選清單。
+
+macOS 實體鍵盤送入 ASCII `'`／`"`，iOS 鍵帽則直接送入 `‘`／`“`；兩端的標點定義會把直引號與對應彎引號合併到同一規則。單引號固定先插入 `‘`，候選依序為 `‘`、`'`、`` ` ``；雙引號固定先插入 `“`，候選依序為 `“`、`"`。這些候選按直接字元呈現，不使用一般標點的「半／全」標籤，也不加入全形 `＇` 或 `＂`。
 
 macOS 立即插入預設標點候選並記錄其範圍，在替換前驗證用戶端選取／範圍。iOS 同樣立即插入，並在刪除與替換前驗證前方完全相符的尾綴。
 
@@ -399,6 +401,15 @@ swiftc -module-cache-path /tmp/hybridime-module-cache-keyboard \
 - `InputMethodController.handle` 在 `event.characters == "="` 且沒有任何 active composition 時回傳 `false`，其餘標點及組字中的 `=`／`＝` 候選路徑維持不變。
 - `xcrun swiftc -parse HybridIME/InputMethodController.swift` 與 `git diff --check` 通過；修正只新增於 macOS `InputMethodController.swift`。
 - universal macOS Release 1.4.0（組建編號 20260912）以 `Developer ID Application: Yan Yin Yu (WX793X49GJ)` archive 成功；嚴格 codesign、arm64／x86_64、套件與 InputMethodKit metadata，以及隨附 SQLite `integrity_check=ok`／schema 2 均通過。
+
+2026-09-13 的引號鍵帽、候選與本機安裝完成以下驗證：
+
+- iOS `123` 頁面的單引號與雙引號鍵帽改為 `‘`、`“`，一般版面與寬版 iPad 同步；寬版向下輕掃仍輸入 `{`、`}`。
+- macOS 與 iOS 的 ASCII／彎引號輸入共用候選規則：`'` 或 `‘` 對應 `‘`、`'`、`` ` ``，`"` 或 `“` 對應 `“`、`"`；第一項是立即插入的預設值，候選不加「半／全」標籤。
+- `xcrun swiftc -parse HybridIME/InputMethodController.swift HybridIMEKeyboard/PunctuationStrategy.swift` 與 `git diff --check` 通過；沒有執行單元測試、UI 測試或 iOS 裝置／Simulator 驗證。
+- universal macOS Release 1.4.0（組建編號 20260913）以 `Developer ID Application: Yan Yin Yu (WX793X49GJ)` archive 並安裝；正式 App 嚴格 codesign、hardened runtime、安全時間戳、arm64／x86_64、套件與 InputMethodKit metadata，以及隨附 SQLite `integrity_check=ok`／schema 2 均通過。正式執行檔 SHA-256 為 `33618c6f15f66dada30dfc4817d1c75f6c287c5f77c7fbed8d70a9fc9201ee30`。
+- 舊 App 已備份至 `~/Library/Application Support/HybridIME Installer Backups/HybridIME-1.4.0-20260913-before-ascii-quote-fix-20260913-110532.app`；使用者學習資料未移動。LaunchServices 重新註冊、`TextInputMenuAgent` 重啟、正式路徑程序及 InputMethodKit endpoint 建立均已確認，且沒有新的 HybridIME crash report。
+- 上述證據只驗證原始碼解析、建置 artifact、簽署、安裝與啟動；macOS 真實文字欄的候選內容／次序，以及 iOS 重新建置安裝後的鍵帽與候選行為仍需手動確認。
 - 正式安裝 app 與 archive 的執行檔 SHA-256 均為 `e95b94fd8c84246b08ce3f04c58c713bb7147ae3741f86865cf1f2968f5f4129`；舊版 1.3.0（組建編號 20260908）已移至 `~/Library/Application Support/HybridIME Installer Backups/`，沒有移動或修改使用者學習資料庫。
 - 新版已重新註冊 LaunchServices、重啟 `TextInputMenuAgent` 並由正式路徑啟動；InputMethodKit `setxpcendpoint` 已建立，且沒有新的 HybridIME crash report。當時系統選取的是美式鍵盤，因此這些結果不證明 Google Sheets 的實際公式輸入；仍需切回 HybridIME，單擊儲存格後輸入 `=` 手動確認。
 

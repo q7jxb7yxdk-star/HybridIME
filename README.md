@@ -19,7 +19,7 @@ HybridIME 是一套以 Swift 開發的中英混合倉頡五代輸入工具，同
 - CC-CEDICT 英文至繁體中文候選，以及倉頡中文至英文翻譯。
 - 以游標前的連續中文做最長詞組翻譯查詢。
 - 中英文聯想候選與連續中文學習。
-- 智能候選會聚合目前 prefix 下曾選字的完整碼紀錄，先依使用次數、再依最近選擇排列；單碼固定保留字根字在首位。多碼沒有已學習 descendant 時，若目前輸入本身有完整碼便由完整碼候選開始；只有沒有完整碼但仍有 descendant 時才加入首字根 fallback。完全沒有倉頡 prefix 的英文不會注入字根或其翻譯。未使用候選維持詞庫順序，學習資料只寫入本機 SQLite。
+- 智能候選會聚合目前 prefix 下曾選字的完整碼紀錄，先依使用次數、再依最近選擇排列；單碼固定保留字根字在首位。二至三碼沒有已學習 descendant 時，若目前輸入本身有完整碼便由完整碼候選開始；只有沒有完整碼但仍有 descendant 時才加入首字根 fallback。四碼或以上不加入首字根。完全沒有倉頡 prefix 的英文不會注入字根或其翻譯。未使用候選維持詞庫順序，學習資料只寫入本機 SQLite。
 - 依中文／英文前文選擇全形或半形標點，並提供替代標點候選。兩平台的單引號鍵以 `‘` 為預設，候選依序為 `‘`、`'`、`` ` ``；雙引號鍵以 `“` 為預設，候選依序為 `“`、`"`。這兩組候選直接顯示字元，不加「半／全」標籤。
 - 以隨附的唯讀 SQLite 詞庫查詢倉頡、雙語與聯想資料。
 
@@ -110,6 +110,17 @@ xcodebuild \
 
 要使用輸入法，需把已適當簽署的 `HybridIME.app` 放入 `~/Library/Input Methods/`，再從「系統設定 > 鍵盤 > 文字輸入」加入「中英混合輸入法」。建置成功只證明產物可建立，不證明已安裝的應用程式、LaunchServices 註冊或 InputMethodKit 端點正常。
 
+本機 Debug 更新可在 Xcode 選 `HybridIME` scheme 與 `My Mac`，依序執行 Product > Run、Product > Stop，再把輸入來源切換至 ABC。於 Terminal 執行 `killall HybridIME 2>/dev/null || true` 後，將 Xcode `Build/Products/Debug/HybridIME.app` 複製至 `~/Library/Input Methods/`，替換已安裝的 App；建議先把舊 App 備份到該目錄之外。若 Finder 顯示 App 正在使用中，先確認 Xcode 已停止且已切換輸入來源，再結束 HybridIME 程序。複製後重新註冊並啟動：
+
+```sh
+APP="$HOME/Library/Input Methods/HybridIME.app"
+/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f "$APP"
+killall TextInputMenuAgent 2>/dev/null || true
+open "$APP"
+```
+
+最後重新選取「中英混合輸入法」，在真實文字欄檢查所需功能。`~` 在引號內不會展開，Terminal 指令應使用 `$HOME`。此流程只供本機開發安裝，不等同 Developer ID 發行封存或公證。
+
 若已安裝版本出現「已選取但沒有輸入反應」，請先檢查 `~/Library/Logs/DiagnosticReports/` 是否有新的 `HybridIME-*.ips`，再參閱[技術文件的 InputMethodKit 診斷](TECHNICAL_DOCUMENTATION.md#macos-inputmethodkit-生命週期)，檢查註冊與 XPC endpoint。
 
 macOS 控制器會以 `IMKTextInput.insertText` 直接插入並自行追蹤可替換範圍，不以 InputMethodKit marked text 保存字母組字。狀態清理不會呼叫 `updateComposition()`；`composedString(_:)` 只保留作為 InputMethodKit 協定介面，並明確回傳 `NSString`。
@@ -137,11 +148,11 @@ macOS 輸入 `vnd` 時會立即在宿主應用程式顯示該字母，候選區�
 
 兩平台一般候選次序為：
 
-1. 完整碼以目前輸入開頭的倉頡中文候選；曾選候選依次數與最近使用提前，單碼字根固定第一。未學習的多碼若有完整碼便以完整碼開始；只有純 descendant prefix 才加入首字根 fallback。
+1. 完整碼以目前輸入開頭的倉頡中文候選；曾選候選依次數與最近使用提前，單碼字根固定第一。未學習的二至三碼若有完整碼便以完整碼開始；只有純 descendant prefix 才加入首字根 fallback。四碼或以上不加入首字根。
 2. 倉頡候選的中譯英結果。
 3. 完整英文詞的繁體中文翻譯。
 
-完全沒有倉頡完整碼或 descendant 的英文只顯示英中字典候選；例如 `good` 不會加入 `g` 的「土」或「土」的英譯。未學習的完整碼也不會加入首字根；例如 `qwlj` 由「擇」開始，而不是「手，擇」。
+完全沒有倉頡完整碼或 descendant 的英文只顯示英中字典候選；例如 `good` 不會加入 `g` 的「土」或「土」的英譯。四碼或以上不會加入首字根；例如完整碼 `qwlj` 由「擇」開始，純 descendant prefix `mrko` 的倉頡候選只有「硤」。
 
 標準倉頡鍵位：
 

@@ -93,7 +93,7 @@ final class SmartCandidateRanker {
             append(rootCandidate)
         }
         learned.forEach { append($0) }
-        if normalizedCode.count > 1,
+        if (2...3).contains(normalizedCode.count),
            learned.isEmpty,
            !candidates.isEmpty,
            !hasExactCandidate

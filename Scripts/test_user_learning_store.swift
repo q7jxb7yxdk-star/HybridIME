@@ -99,6 +99,15 @@ enum UserLearningStoreTest {
         )
         try require(
             ranker.rankedCandidates(
+                code: "mrko",
+                candidates: [CangjieCandidate(text: "硤", code: "mrkoo")],
+                rootCandidate: CangjieCandidate(text: "一", code: "m"),
+                limit: 3
+            ) == [CangjieCandidate(text: "硤", code: "mrkoo")],
+            "four-code prefix excludes root fallback"
+        )
+        try require(
+            ranker.rankedCandidates(
                 code: "qwlj",
                 candidates: [CangjieCandidate(text: "擇", code: "qwlj")],
                 rootCandidate: CangjieCandidate(text: "手", code: "q"),

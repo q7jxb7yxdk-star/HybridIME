@@ -124,7 +124,7 @@ flowchart LR
 3. ASCII 字母立即插入宿主應用程式，並附加到記憶體中的緩衝區；控制器另行追蹤其 UTF-16 範圍，不使用標記文字顯示英文組字。
 4. 最多五個字母會按小寫字典序查詢完整碼以緩衝區開頭的倉頡資料列；候選以明確 eager 迴圈依序去重，保留資料列內次序與真實完整碼，完整緩衝區也會查詢英譯中的 SQLite 項目。
 5. 倉頡候選完成排序後才加入中譯英結果；翻譯使用前方中文加目前候選的最長尾綴。
-6. 結果會去除重複並限制為十個；單碼固定以字根字為首。多碼有已學習 descendant 時依學習分數排序；沒有學習結果時，若目前輸入本身有完整碼便由完整碼候選開始，只有沒有完整碼但仍有 descendant 時才加入首字根 fallback。完全沒有倉頡 prefix 的英文不加入字根候選。
+6. 結果會去除重複並限制為十個；單碼固定以字根字為首。多碼有已學習 descendant 時依學習分數排序；沒有學習結果時，二至三碼若目前輸入本身有完整碼便由完整碼候選開始，只有沒有完整碼但仍有 descendant 時才加入首字根 fallback。四碼或以上不加入首字根；完全沒有倉頡 prefix 的英文也不加入字根候選。
 7. `1`–`0` 只在對應候選存在時攔截按鍵，並以 `IMKTextInput` 替換已追蹤範圍；沒有對應候選的數字交回宿主。
 8. `Return` 不提交候選，只清除目前組字狀態並交回宿主處理。
 9. 若 Safari URL 欄在已輸入字母後選取自動完成尾段，只要選取起點仍在追蹤範圍尾端，組字便會繼續；候選替換及 Delete 會一併處理該尾段。若游標、範圍或原文不再吻合，控制器會拒絕替換並重設狀態。
@@ -177,6 +177,8 @@ open "$HOME/Library/Input Methods/HybridIME.app"
 ```
 
 成功復原後仍需要真實文字用戶端檢查；僅有程序存在並不足夠。這些指令會變更本機執行期狀態，不屬於一般未簽署建置驗證。
+
+本機 Debug 更新可由使用者在 Xcode 以 `HybridIME` scheme 執行 Run、Stop，切換至 ABC 後結束 `HybridIME` 程序，再將 `Build/Products/Debug/HybridIME.app` 複製至 `~/Library/Input Methods/`。若舊 App 正在使用中，須先停止執行程序才能替換；舊版備份應放在 `Input Methods` 之外。替換後以 `lsregister -f` 重新註冊，重啟 `TextInputMenuAgent`，並從正式安裝路徑開啟 App。此流程不包含 Developer ID 封存、公證或發佈；實際候選行為仍須在文字用戶端驗證。
 
 ### 詞彙包裝層
 
@@ -244,7 +246,7 @@ macOS 與 iOS 儲存庫各自建立：
 
 ### 智慧候選排序
 
-正規化的小寫完整碼對應到選取次數與最後使用時間。查詢某個輸入 prefix 時，同一字在 descendant 完整碼下的次數以總和合併，最後使用時間取最大值，再依總次數及最近時間遞減排列。單碼的字根字固定在首位；二至五碼若已有學習 descendant，便由學習排序決定前列候選。沒有學習結果時，完整碼候選優先於 fallback；只有查不到目前完整碼、但仍存在 descendant 時才加入首字根。完全沒有倉頡完整碼或 descendant 的輸入不產生字根候選，因此 `good` 只進入英中字典，而未學習的 `qwlj` 由完整碼「擇」開始。其餘未使用候選按完整碼字典序及 canonical 資料列內順序排列。每個候選動作保存真實完整碼，選取 prefix 候選不會把當前短 buffer 寫成新的學習碼。翻譯及詞典候選排在倉頡候選之後；詞典候選及 canonical 倉頡資料不受學習資料修改。這不是機率、百分比或具上下文的語言模型。
+正規化的小寫完整碼對應到選取次數與最後使用時間。查詢某個輸入 prefix 時，同一字在 descendant 完整碼下的次數以總和合併，最後使用時間取最大值，再依總次數及最近時間遞減排列。單碼的字根字固定在首位；二至五碼若已有學習 descendant，便由學習排序決定前列候選。沒有學習結果時，二至三碼的完整碼候選優先於 fallback；只有查不到目前完整碼、但仍存在 descendant 時才加入首字根。四碼或以上不加入首字根，因此 `mrko` 的倉頡候選只有 descendant `mrkoo` 的「硤」。完全沒有倉頡完整碼或 descendant 的輸入不產生字根候選，因此 `good` 只進入英中字典，而未學習的 `qwlj` 由完整碼「擇」開始。其餘未使用候選按完整碼字典序及 canonical 資料列內順序排列。每個候選動作保存真實完整碼，選取 prefix 候選不會把當前短 buffer 寫成新的學習碼。翻譯及詞典候選排在倉頡候選之後；詞典候選及 canonical 倉頡資料不受學習資料修改。這不是機率、百分比或具上下文的語言模型。
 
 透過 macOS `Shift + Space`，或 iOS 非小寫 Shift 狀態加 Space 選擇原始英文時，會以保持大小寫的原始字串取代該代碼的所有學習候選。
 
@@ -395,6 +397,11 @@ swiftc -module-cache-path /tmp/hybridime-module-cache-keyboard \
 ```
 
 ### 本次工作已驗證
+
+2026-09-19 的四碼候選調整與本機 Debug 安裝：
+
+- macOS 與 iOS 候選排序器均將首字根 fallback 限於二至三碼；`mrko` 的詞庫 descendant 為 `mrkoo → 硤`，兩平台已加入對應回歸檢查。Swift 語法檢查及 `git diff --check` 通過；本次未由代理執行 Xcode Build 或 Test。
+- 使用者回報在 Xcode 以 `HybridIME` scheme Run、Stop 後切換至 ABC、結束 HybridIME 程序、複製 Debug App、重新註冊 LaunchServices、重啟 `TextInputMenuAgent` 並從正式路徑啟動，輸入法已正常使用。此回報未單獨提供 `mrko` 候選內容或簽署驗證結果。
 
 2026-09-12 的 Google Sheets `=` 相容性修正與本機安裝完成以下驗證：
 

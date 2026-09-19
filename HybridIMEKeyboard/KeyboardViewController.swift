@@ -337,6 +337,10 @@ final class KeyboardViewController: UIInputViewController {
 
         candidateScrollView.showsHorizontalScrollIndicator = false
         candidateScrollView.alwaysBounceHorizontal = true
+        candidateScrollView.topEdgeEffect.isHidden = true
+        candidateScrollView.bottomEdgeEffect.isHidden = true
+        candidateScrollView.leftEdgeEffect.isHidden = true
+        candidateScrollView.rightEdgeEffect.isHidden = true
         candidateScrollView.addSubview(candidateStackView)
         candidateScrollView.heightAnchor.constraint(equalToConstant: 38).isActive = true
 

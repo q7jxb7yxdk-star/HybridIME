@@ -86,6 +86,27 @@ final class SmartCandidateRanker {
             .compactMap { row -> CangjieCandidate? in
                 staticByText[row.candidate]
             }
+        let learnedRank = Dictionary(
+            uniqueKeysWithValues: learned.enumerated().map {
+                ($0.element.text, $0.offset)
+            }
+        )
+        let orderedCandidates = candidates.enumerated().sorted { left, right in
+            let leftCode = left.element.code.lowercased()
+            let rightCode = right.element.code.lowercased()
+            if leftCode.count != rightCode.count {
+                return leftCode.count < rightCode.count
+            }
+            if leftCode != rightCode {
+                return leftCode < rightCode
+            }
+            let leftRank = learnedRank[left.element.text] ?? Int.max
+            let rightRank = learnedRank[right.element.text] ?? Int.max
+            if leftRank != rightRank {
+                return leftRank < rightRank
+            }
+            return left.offset < right.offset
+        }.map(\.element)
         let hasExactCandidate = candidates.contains {
             $0.code.lowercased() == normalizedCode
         }
@@ -103,7 +124,6 @@ final class SmartCandidateRanker {
         if normalizedCode.count == 1 {
             append(rootCandidate)
         }
-        learned.forEach { append($0) }
         if (2...3).contains(normalizedCode.count),
            learned.isEmpty,
            !candidates.isEmpty,
@@ -111,7 +131,7 @@ final class SmartCandidateRanker {
         {
             append(rootCandidate)
         }
-        candidates.forEach { append($0) }
+        orderedCandidates.forEach { append($0) }
         return result
     }
 

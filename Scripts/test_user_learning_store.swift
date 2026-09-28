@@ -85,7 +85,7 @@ enum UserLearningStoreTest {
                 candidates: prefixCandidates,
                 rootCandidate: rootCandidate,
                 limit: 3
-            ) == [prefixCandidates[0], prefixCandidates[1], prefixCandidates[3]],
+            ) == [prefixCandidates[0], prefixCandidates[3], prefixCandidates[1]],
             "exact multi-code candidate suppresses root fallback"
         )
         try require(
@@ -94,7 +94,7 @@ enum UserLearningStoreTest {
                 candidates: [prefixCandidates[1], prefixCandidates[3]],
                 rootCandidate: rootCandidate,
                 limit: 3
-            ) == [rootCandidate, prefixCandidates[1], prefixCandidates[3]],
+            ) == [rootCandidate, prefixCandidates[3], prefixCandidates[1]],
             "descendant-only prefix retains root fallback"
         )
         try require(
@@ -124,6 +124,22 @@ enum UserLearningStoreTest {
             ).isEmpty,
             "missing Cangjie prefix does not inject a root candidate"
         )
+        let myCandidates = [
+            CangjieCandidate(text: "龎", code: "mybp"),
+            CangjieCandidate(text: "㠪", code: "mym"),
+            CangjieCandidate(text: "下", code: "my"),
+            CangjieCandidate(text: "颪", code: "myhn"),
+        ]
+        store.recordSmartCandidate(code: "mybp", candidate: "龎")
+        try require(
+            ranker.rankedCandidates(
+                code: "my",
+                candidates: myCandidates,
+                rootCandidate: CangjieCandidate(text: "一", code: "m"),
+                limit: 4
+            ) == [myCandidates[2], myCandidates[1], myCandidates[0], myCandidates[3]],
+            "my exact 下 and shorter full codes precede learned descendants"
+        )
         store.recordSmartCandidate(code: "ebcn", candidate: "測")
         store.recordSmartCandidate(code: "ebcn", candidate: "測")
         store.recordSmartCandidate(code: "ebxx", candidate: "測")
@@ -140,11 +156,11 @@ enum UserLearningStoreTest {
                 rootCandidate: rootCandidate,
                 limit: 3
             ) == [
-                CangjieCandidate(text: "測", code: "ebcn"),
-                prefixCandidates[3],
                 prefixCandidates[0],
+                prefixCandidates[3],
+                CangjieCandidate(text: "測", code: "ebcn"),
             ],
-            "learned descendant replaces multi-code fallback and preserves full code"
+            "exact and shorter codes precede learned descendants"
         )
         try require(
             ranker.rankedCandidates(
@@ -154,10 +170,10 @@ enum UserLearningStoreTest {
                 limit: 3
             ).prefix(3) == [
                 rootCandidate,
-                CangjieCandidate(text: "測", code: "ebcn"),
+                prefixCandidates[0],
                 prefixCandidates[3],
             ],
-            "single-code root remains pinned before a learned descendant"
+            "single-code root remains pinned before shorter descendants"
         )
         store.recordAssociationSelection(
             language: "chinese",

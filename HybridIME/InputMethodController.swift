@@ -464,15 +464,9 @@ final class InputMethodController: IMKInputController {
             limit: 10
         )
         currentCandidates = currentCandidateActions.map(\.text)
-        let learnedChineseCandidates: [String] = currentCandidateActions.compactMap {
-            guard case .cangjie(let text, _) = $0, text.allSatisfy(isChinese) else {
-                return nil
-            }
-            return text
-        }
         let prediction = smartCandidateRanker.prediction(
             code: buffer,
-            availableCandidates: learnedChineseCandidates + [buffer]
+            availableCandidates: cangjieCandidates.first.map { [$0.text] } ?? [buffer]
         )
         applySmartPrediction(prediction)
 

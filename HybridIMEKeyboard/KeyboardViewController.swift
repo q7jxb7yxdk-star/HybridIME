@@ -2092,9 +2092,7 @@ final class KeyboardViewController: UIInputViewController {
         )
         let prediction = SmartCandidateRanker.shared.prediction(
             code: buffer,
-            availableCandidates: buffer.isEmpty
-                ? cangjieCandidates.map(\.text)
-                : cangjieCandidates.map(\.text) + [buffer]
+            availableCandidates: cangjieCandidates.first.map { [$0.text] } ?? [buffer]
         )
         learnedCandidate = prediction?.candidate
         if let learnedCandidate {

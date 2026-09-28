@@ -69,7 +69,7 @@ struct KeyboardUserLearningStoreTests {
                 candidates: prefixCandidates,
                 rootCandidate: rootCandidate,
                 limit: 3
-            ) == [prefixCandidates[0], prefixCandidates[1], prefixCandidates[3]],
+            ) == [prefixCandidates[0], prefixCandidates[3], prefixCandidates[1]],
             "Exact multi-code candidate did not suppress root fallback"
         )
         precondition(
@@ -78,7 +78,7 @@ struct KeyboardUserLearningStoreTests {
                 candidates: [prefixCandidates[1], prefixCandidates[3]],
                 rootCandidate: rootCandidate,
                 limit: 3
-            ) == [rootCandidate, prefixCandidates[1], prefixCandidates[3]],
+            ) == [rootCandidate, prefixCandidates[3], prefixCandidates[1]],
             "Descendant-only prefix did not retain root fallback"
         )
         precondition(
@@ -108,6 +108,22 @@ struct KeyboardUserLearningStoreTests {
             ).isEmpty,
             "Missing Cangjie prefix injected a root candidate"
         )
+        let myCandidates = [
+            CangjieCandidate(text: "龎", code: "mybp"),
+            CangjieCandidate(text: "㠪", code: "mym"),
+            CangjieCandidate(text: "下", code: "my"),
+            CangjieCandidate(text: "颪", code: "myhn"),
+        ]
+        store.recordSmartCandidate(code: "mybp", candidate: "龎")
+        precondition(
+            ranker.rankedCandidates(
+                code: "my",
+                candidates: myCandidates,
+                rootCandidate: CangjieCandidate(text: "一", code: "m"),
+                limit: 4
+            ) == [myCandidates[2], myCandidates[1], myCandidates[0], myCandidates[3]],
+            "my exact 下 or shorter full codes did not precede learned descendants"
+        )
         store.recordSmartCandidate(code: "ebcn", candidate: "測")
         store.recordSmartCandidate(code: "ebcn", candidate: "測")
         store.recordSmartCandidate(code: "ebxx", candidate: "測")
@@ -124,11 +140,11 @@ struct KeyboardUserLearningStoreTests {
                 rootCandidate: rootCandidate,
                 limit: 3
             ) == [
-                CangjieCandidate(text: "測", code: "ebcn"),
-                prefixCandidates[3],
                 prefixCandidates[0],
+                prefixCandidates[3],
+                CangjieCandidate(text: "測", code: "ebcn"),
             ],
-            "Learned descendant did not replace fallback or preserve its full code"
+            "Exact and shorter codes did not precede learned descendants"
         )
         precondition(
             ranker.rankedCandidates(
@@ -138,10 +154,10 @@ struct KeyboardUserLearningStoreTests {
                 limit: 3
             ).prefix(3) == [
                 rootCandidate,
-                CangjieCandidate(text: "測", code: "ebcn"),
+                prefixCandidates[0],
                 prefixCandidates[3],
             ],
-            "Single-code root was not pinned before learned descendant"
+            "Single-code root was not pinned before shorter descendants"
         )
         store.replaceSmartCandidate(code: "app", candidate: "app")
         precondition(

@@ -87,6 +87,8 @@ flowchart LR
 | `HybridIME/SmartCandidateRanker.swift` | macOS 依使用次數、最近時間與詞庫順序排列智慧候選 |
 | `HybridIME/UserLearningStore.swift` | macOS 可寫入的 SQLite 學習結構 |
 | `HybridIMEKeyboard/KeyboardViewController.swift` | iOS 鍵盤 UI、文字代理操作與組字狀態 |
+| `HybridIMEKeyboard/SwipeInputGestureRecognizer.swift` | 單指字母滑動門檻、軌跡取樣、取消與點按共存 |
+| `HybridIMEKeyboard/SwipePathDecoder.swift` | 無 UIKit 相依的英文／倉頡幾何路徑比對 |
 | `HybridIMEKeyboard/OfflineLexicon.swift` | iOS 具有限制快取的唯讀 SQLite 倉頡／雙語／聯想查詢 |
 | `HybridIMEKeyboard/KeyboardAssociationDictionary.swift` | iOS 聯想合併／排序 |
 | `HybridIMEKeyboard/SmartCandidateRanker.swift` | iOS 依使用次數、最近時間與詞庫順序排列智慧候選 |
@@ -142,6 +144,26 @@ iOS 無法透過目前實作的路徑使用標記文字。`enterLetter` 立即�
 
 Delete 按鈕的點按動作會呼叫一次 `deleteBackward()`。長按手勢在 0.35 秒後先刪除一次，再以加入主執行緒 common run-loop mode 的 `Timer` 每 0.08 秒重複呼叫相同路徑，因此每次刪除都會同步更新組字緩衝區與候選。手勢結束或取消、鍵盤版面重建，以及控制器檢視即將消失時都會停止並清除計時器。
 
+#### 離線滑動輸入
+
+`SwipeInputGestureRecognizer` 只接受從已註冊字母鍵開始的單指直接觸控；VoiceOver 開啟及空白鍵游標模式期間不接受。位移達 14 點才進入連續辨識並取消原按鈕點按，保留最多約 512 個取樣點；功能鍵起滑不參與。超出鍵盤邊界過遠、非字母區放手、重建鍵盤或離開控制器時取消，軌跡以不攔截觸控的 `CAShapeLayer` 顯示。
+
+放手後依實際按鍵中心建立 `SwipePoint`／`SwipeKey`。`OfflineLexicon.swipeEnglishWords()` 從隨附英文聯想提取 2–24 個 ASCII 字母的詞及近似權重，`swipeCangjieCodes()` 讀取 1–5 碼；兩者首次在主 actor 讀取後留存陣列。幾何排序在 detached task 執行，僅跨 actor 傳遞 `Sendable` 值；generation、取消與文件快照檢查防止舊結果覆寫新輸入。
+
+`SwipePathDecoder` 將觀察路徑與按鍵模板重採樣為 24 點，以起終點、形狀及長度評分，最多保留 768 個模板做比較；英文另以詞料權重輔助。倉頡結果池最多 64 碼，英文最多 6 詞。相差不超過 0.03 的碼視為近乎同形，跨碼順序由折疊相鄰重複字根後的長度、完整碼長度、詞庫預設首字的聯想權重、幾何分數及碼序決定；學習只調整同碼字序。聯想權重是語料使用程度的近似，並非完整的字頻模型。
+
+小寫狀態下，明確的原始英文學習偏好可直接輸出英文；中文須通過幾何分數不高於 0.50 且優於英文比對至少 0.10 的條件。否則輸出辨識到的英文；無有效結果則不插入猜測文字。Shift／Caps Lock 走英文大小寫路徑。共線及重複字根不能僅靠空間路徑確定次數；例如 `mks` 與 `mmks` 可共用模板，因此需要替換候選。
+
+#### 共用候選快照與替換
+
+逐字輸入的 `refreshComposition` 與中文滑動上字的 `commitSwipeCandidate` 都使用 `compositionCandidates(for:precedingChinese:)`。共用流程以碼的理想路徑生成 canonical matches，不採用每次手指的偏移來排列候選；快取只保留最多 16 個碼的幾何結果，按鍵中心改變即清除。學習排序與翻譯每次重新查詢。候選包含基本碼、重複字根碼、最佳分數加 0.60 內的相近完整碼、既有 prefix 候選及雙語結果；每個碼都保留通過字型檢查的字，再去重。
+
+完整英文字典命中優先，例如 `find` 先顯示「尋獲、找、找出、找到……」。未有同碼學習時，共用流程把基本上字放在第一替代候選之後，例如 `mks` 自動輸出「功」，列表從「勁、功」開始。藍色首選直接使用目前輸入碼的精確學習紀錄，並只接受仍在列表中的同碼倉頡候選或明確的原始英文偏好；沒有字典命中時，有效同碼首選會移到最前。`toog → 難` 不再因幾何推測的首字不同而失去標記；`mmks` 紀錄也不會成為 `mks` 的首選。候選按鈕採單行自然寬度、左右各 6 點內距、4 點間距及水平抗伸縮優先級，橫向捲動，不設固定／最大寬度或額外 8 字截斷。
+
+`PendingSwipeReplacement` 保存已上字、文件 ID、完整可用前後文、選取狀態及 `CompositionCandidates`。點選列表中的已上字是零刪字、零插字、零學習的 no-op；其他候選須通過快照及尾綴檢查才刪舊上新。中譯英候選還須驗證要消耗的中文前綴，完成後不再沿用舊快照。手動倉頡替換記錄候選的實際完整碼，字典替換不記為倉頡學習。
+
+暫定滑動上字有快照時，中文序列學習延後至確認／繼續輸入，只學最終保留字；不把被替換的「功」與「勁」誤記成連續詞。新 swipe 的 `.began` 使用不取消目前 recognizer 的 finalize 路徑。一般按字母、符號、Space、Return 或 Shift 會完成暫定字；刪除、重建、隱藏、游標及文件變動則清理狀態。已上字的退格會實際刪字；仍在辨識的 swipe 則先取消。前後文不可用時不提供破壞性替換。英文滑動上字仍走既有聯想流程。
+
 ### 聯想流程
 
 - 中文查詢會嘗試最長的靜態尾綴與最長的學習尾綴，接著選取較長的鍵值；長度相同時優先使用靜態查詢鍵值，再合併學習候選。
@@ -183,6 +205,8 @@ open "$HOME/Library/Input Methods/HybridIME.app"
 ### 詞彙包裝層
 
 macOS `StaticLexicon` 以 `SQLITE_OPEN_FULLMUTEX` 唯讀開啟資料庫、啟用 `query_only`、每批最多處理 32 個鍵值，並維持 256 項 FIFO 快取。iOS `OfflineLexicon` 在主 actor 上使用唯讀 `SQLITE_OPEN_NOMUTEX` 與 128 項 FIFO 快取。
+
+iOS 的英文滑動詞陣列與倉頡碼陣列另有生命週期快取，不受上述 128 項查詢快取限制。初次提取、字型檢查及擴展候選按鈕建立仍在主 actor，真機啟動延遲、捲動與 keyboard extension 記憶體壓力尚待驗證。
 
 傳入 SQL 輔助程式的所有資料表與欄位名稱都是內部常數。使用者衍生的鍵值會使用繫結參數。
 
@@ -289,9 +313,9 @@ macOS 立即插入預設標點候選並記錄其範圍，在替換前驗證用�
 
 | 建置目標 | 產品 | 套件識別碼 | 部署目標 | 版本 |
 | --- | --- | --- | --- | --- |
-| `HybridIME` | macOS 應用程式／輸入法 | `com.sunny.inputmethod.hybridime` | macOS 26.0 | 1.4.0（組建編號 20260913） |
-| `HybridIMEiOS` | iOS／iPadOS 應用程式 | `com.sunny.inputmethod.hybridime.ios` | iOS 26.0 | 1.4.0（組建編號 20260913） |
-| `HybridIMEKeyboard` | 鍵盤延伸功能 | `com.sunny.inputmethod.hybridime.ios.keyboard` | iOS 26.0 | 1.4.0（組建編號 20260913） |
+| `HybridIME` | macOS 應用程式／輸入法 | `com.sunny.inputmethod.hybridime` | macOS 26.0 | 1.4.0（組建編號 20261020） |
+| `HybridIMEiOS` | iOS／iPadOS 應用程式 | `com.sunny.inputmethod.hybridime.ios` | iOS 26.0 | 1.4.0（組建編號 20261020） |
+| `HybridIMEKeyboard` | 鍵盤延伸功能 | `com.sunny.inputmethod.hybridime.ios.keyboard` | iOS 26.0 | 1.4.0（組建編號 20261020） |
 
 所有建置目標都將 Swift 語言版本設定為 5.0。專案沒有 `.xcconfig`、`.swift-version`、`.xcode-version`、CI 矩陣或套件鎖定檔。中繼資料記錄以 Xcode 26.5／26.6 建立或升級，但這不是正式的最低 Xcode 宣告。
 
@@ -315,7 +339,7 @@ macOS 立即插入預設標點候選並記錄其範圍，在替換前驗證用�
 
 執行期原始碼不會讀取環境變數。`Scripts/release.sh` 辨識 `HYBRIDIME_NOTARY_PROFILE`、`HYBRIDIME_RESUME_AFTER_APP_NOTARIZATION` 與 `HYBRIDIME_RELEASE_ROOT_OVERRIDE`；這些是僅供發行使用的控制項。公證設定檔會命名一個 Keychain 項目，不得將其記錄為秘密值。
 
-發行腳本解析 `HybridIME` macOS scheme 的 Debug 與 Release 建置設定，除非兩者都使用版本 `1.4.0`、組建編號 `20260913`、部署目標 `26.0`，以及預期的 macOS 建置目標與套件識別碼，否則會硬停止。此預檢不會執行或證明簽署、公證、封裝釘選或發佈。
+發行腳本解析 `HybridIME` macOS scheme 的 Debug 與 Release 建置設定，除非兩者都使用版本 `1.4.0`、組建編號 `20260913`、部署目標 `26.0`，以及預期的 macOS 建置目標與套件識別碼，否則會硬停止。此預檢不會執行或證明簽署、公證、封裝釘選或發佈。 目前 Xcode 專案的三個建置目標均為組建編號 `20261020`，與發行腳本的固定值不同；本次沒有修改或執行發行腳本。
 
 ## 10. 錯誤處理與記錄
 
@@ -353,11 +377,17 @@ Xcode 專案沒有測試建置目標。測試涵蓋由獨立腳本提供：
 | `Scripts/test_user_learning_store.swift` | macOS 學習結構與讀寫行為 | 無；暫存 SQLite |
 | `Scripts/test_mac_dictionary.swift` | macOS 詞彙 + 聯想整合與學習重新排序 | 無；暫存 SQLite |
 | `Scripts/test_keyboard_user_learning_store.swift` | iOS 學習結構、替換與完整性 | 無；暫存 SQLite |
+| `Scripts/check_swipe_decoder.swift` | 12 項英文／倉頡幾何、重複字根、抖動、無效路徑與限制值檢查 | 無；合成座標，不含 UIKit |
 | `Scripts/verify_static_lexicon.swift` | 唯讀完整性、版本、表次序、固定倉頡結構／列數，以及雙語／聯想來源完全相等 | 無；以唯讀方式開啟隨附 DB |
 
 代表性指令只使用 `/tmp` 輸出：
 
 ```sh
+swiftc -parse-as-library -module-cache-path /tmp/hybridime-module-cache-swipe \
+  HybridIMEKeyboard/SwipePathDecoder.swift Scripts/check_swipe_decoder.swift \
+  -o /tmp/hybridime-check-swipe
+/tmp/hybridime-check-swipe
+
 swiftc -parse-as-library -module-cache-path /tmp/hybridime-module-cache-verify \
   Scripts/verify_static_lexicon.swift -lsqlite3 -o /tmp/hybridime-verify-static
 /tmp/hybridime-verify-static
@@ -401,6 +431,13 @@ swiftc -module-cache-path /tmp/hybridime-module-cache-keyboard \
 ```
 
 ### 本次工作已驗證
+
+2026-10-20 的 iOS／iPadOS 滑動、共用候選、字典優先及精確碼首選修正：
+
+- 隨附 `check_swipe_decoder.swift` 的 12 項獨立幾何檢查通過；相關 Swift 原始碼語法檢查與 whitespace 檢查通過。
+- 額外的 69 項暫存檢查使用目前控制器函式、解碼器、排序器、標點邏輯及隨附資料，驗證共用候選／動作序列、`mks`／`hqi`、替換安全、英文與字典優先等回歸。UI、文字代理、字型及該組學習儲存庫使用替身；這些暫存檢查不屬於儲存庫內的永久測試套件。
+- 另有 11 項暫存檢查使用實際 `KeyboardUserLearningStore` 與 SQLite，驗證逐字 `toog` 選「難」後的寫入、再次組字首選判定、次數、重新開啟資料庫、無效歷史字排除及同碼其他字。資料庫位於 `/tmp`；UI／文字代理／字型仍為替身，沒有讀寫裝置上的正式學習資料。
+- 本次沒有執行 Xcode Build/Test、Simulator／CoreSimulator、真機安裝或驗證。離線結果不證明 SDK 型別相容性、實際藍色顯示、HEIC 截圖的候選排版、UIKit 回呼順序、手勢準確度或裝置效能。
 
 2026-09-19 的四碼候選調整與本機 Debug 安裝：
 

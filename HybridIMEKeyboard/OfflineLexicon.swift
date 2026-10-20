@@ -23,6 +23,8 @@ final class OfflineLexicon {
     private var cache: [CacheKey: [String]] = [:]
     private var cacheOrder: [CacheKey] = []
     private let cacheLimit = 128
+    private var cachedSwipeWords: [SwipeWord]?
+    private var cachedSwipeCodes: [String]?
     private var cangjiePrefixCache: [String: [(code: String, text: String)]] = [:]
     private var cangjiePrefixCacheOrder: [String] = []
     private let cangjiePrefixCacheLimit = 16
@@ -58,6 +60,57 @@ final class OfflineLexicon {
             key: english.lowercased(),
             limit: limit
         )
+    }
+
+    /// Reuses the bundled CC0 English associations; counts are approximate word priors.
+    func swipeEnglishWords() -> [SwipeWord] {
+        if let cachedSwipeWords { return cachedSwipeWords }
+        guard database != nil else { return [] }
+        var statement: OpaquePointer?
+        guard sqlite3_prepare_v2(database,
+            "SELECT key, candidates FROM association WHERE language = 1",
+            -1, &statement, nil) == SQLITE_OK else { return [] }
+        defer { sqlite3_finalize(statement) }
+        var weights: [String: Int] = [:]
+        func isWord(_ word: String) -> Bool {
+            (2...24).contains(word.count)
+                && word.utf8.allSatisfy { (97...122).contains($0) }
+        }
+        while sqlite3_step(statement) == SQLITE_ROW {
+            guard let keyBytes = sqlite3_column_text(statement, 0),
+                  let valueBytes = sqlite3_column_text(statement, 1) else { continue }
+            let key = String(cString: keyBytes)
+            if isWord(key) { weights[key, default: 1] += 1 }
+            let fields = String(cString: valueBytes).split(separator: "\t")
+            for index in stride(from: 0, to: max(0, fields.count - 1), by: 2) {
+                let word = String(fields[index])
+                if isWord(word), let count = Int(fields[index + 1]) {
+                    weights[word, default: 1] += min(max(count, 0), 1_000_000)
+                }
+            }
+        }
+        let words = weights.map { SwipeWord(text: $0.key, weight: $0.value) }
+            .sorted { $0.text < $1.text }
+        cachedSwipeWords = words
+        return words
+    }
+
+    func swipeCangjieCodes() -> [String] {
+        if let cachedSwipeCodes { return cachedSwipeCodes }
+        guard database != nil else { return [] }
+        var statement: OpaquePointer?
+        guard sqlite3_prepare_v2(database,
+            "SELECT code FROM cangjie WHERE length(code) BETWEEN 1 AND 5 ORDER BY code",
+            -1, &statement, nil) == SQLITE_OK else { return [] }
+        defer { sqlite3_finalize(statement) }
+        var codes: [String] = []
+        while sqlite3_step(statement) == SQLITE_ROW {
+            guard let bytes = sqlite3_column_text(statement, 0) else { continue }
+            let code = String(cString: bytes)
+            if code.utf8.allSatisfy({ (97...122).contains($0) }) { codes.append(code) }
+        }
+        cachedSwipeCodes = codes
+        return codes
     }
 
     func cangjieCandidates(for code: String, limit: Int = 10) -> [String] {

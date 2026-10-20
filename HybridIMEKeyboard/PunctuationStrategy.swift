@@ -10,7 +10,7 @@ struct PunctuationDefinition {
 enum PunctuationStrategy {
     private static let labeledHalfWidthPunctuation: Set<String> = [
         "`", "~", "!", "%", "^", "&", "(", ")", "-", "+", "\\",
-        "|", ";", ":", "'", "\"", "/", "?", "@", "#",
+        "|", ";", ":", "'", "\"", "/", "?", "@", "#", "=",
     ]
 
     static func definition(for text: String) -> PunctuationDefinition? {
@@ -137,7 +137,10 @@ enum PunctuationStrategy {
         case "$":
             candidates = ["$", "¥", "£", "€", "₹", "₺", "＄"]
             chineseDefault = "$"
-        case "\"", "'", "#", "%", "&", "+", "-", "=", "@", "^", "`", "|":
+        case "=":
+            candidates = ["=", "≤", "≥", "＝"]
+            chineseDefault = "="
+        case "\"", "'", "#", "%", "&", "+", "-", "@", "^", "`", "|":
             candidates = [String(character), String(fullWidth)]
             chineseDefault = String(character)
         case ".":

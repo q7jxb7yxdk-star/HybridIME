@@ -171,6 +171,15 @@ final class UserLearningStore: @unchecked Sendable {
         }
     }
 
+    func forgetAssociationSelection(language: String, key: String, candidate: String) {
+        lock.withLock {
+            execute(
+                "DELETE FROM association_selection WHERE language = ? AND context = ? AND candidate = ?",
+                strings: [language, key, candidate]
+            )
+        }
+    }
+
     func recordAssociationSelection(
         language: String,
         key: String,

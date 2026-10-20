@@ -30,6 +30,7 @@
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "9655A7E03037DFDA0045C799"
                BuildableName = "HybridIMEiOS.app"
+               BlueprintName = "HybridIMEiOS"
                ReferencedContainer = "container:HybridIME.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -61,6 +62,7 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "9655A7E03037DFDA0045C799"
             BuildableName = "HybridIMEiOS.app"
+            BlueprintName = "HybridIMEiOS"
             ReferencedContainer = "container:HybridIME.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -79,6 +81,7 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "9655A7E03037DFDA0045C799"
             BuildableName = "HybridIMEiOS.app"
+            BlueprintName = "HybridIMEiOS"
             ReferencedContainer = "container:HybridIME.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

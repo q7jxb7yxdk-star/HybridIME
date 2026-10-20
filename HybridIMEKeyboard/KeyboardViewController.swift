@@ -1980,6 +1980,23 @@ final class KeyboardViewController: UIInputViewController {
               currentCandidateActions.indices.contains(index)
         else { return }
 
+        if isSelectingAssociation,
+           shiftState != .lowercased,
+           index == 0,
+           candidate == learnedCandidate,
+           case .association(let suggestion) = currentCandidateActions[index],
+           suggestion.isMostRecentSelection,
+           let language = associationLanguage
+        {
+            associationDictionary.forgetSelection(suggestion)
+            if shiftState == .uppercased {
+                shiftState = .lowercased
+                rebuildKeyboard()
+            }
+            showAssociations(context: associationContext, language: language)
+            return
+        }
+
         switch currentCandidateActions[index] {
         case .cangjie(let text, let code):
             SmartCandidateRanker.shared.record(

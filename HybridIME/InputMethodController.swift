@@ -112,6 +112,24 @@ final class InputMethodController: IMKInputController {
             )
         }
 
+        if isSelectingAssociation,
+           isShiftModified(event),
+           candidateIndex(for: event) == 0,
+           smartPredictionIndex == 0,
+           let firstAction = currentCandidateActions.first,
+           case .associate(let suggestion) = firstAction,
+           suggestion.isMostRecentSelection,
+           let language = associationLanguage
+        {
+            associationDictionary?.forgetSelection(suggestion)
+            showAssociations(
+                context: associationContext,
+                language: language,
+                client: sender as? IMKTextInput
+            )
+            return true
+        }
+
         switch event.keyCode {
         case 36, 76:
             if isSelectingPunctuation {
@@ -159,13 +177,6 @@ final class InputMethodController: IMKInputController {
 
         if shouldReleaseCompositionForSystemKey(event) {
             releaseCompositionForSystemTakeover()
-            return false
-        }
-
-        // Spreadsheet clients use the raw equals key event to enter formula mode.
-        // Direct insertion bypasses that command when no composition is active.
-        if event.characters == "=", !hasActiveComposition {
-            learnedChineseContext = ""
             return false
         }
 
@@ -1223,7 +1234,7 @@ final class InputMethodController: IMKInputController {
     ) -> [String]? {
         let labeledHalfWidthPunctuation: Set<String> = [
             "`", "~", "!", "%", "^", "&", "(", ")", "-", "+", "\\",
-            "|", ";", ":", "'", "\"", "/", "?", "@", "#",
+            "|", ";", ":", "'", "\"", "/", "?", "@", "#", "=",
         ]
         guard labeledHalfWidthPunctuation.contains(punctuation.halfWidth) else {
             return nil
@@ -1398,7 +1409,10 @@ final class InputMethodController: IMKInputController {
         case "$":
             candidates = ["$", "¥", "£", "€", "₹", "₺", "＄"]
             chineseDefault = "$"
-        case "\"", "'", "#", "%", "&", "+", "-", "=", "@", "^", "`", "|":
+        case "=":
+            candidates = ["=", "≤", "≥", "＝"]
+            chineseDefault = "="
+        case "\"", "'", "#", "%", "&", "+", "-", "@", "^", "`", "|":
             candidates = [String(character), String(fullWidth)]
             chineseDefault = String(character)
         case ".":

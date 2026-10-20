@@ -30,9 +30,16 @@ final class SmartCandidateRanker {
         code: String,
         availableCandidates: [String]
     ) -> Prediction? {
-        let learned = Set(
-            learningStore.smartCandidates(code: code).map(\.candidate)
-        )
+        let learnedRows = learningStore.smartCandidates(code: code)
+        // An explicit raw-English selection takes effect on the next input,
+        // even when a Chinese candidate has a higher historical count.
+        if let rawSelection = learnedRows.first(where: { $0.candidate == code }),
+           rawSelection.lastUsed == learnedRows.map(\.lastUsed).max()
+        {
+            return Prediction(candidate: code)
+        }
+
+        let learned = Set(learnedRows.map(\.candidate))
         guard let candidate = rankedCandidates(
             code: code,
             candidates: availableCandidates

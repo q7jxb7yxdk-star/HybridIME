@@ -120,7 +120,7 @@ flowchart LR
 ### macOS 輸入流程
 
 1. `HybridIMEApp` 建立 `IMKServer`；`InputResources` 建立 `StaticLexicon`、詞典包裝層與聯想詞典，接著在分離的工作中載入倉頡。
-2. `InputMethodController.handle` 接受 `keyDown`；Command／Control／Option 與不支援的系統事件會返回宿主應用程式。完全沒有組字或候選狀態時，`=` 也會返回宿主，保留 Google Sheets 等介面用原始按鍵進入公式模式的能力。
+2. `InputMethodController.handle` 接受 `keyDown`；Command／Control／Option 與不支援的系統事件會返回宿主應用程式。`=` 依一般標點流程處理，即使沒有組字也會插入預設值並顯示候選。
 3. ASCII 字母立即插入宿主應用程式，並附加到記憶體中的緩衝區；控制器另行追蹤其 UTF-16 範圍，不使用標記文字顯示英文組字。
 4. 最多五個字母會按小寫字典序查詢完整碼以緩衝區開頭的倉頡資料列；候選以明確 eager 迴圈依序去重，保留真實完整碼，之後按完整碼長度及碼字典序排列，完整緩衝區也會查詢英譯中的 SQLite 項目。
 5. 倉頡候選完成排序後才加入中譯英結果；翻譯使用前方中文加目前候選的最長尾綴。
@@ -164,7 +164,7 @@ Delete 按鈕的點按動作會呼叫一次 `deleteBackward()`。長按手勢在
 
 macOS 控制器以 `IMKTextInput.insertText` 直接插入字母，並用 `directComposition` 記錄宿主內可替換的 UTF-16 範圍；它不以 InputMethodKit marked text 保存這段組字。清除候選、標點、聯想或系統接管狀態時不需呼叫 `updateComposition()`。`composedString(_:)` 仍實作 InputMethodKit 協定，並明確把 Swift `String` 橋接為 `NSString`；這符合 SDK 所述可回傳 `NSString` 或 `NSAttributedString` 的介面契約。
 
-標點通常由控制器以 `insertText` 插入並回傳已處理。Google Sheets 在只選取、尚未編輯儲存格時，必須收到原始 `=` key-down 才會進入公式模式；直接插入同一字元不具有相同語義。因此系統按鍵處理後會在 `event.characters == "=" && !hasActiveComposition` 時清除已學習中文上下文並回傳未處理。這只放行完全空閒狀態的 `=`；已有字母組字、標點候選或聯想候選時，仍沿用原本的提交與 `=`／`＝` 候選流程。
+標點由控制器以 `insertText` 插入並回傳已處理。`=` 已移除空閒狀態下直接傳遞原始按鍵的例外，統一進入標點候選流程，預設插入半形 `=`。直接插入文字與傳遞原始 key-down 的語義不同；Google Sheets 等試算表在選取但尚未編輯儲存格時的公式模式觸發，需要另行手動驗證。
 
 僅憑建置輸出無法驗證已安裝的輸入來源。對於已安裝、已選取但沒有回應的已簽署應用程式，先檢查 `~/Library/Logs/DiagnosticReports/HybridIME-*.ips` 是否有程序崩潰，再檢查統一日誌中是否有 `NO Endpoint`、無法辨識的 `InputMethodConnectionName`，或 `com.apple.inputmethodkit.setxpcendpoint`／`getxpcendpoint` 是否成功建立連線。開發環境的復原順序如下：
 
@@ -255,6 +255,8 @@ macOS 與 iOS 儲存庫各自建立：
 ### 標點
 
 兩個平台都從最近實際提交的非空白字元判定上下文，遇到句末標點即停止。macOS 尚未選取候選的直接英文固定使用半形標點，不會因候選區存在中文字而轉換。中文字元涵蓋常見的 CJK 統一表意文字、相容表意文字與擴充純量範圍。在中文上下文中，某些字元刻意優先維持半形；貨幣、斜線、括號與箭頭替代符號使用固定候選清單。
+
+兩平台的 `=` 候選值固定依序為 `=`、`≤`、`≥`、`＝`，中文與英文上下文均以半形 `=` 為預設值。候選呈現依序為 `半 =`、`≤`、`≥`、`全 ＝`；「半／全」僅為顯示標籤，選取時只插入對應符號。
 
 macOS 實體鍵盤送入 ASCII `'`／`"`，iOS 鍵帽則直接送入 `‘`／`“`；兩端的標點定義會把直引號與對應彎引號合併到同一規則。單引號固定先插入 `‘`，候選依序為 `‘`、`'`、`` ` ``；雙引號固定先插入 `“`，候選依序為 `“`、`"`。這些候選按直接字元呈現，不使用一般標點的「半／全」標籤，也不加入全形 `＇` 或 `＂`。
 
@@ -405,7 +407,7 @@ swiftc -module-cache-path /tmp/hybridime-module-cache-keyboard \
 - macOS 與 iOS 候選排序器均將首字根 fallback 限於二至三碼；`mrko` 的詞庫 descendant 為 `mrkoo → 硤`，兩平台已加入對應回歸檢查。Swift 語法檢查及 `git diff --check` 通過；本次未由代理執行 Xcode Build 或 Test。
 - 使用者回報在 Xcode 以 `HybridIME` scheme Run、Stop 後切換至 ABC、結束 HybridIME 程序、複製 Debug App、重新註冊 LaunchServices、重啟 `TextInputMenuAgent` 並從正式路徑啟動，輸入法已正常使用。此回報未單獨提供 `mrko` 候選內容或簽署驗證結果。
 
-2026-09-12 的 Google Sheets `=` 相容性修正與本機安裝完成以下驗證：
+2026-09-12 的 Google Sheets `=` 相容性修正與本機安裝完成以下歷史驗證（該次空閒狀態直接傳遞 `=` 的行為已由目前的四項標點候選流程取代，不代表目前版本的相容性驗證）：
 
 - `InputMethodController.handle` 在 `event.characters == "="` 且沒有任何 active composition 時回傳 `false`，其餘標點及組字中的 `=`／`＝` 候選路徑維持不變。
 - `xcrun swiftc -parse HybridIME/InputMethodController.swift` 與 `git diff --check` 通過；修正只新增於 macOS `InputMethodController.swift`。

@@ -141,7 +141,8 @@ final class CandidateWindowController {
             return
         }
 
-        codeLabel.isHidden = true
+        codeLabel.stringValue = "Shift + 1：取消第一項的聯想學習"
+        codeLabel.isHidden = smartPredictionIndex != 0
         rootsLabel.isHidden = true
         candidatesLabel.attributedStringValue = candidateText(
             candidates,

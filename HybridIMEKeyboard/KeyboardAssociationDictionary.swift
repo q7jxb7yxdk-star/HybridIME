@@ -118,6 +118,26 @@ final class KeyboardAssociationDictionary {
             }
     }
 
+    func forgetSelection(_ suggestion: Suggestion) {
+        guard suggestion.isMostRecentSelection else { return }
+        learningStore.forgetAssociationSelection(
+            language: suggestion.language.rawValue,
+            key: suggestion.key,
+            candidate: suggestion.text
+        )
+        // Remove the paired Chinese fallback written by recordSelection as well.
+        if suggestion.language == .chinese,
+           let lastCharacter = suggestion.key.last,
+           suggestion.key != String(lastCharacter)
+        {
+            learningStore.forgetAssociationSelection(
+                language: suggestion.language.rawValue,
+                key: String(lastCharacter),
+                candidate: suggestion.text
+            )
+        }
+    }
+
     func recordSelection(_ suggestion: Suggestion) {
         learningStore.recordAssociationSelection(
             language: suggestion.language.rawValue,

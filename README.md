@@ -214,6 +214,26 @@ swiftc -parse-as-library -module-cache-path /tmp/hybridime-module-cache-update \
 
 實際驗證結果記錄在[技術文件的測試章節](TECHNICAL_DOCUMENTATION.md#12-測試)。本機 Developer ID 簽署與 macOS 安裝驗證會和一般建置、真實文字輸入、公證及發佈結果分開記錄。
 
+### macOS GitHub Release
+
+發行前同步 Xcode macOS target 與 `Scripts/release.sh` 的 Version／Build；目前為 `1.5.1`／`20261021`，macOS 部署目標為 `26.0`。先只檢查腳本語法：
+
+```zsh
+zsh -n ~/Documents/Xcode/HybridIME/Scripts/release.sh
+```
+
+沒有輸出並返回提示符號代表語法檢查通過。準備正式建置與公證時，再執行：
+
+```zsh
+GIT_PAGER=cat zsh ~/Documents/Xcode/HybridIME/Scripts/release.sh
+```
+
+腳本會自行切換到專案根目錄；`GIT_PAGER=cat` 避免前置 Git 檢查進入分頁器。預設公證設定檔為 `sunny-notary-WX793X49GJ`，可透過 `HYBRIDIME_NOTARY_PROFILE` 覆寫；本機必須已有有效的 Keychain 公證設定及 Developer ID Application 憑證。設定檔名稱不是密碼。
+
+完整流程包含 Debug／Release build、靜態分析、Developer ID archive、App 與 DMG 簽署／公證／Staple、Gatekeeper 與掛載後內容驗證，以及 SHA-256。只有最後顯示 `Release artifacts are ready:` 才表示整個腳本成功。成品位於 `/private/tmp/HybridIME-v<版本>.*`，應另存 DMG 與 `.sha256.txt` 到固定位置。
+
+完成手動功能驗證，並確認所有發行變更已 Commit／Push、版本 tag 對應該次建置輸入後，再到 GitHub 建立 Release、上傳 DMG 與 checksum，儲存草稿檢查後公開。腳本不會自動 Commit、建立 tag 或發佈 GitHub Release；tag 也不會包含未提交變更。2026-10-21 的 macOS 發行成品驗證紀錄見技術文件；真實文字輸入與公開下載仍須分別驗證。
+
 ## 已知限制
 
 - SQLite 執行期與學習資料庫的發佈／安裝後行為必須以本次建置結果及後續實機測試分開判斷。
@@ -228,7 +248,7 @@ swiftc -parse-as-library -module-cache-path /tmp/hybridime-module-cache-update \
 - iPhone 在本次量度裝置上使用縱向 242 點、橫向 187 點自訂內容高度；這些值來自同一裝置與宿主 App 的 HybridIME／Apple 內建倉頡截圖差值，無公開 API 可讀取或保證在其他裝置及宿主 App 同步原生高度，其按鍵比例、字根／英文標籤與地球鍵仍需實機驗證。
 - iPad 寬版配置、原生式按鍵格線、Light／Dark 外觀、替代符號下滑門檻與預覽在不同裝置、方向及應用程式內的視覺與操作行為仍需模擬器／實機驗證。
 - 第三方鍵盤在安全文字欄位、電話／姓名電話鍵盤或宿主應用程式禁用延伸功能時會由系統鍵盤取代；本次未做裝置／多應用程式相容性驗證。
-- `Scripts/release.sh` 的前置檢查會讀取 `HybridIME` macOS scheme 的 Debug／Release 已解析建置設定，並硬性要求版本 `1.5.1`、組建編號 `20261021` 與部署目標 `26.0`。這只準備發佈流程，並不代表簽署、公證或發佈已完成。
+- `Scripts/release.sh` 的前置檢查會讀取 `HybridIME` macOS scheme 的 Debug／Release 已解析建置設定，並硬性要求版本 `1.5.1`、組建編號 `20261021` 與部署目標 `26.0`。前置檢查通過本身不代表後續簽署、公證或公開發佈已完成。
 - 儲存庫沒有自動測試建置目標、CI、效能量測或記憶體預算迴歸測試。
 
 ## 授權

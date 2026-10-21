@@ -357,9 +357,11 @@ macOS 立即插入預設標點候選並記錄其範圍，在替換前驗證用�
 
 ### 環境變數
 
-執行期原始碼不會讀取環境變數。`Scripts/release.sh` 辨識 `HYBRIDIME_NOTARY_PROFILE`、`HYBRIDIME_RESUME_AFTER_APP_NOTARIZATION` 與 `HYBRIDIME_RELEASE_ROOT_OVERRIDE`；這些是僅供發行使用的控制項。公證設定檔會命名一個 Keychain 項目，不得將其記錄為秘密值。
+執行期原始碼不會讀取環境變數。`Scripts/release.sh` 辨識 `HYBRIDIME_NOTARY_PROFILE`、`HYBRIDIME_RESUME_AFTER_APP_NOTARIZATION` 與 `HYBRIDIME_RELEASE_ROOT_OVERRIDE`；這些是僅供發行使用的控制項。`HYBRIDIME_NOTARY_PROFILE` 預設為共用設定檔 `sunny-notary-WX793X49GJ`；設定檔名稱可記錄，對應的 Keychain 憑證內容與密碼不得寫入儲存庫。指令前的環境變數指派只影響該次執行，不會改寫腳本預設值。
 
-發行腳本解析 `HybridIME` macOS scheme 的 Debug 與 Release 建置設定，除非兩者都使用版本 `1.5.1`、組建編號 `20261021`、部署目標 `26.0`，以及預期的 macOS 建置目標與套件識別碼，否則會硬停止。此預檢不會執行或證明簽署、公證、封裝釘選或發佈。目前 Xcode 專案的三個建置目標與發行腳本均設定為版本 `1.5.1`、組建編號 `20261021`；此處僅依設定內容核對，未執行發行腳本或解析 Xcode 建置設定。
+發行腳本解析 `HybridIME` macOS scheme 的 Debug 與 Release 建置設定，除非兩者都使用版本 `1.5.1`、組建編號 `20261021`、部署目標 `26.0`，以及預期的 macOS 建置目標與套件識別碼，否則會硬停止。此預檢不會執行或證明簽署、公證、封裝釘選或發佈。目前 Xcode 專案的三個建置目標與發行腳本均設定為版本 `1.5.1`、組建編號 `20261021`；macOS 發行流程的本次執行證據另列於第 12 節。
+
+封存後以 `vtool -show-build` 取得 Mach-O 部署資訊，再以 `/usr/bin/awk` 比較 `minos` 欄位：必須恰有兩筆，且均等於 `HYBRIDIME_DEPLOYMENT_TARGET`。此檢查不依賴 `rg` 的輸出格式；另以 `lipo -archs` 顯示架構。腳本可在任意目錄透過 `GIT_PAGER=cat zsh ~/Documents/Xcode/HybridIME/Scripts/release.sh` 執行，避免內部 `git diff --check` 進入分頁器。成功訊息只會在 SHA-256 產生後顯示；成品預設存放於 `/private/tmp`，必須另存。腳本不會建立 Git commit／tag 或 GitHub Release。
 
 ## 10. 錯誤處理與記錄
 
@@ -452,6 +454,13 @@ swiftc -module-cache-path /tmp/hybridime-module-cache-keyboard \
 
 ### 本次工作已驗證
 
+2026-10-21 的 macOS 1.5.1（組建編號 20261021）發行封裝：
+
+- 發行腳本的部署版本檢查改用 `awk` 欄位比較；zsh 語法檢查、既有 universal archive，以及版本不符、缺少／多出版本資料、版本後綴與空白差異等隔離案例通過。先前 Terminal 中 `rg` 計數檢查失敗的原因尚未重現；既有 archive 的 x86_64 與 arm64 均為 `minos 26.0`。
+- 使用者自行執行腳本並回報最後的 `Release artifacts are ready:`。依腳本流程，此回報涵蓋 Debug／Release build、靜態分析、Developer ID archive、App／DMG 簽署與公證、Staple、Gatekeeper、DMG 掛載與內容比對；代理沒有重新執行上述流程。
+- 代理唯讀檢查該次工作目錄內的 `app-notary.plist` 與 `dmg-notary.plist`，兩者 `status` 均為 `Accepted`；另重新計算 `HybridIME-v1.5.1.dmg` 的 SHA-256，與 checksum 檔案一致：`8f0d278aaa704d560727560a54c3f809b61be5cc1618348903ae4f4334f0358b`。
+- 本次封裝不證明真實文字用戶端的功能、iOS／iPadOS 裝置行為或 GitHub 公開下載已通過驗證。發佈前須保留成品並完成手動功能驗證，確認 tag 包含對應建置輸入；建立 tag 不會自動納入未提交的腳本修改。
+
 2026-10-21 的 Safari Google Sheets 起始輸入修正：
 
 - 使用者依序測試單擊與雙擊空白儲存格；暫時診斷分別取得初始選取範圍 `(0,1)` 與 `(0,0)`。單擊時原有條件產生 `browser.skip.selection`，未把首個原始字母按鍵傳給 Safari。
@@ -539,7 +548,7 @@ swiftc -module-cache-path /tmp/hybridime-module-cache-keyboard \
 - macOS 真實文字用戶端的按鍵輸入、候選呈現與提交。
 - 第三方 macOS 用戶端間的候選定位與替換。
 - iOS 鍵盤的完整跨裝置、方向、外觀、記憶體使用量與宿主相容性矩陣。
-- Developer ID 發行簽署、封存、公證、DMG、GitHub 發行或 App Store 行為；本機 Apple Development 簽署不涵蓋這些範圍。
+- GitHub Release 公開下載、App Store 行為，以及後續變更重新產生的 Developer ID 成品；2026-10-21 的 macOS 發行成品證據僅限上述紀錄，不延伸為安裝後功能驗證。
 
 ## 13. 已知限制與技術債
 

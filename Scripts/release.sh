@@ -266,7 +266,13 @@ HYBRIDIME_APP_SIGNATURE="$(codesign -dvvv "${HYBRIDIME_APP}" 2>&1)"
 file "${HYBRIDIME_APP}/Contents/MacOS/HybridIME"
 lipo -archs "${HYBRIDIME_APP}/Contents/MacOS/HybridIME"
 HYBRIDIME_BUILD_INFO="$(xcrun vtool -show-build "${HYBRIDIME_APP}/Contents/MacOS/HybridIME")"
-[[ "$(print -r -- "${HYBRIDIME_BUILD_INFO}" | rg -c "minos ${HYBRIDIME_DEPLOYMENT_TARGET}$")" == "2" ]] || \
+/usr/bin/awk -v expected="${HYBRIDIME_DEPLOYMENT_TARGET}" '
+    $1 == "minos" {
+        count++
+        if (NF == 2 && $2 == expected) matches++
+    }
+    END { exit !(count == 2 && matches == 2) }
+' <<< "${HYBRIDIME_BUILD_INFO}" || \
     fail "not every architecture has deployment target ${HYBRIDIME_DEPLOYMENT_TARGET}"
 
 step "Notarize and staple app"

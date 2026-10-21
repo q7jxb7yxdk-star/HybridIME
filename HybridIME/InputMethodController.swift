@@ -13,6 +13,13 @@ final class InputMethodController: IMKInputController {
         let range: NSRange
     }
 
+    private struct PendingBrowserInput {
+        let id = UUID()
+        let text: String
+        let clientID: ObjectIdentifier
+        let applicationPID: pid_t
+    }
+
     private enum CandidateAction {
         case cangjie(String, code: String)
         case commit(String)
@@ -44,6 +51,7 @@ final class InputMethodController: IMKInputController {
 
     private var buffer = ""
     private var directComposition: DirectComposition?
+    private var pendingBrowserInput: PendingBrowserInput?
     private var currentCandidates: [String] = []
     private var currentCandidateActions: [CandidateAction] = []
     private var smartPredictionIndex: Int?
@@ -81,6 +89,12 @@ final class InputMethodController: IMKInputController {
         }
 
         registerLifecycleObserversIfNeeded()
+
+        if event.type == .keyDown {
+            adoptPendingBrowserInput(from: sender)
+            // Never adopt an older key after a subsequent edit or navigation.
+            pendingBrowserInput = nil
+        }
 
         if event.type == .flagsChanged {
             if shouldReleaseCompositionForModifierChange(event) {
@@ -247,6 +261,9 @@ final class InputMethodController: IMKInputController {
         dismissAssociation(clearContext: false)
         isSelectingPunctuation = false
         lastPassthroughPunctuationUsesFullWidth = nil
+        if beginBrowserInputIfNeeded(characters, client: sender) {
+            return false
+        }
         guard insertDirectCharacter(characters, into: sender) else {
             return false
         }
@@ -255,18 +272,111 @@ final class InputMethodController: IMKInputController {
         return true
     }
 
+    private func beginBrowserInputIfNeeded(
+        _ text: String,
+        client sender: Any?
+    ) -> Bool {
+        guard buffer.isEmpty else {
+            return false
+        }
+        guard let inputClient = sender as? IMKTextInput,
+              let application = NSWorkspace.shared.frontmostApplication,
+              let identifier = application.bundleIdentifier,
+              [
+                  "com.apple.Safari", "com.apple.SafariTechnologyPreview",
+                  "com.google.Chrome", "com.google.Chrome.beta",
+                  "com.google.Chrome.dev", "com.google.Chrome.canary",
+                  "com.microsoft.edgemac", "org.mozilla.firefox",
+                  "com.brave.Browser", "company.thebrowser.Browser",
+              ].contains(identifier)
+        else {
+            return false
+        }
+
+        let selection = inputClient.selectedRange()
+        // Safari's inactive Sheets editor can report (0, 1).
+        // Its native key handler must receive the first letter to enter editing.
+        let needsSafariSelectionPassthrough =
+            (identifier == "com.apple.Safari" ||
+                identifier == "com.apple.SafariTechnologyPreview") &&
+            selection == NSRange(location: 0, length: 1)
+        guard needsSafariSelectionPassthrough ||
+                selection == NSRange(location: 0, length: 0) ||
+                selection.location == NSNotFound
+        else {
+            return false
+        }
+        if !needsSafariSelectionPassthrough {
+            // A browser's inactive grid editor and an empty text field can both
+            // report (0, 0). Keep the existing empty-text check for this path.
+            let initialText = inputClient.attributedSubstring(
+                from: NSRange(location: 0, length: 1)
+            )?.string
+            guard initialText == nil || initialText == "" else {
+                return false
+            }
+        }
+
+        let pending = PendingBrowserInput(
+            text: text,
+            clientID: ObjectIdentifier(inputClient as AnyObject),
+            applicationPID: application.processIdentifier
+        )
+        pendingBrowserInput = pending
+        // The browser processes the unhandled key asynchronously. A later key
+        // also attempts adoption if the browser has not replied by this time.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) { [weak self] in
+            guard let self, self.pendingBrowserInput?.id == pending.id else {
+                return
+            }
+            self.adoptPendingBrowserInput(from: self.client())
+        }
+        return true
+    }
+
+    private func adoptPendingBrowserInput(from sender: Any?) {
+        guard let pending = pendingBrowserInput else { return }
+        guard let inputClient = sender as? IMKTextInput,
+              ObjectIdentifier(inputClient as AnyObject) == pending.clientID,
+              NSWorkspace.shared.frontmostApplication?.processIdentifier ==
+                pending.applicationPID
+        else {
+            pendingBrowserInput = nil
+            return
+        }
+        let range = NSRange(location: 0, length: pending.text.utf16.count)
+        guard inputClient.selectedRange() ==
+                NSRange(location: NSMaxRange(range), length: 0)
+        else {
+            return
+        }
+        guard inputClient.attributedSubstring(from: range)?.string == pending.text
+        else {
+            return
+        }
+
+        pendingBrowserInput = nil
+        buffer = pending.text
+        directComposition = DirectComposition(range: range)
+        refreshComposition(client: sender)
+    }
+
     private func insertDirectCharacter(
         _ text: String,
         into sender: Any?
     ) -> Bool {
-        guard let inputClient = sender as? IMKTextInput else { return false }
+        guard let inputClient = sender as? IMKTextInput else {
+            return false
+        }
 
         if !buffer.isEmpty, !directCompositionMatches(in: inputClient) {
             resetState()
         }
 
         let selection = inputClient.selectedRange()
-        guard selection.location != NSNotFound else { return false }
+        guard selection.location != NSNotFound else {
+            return false
+        }
 
         inputClient.insertText(
             text,
@@ -635,7 +745,8 @@ final class InputMethodController: IMKInputController {
     }
 
     private var hasActiveComposition: Bool {
-        !buffer.isEmpty ||
+        pendingBrowserInput != nil ||
+            !buffer.isEmpty ||
             isSelectingPunctuation ||
             isSelectingAssociation ||
             CandidateWindowController.shared.isVisible
@@ -672,6 +783,7 @@ final class InputMethodController: IMKInputController {
     private func resetState() {
         buffer = ""
         directComposition = nil
+        pendingBrowserInput = nil
         currentCandidates = []
         currentCandidateActions = []
         smartPredictionIndex = nil

@@ -34,6 +34,7 @@ HybridIME 是一套以 Swift 開發的中英混合倉頡五代輸入工具，同
 - 倉頡或聯想候選以藍色顯示時，按住 Shift 再按該字對應的數字鍵（第 10 項為 `0`），取消該項學習並立即更新候選，不插入文字。只移除對應完整碼／聯想上下文的選取記錄；內建候選仍可能出現。標點不適用。
 - `Return` 不選取候選，而是結束目前英文組字並交回宿主應用程式處理。
 - Safari URL 欄的自動完成尾段不會截斷輸入碼；選取候選時會連同該尾段一起安全替換。
+- Safari 的 Google Sheets 支援單擊儲存格後直接輸入；2026-10-21 使用者已確認可輸入文字與數字。控制器會在符合瀏覽器起始輸入條件時傳遞首個原始字母按鍵，確認宿主已插入該字母後再接續候選組字。
 - 未選取候選的直接英文使用半形標點；只有實際提交中文字後，後續標點才依中文上下文選用全形。
 - `=` 在兩平台均預設插入半形 `=`，候選依序顯示 `半 =`、`≤`、`≥`、`全 ＝`；半／全標籤不會寫入文字。macOS 的 `=` 會進入標點候選流程，Google Sheets 等試算表的公式模式觸發仍需手動驗證。
 - Command、Control、Option、滑鼠及系統輸入事件交回目前應用程式。
@@ -131,6 +132,8 @@ open "$APP"
 若已安裝版本出現「已選取但沒有輸入反應」，請先檢查 `~/Library/Logs/DiagnosticReports/` 是否有新的 `HybridIME-*.ips`，再參閱[技術文件的 InputMethodKit 診斷](TECHNICAL_DOCUMENTATION.md#macos-inputmethodkit-生命週期)，檢查註冊與 XPC endpoint。
 
 macOS 控制器會以 `IMKTextInput.insertText` 直接插入並自行追蹤可替換範圍，不以 InputMethodKit marked text 保存字母組字。狀態清理不會呼叫 `updateComposition()`；`composedString(_:)` 只保留作為 InputMethodKit 協定介面，並明確回傳 `NSString`。
+
+瀏覽器起始輸入另有原始按鍵傳遞流程，讓尚未編輯的儲存格有機會進入編輯模式。Safari 的 Google Sheets 文字與數字輸入已由使用者確認；中文候選替換、其他瀏覽器及 `=` 公式模式仍需分別驗證。暫時診斷紀錄程式碼已移除。
 
 ### iOS／iPadOS
 

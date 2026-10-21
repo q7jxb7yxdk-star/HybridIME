@@ -188,6 +188,10 @@ final class KeyboardViewController: UIInputViewController {
     private var swipeTask: Task<Void, Never>?
     private var swipeGeneration = 0
     private var swipeIsDecoding = false
+    private let englishSwipeChecker = UITextChecker()
+    private let englishSwipeLanguage = UITextChecker.availableLanguages.first { $0 == "en_US" }
+        ?? UITextChecker.availableLanguages.first { $0.hasPrefix("en_") }
+    private var englishSwipeWordCache: [String: Bool] = [:]
     private struct SwipeContext {
         let documentID: UUID
         let before: String?
@@ -212,6 +216,15 @@ final class KeyboardViewController: UIInputViewController {
         let snapshot: CompositionCandidates
     }
     private var pendingSwipeReplacement: PendingSwipeReplacement?
+    private struct PendingRawSwipe {
+        let letters: String
+        let insertedText: String
+        let context: SwipeContext
+    }
+    private var pendingRawSwipe: PendingRawSwipe?
+    private var pendingSwipeContext: SwipeContext? {
+        swipeContext ?? pendingSwipeReplacement?.context ?? pendingRawSwipe?.context
+    }
     private struct CompositionCandidates {
         let actions: [CandidateAction]
         let learned: String?
@@ -363,7 +376,7 @@ final class KeyboardViewController: UIInputViewController {
         super.textDidChange(textInput)
         updateAppearance()
         updateReturnKeyTitle()
-        if let context = swipeContext ?? pendingSwipeReplacement?.context, !matchesSwipeContext(context) {
+        if let context = pendingSwipeContext, !matchesSwipeContext(context) {
             resetCompositionState()
             refreshComposition()
         }
@@ -371,7 +384,7 @@ final class KeyboardViewController: UIInputViewController {
 
     override func textWillChange(_ textInput: UITextInput?) {
         super.textWillChange(textInput)
-        if swipeContext != nil || pendingSwipeReplacement != nil {
+        if pendingSwipeContext != nil {
             resetCompositionState()
             refreshComposition()
         }
@@ -379,7 +392,7 @@ final class KeyboardViewController: UIInputViewController {
 
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        if let context = swipeContext ?? pendingSwipeReplacement?.context,
+        if let context = pendingSwipeContext,
            context.keyboardSize != keyboardStackView.bounds.size {
             resetCompositionState()
             refreshComposition()
@@ -388,7 +401,7 @@ final class KeyboardViewController: UIInputViewController {
 
     override func selectionWillChange(_ textInput: UITextInput?) {
         super.selectionWillChange(textInput)
-        if swipeContext != nil || pendingSwipeReplacement != nil {
+        if pendingSwipeContext != nil {
             resetCompositionState()
             refreshComposition()
         }
@@ -396,7 +409,7 @@ final class KeyboardViewController: UIInputViewController {
 
     override func selectionDidChange(_ textInput: UITextInput?) {
         super.selectionDidChange(textInput)
-        if swipeContext != nil || pendingSwipeReplacement.map({ !matchesSwipeContext($0.context) }) == true {
+        if swipeContext != nil || pendingSwipeContext.map({ !matchesSwipeContext($0) }) == true {
             resetCompositionState()
             refreshComposition()
         }
@@ -438,6 +451,7 @@ final class KeyboardViewController: UIInputViewController {
         swipeTask = nil
         swipeContext = nil
         pendingSwipeReplacement = nil
+        pendingRawSwipe = nil
         swipeIsDecoding = false
         swipeTrail.path = nil
         if swipeGesture.state == .began || swipeGesture.state == .changed {
@@ -536,7 +550,7 @@ final class KeyboardViewController: UIInputViewController {
         let work = Task.detached(priority: .userInitiated) {
             let chinese = SwipePathDecoder.rankCodes(path: path, keys: keys, codes: codes, limit: 64)
             guard !Task.isCancelled else { return ([SwipeWord](), [SwipeCodeMatch]()) }
-            let english = SwipePathDecoder.rank(path: path, keys: keys, words: words, limit: 6)
+            let english = SwipePathDecoder.rank(path: path, keys: keys, words: words, limit: 24)
             return (english, chinese)
         }
         swipeTask = Task { [weak self] in
@@ -561,37 +575,51 @@ final class KeyboardViewController: UIInputViewController {
         }
     }
 
+    private func isEnglishSwipeWord(_ word: String) -> Bool {
+        if let cached = englishSwipeWordCache[word] { return cached }
+        guard let language = englishSwipeLanguage else { return false }
+        // Association corpora also contain names and noise; their presence is not a
+        // dictionary check. Use the system's offline English spelling vocabulary.
+        let range = NSRange(location: 0, length: word.utf16.count)
+        let valid = !word.isEmpty && englishSwipeChecker.rangeOfMisspelledWord(
+            in: word, range: range, startingAt: 0, wrap: false, language: language
+        ).location == NSNotFound
+        if englishSwipeWordCache.count >= 512 { englishSwipeWordCache.removeAll() }
+        englishSwipeWordCache[word] = valid
+        return valid
+    }
+
     private func commitDecodedSwipe(
         english: [SwipeWord], chinese: [SwipeCodeMatch],
         path: [SwipePoint], keys: [SwipeKey], context: SwipeContext
     ) {
-        // Shift keeps English literal. Existing explicit preferences take precedence.
+        let rawLetters = SwipePathDecoder.lettersCrossed(path: path, keys: keys)
+        let validEnglish = english.filter { isEnglishSwipeWord($0.text) }
+        // Shift keeps recognized English capitalized. Only Shift-Space requests the
+        // literal letters crossed, which are stored separately from either decoder.
         if context.shift == .lowercased {
             let rankedChinese = rankedCompleteSwipeCandidates(matches: chinese)
-            if let word = english.first?.text, let preferred = learnedEnglishSwipeWord(for: word) {
-                commitSwipeCandidate(preferred, code: nil)
+            let englishScore = validEnglish.first.flatMap {
+                SwipePathDecoder.geometricScore(path: path, keys: keys, text: $0.text)
+            }
+            // A learned nearby English word must not preempt a clear Chinese root path.
+            // Retain the preference only when that English path itself matches as well.
+            if let word = validEnglish.first?.text, let preferred = learnedEnglishSwipeWord(for: word),
+               let englishScore,
+               rankedChinese.first.map({ englishScore <= $0.score + 0.03 }) ?? true {
+                commitSwipeCandidate(preferred, code: nil, rawLetters: rawLetters)
                 return
             }
-            // Choose the basic code independently of learning for other codes.
-            // Same-code learning changes its character, not the geometric eligibility check.
-
-            // A clear complete root path may use the dictionary's first character even
-            // before it has been learned. Score against the English path too: a familiar
-            // word such as "hi" must not turn Chinese merely because its letters form a code.
-            let englishPathCode = english.first?.text.reduce(into: "") { result, letter in
-                if result.last != letter { result.append(letter) }
-            }
-            let englishScore = englishPathCode.flatMap {
-                SwipePathDecoder.rankCodes(path: path, keys: keys, codes: [$0], limit: 1).first?.score
-            }
             if let preferred = completeSwipeCandidate(candidates: rankedChinese, englishScore: englishScore) {
-                commitSwipeCandidate(preferred.text, code: preferred.code)
+                commitSwipeCandidate(preferred.text, code: preferred.code, rawLetters: rawLetters)
                 return
             }
         }
 
-        guard let word = english.first?.text else {
-            // No English match or eligible Chinese result: leave the document untouched.
+        guard let word = validEnglish.first?.text else {
+            // An unrecognized string is available only through explicit Shift-Space.
+            swipeContext = nil
+            rememberRawSwipe(rawLetters, insertedText: "")
             rebuildCandidateButtons()
             return
         }
@@ -601,14 +629,15 @@ final class KeyboardViewController: UIInputViewController {
         case .uppercased: text = word.prefix(1).uppercased() + word.dropFirst()
         case .capsLocked: text = word.uppercased()
         }
-        commitSwipeCandidate(text, code: nil)
+        commitSwipeCandidate(text, code: nil, rawLetters: rawLetters)
     }
 
     private func completeSwipeCandidate(
         candidates: [CompleteSwipeCandidate], englishScore: Double?
     ) -> (text: String, code: String)? {
-        guard let candidate = candidates.first, candidate.score <= 0.50,
-              englishScore.map({ $0 > candidate.score + 0.10 }) ?? true else { return nil }
+        guard let candidate = candidates.first,
+              SwipePathDecoder.prefersCangjie(chineseScore: candidate.score, englishScore: englishScore)
+        else { return nil }
         return (candidate.text, candidate.code)
     }
 
@@ -681,7 +710,7 @@ final class KeyboardViewController: UIInputViewController {
         SmartCandidateRanker.shared.prediction(code: word, availableCandidates: [word])?.candidate
     }
 
-    private func commitSwipeCandidate(_ text: String, code: String?) {
+    private func commitSwipeCandidate(_ text: String, code: String?, rawLetters: String) {
         guard let context = swipeContext, matchesSwipeContext(context) else {
             resetCompositionState()
             refreshComposition()
@@ -692,7 +721,9 @@ final class KeyboardViewController: UIInputViewController {
             $0.isASCII && ($0.isLetter || $0.isNumber || $0 == "'")
         } == true
         let snapshot = code.map {
-            compositionCandidates(for: $0, precedingChinese: trailingChineseText(in: context.before ?? ""))
+            compositionCandidates(
+                for: $0, precedingChinese: trailingChineseText(in: context.before ?? ""), mode: .swipe
+            )
         }
         resetCompositionState()
         textDocumentProxy.insertText((needsSpace ? " " : "") + text)
@@ -701,8 +732,50 @@ final class KeyboardViewController: UIInputViewController {
             shiftState = .lowercased
             rebuildKeyboard()
         }
-        if let snapshot, showSwipeReplacements(for: text, snapshot: snapshot) { return }
+        if let snapshot, showSwipeReplacements(for: text, snapshot: snapshot) {
+            rememberRawSwipe(rawLetters, insertedText: text)
+            return
+        }
         finishCommittedText(text, forcedLanguage: code == nil ? .english : .chinese)
+        rememberRawSwipe(rawLetters, insertedText: text)
+    }
+
+    private func rememberRawSwipe(_ letters: String, insertedText: String) {
+        guard !letters.isEmpty,
+              let before = textDocumentProxy.documentContextBeforeInput,
+              before.hasSuffix(insertedText), textDocumentProxy.selectedText?.isEmpty ?? true else { return }
+        pendingRawSwipe = PendingRawSwipe(
+            letters: letters, insertedText: insertedText,
+            context: SwipeContext(
+                documentID: textDocumentProxy.documentIdentifier,
+                before: before, after: textDocumentProxy.documentContextAfterInput,
+                selectedText: textDocumentProxy.selectedText, shift: shiftState,
+                keyboardSize: keyboardStackView.bounds.size
+            )
+        )
+    }
+
+    /// Consume Shift-Space before finalization can learn or discard the automatic word.
+    private func commitRawSwipeIfRequested() -> Bool {
+        guard shiftState != .lowercased, let pending = pendingRawSwipe else { return false }
+        guard matchesSwipeContext(pending.context),
+              let before = textDocumentProxy.documentContextBeforeInput,
+              before.hasSuffix(pending.insertedText),
+              textDocumentProxy.selectedText?.isEmpty ?? true else {
+            resetCompositionState()
+            refreshComposition()
+            return true
+        }
+        resetCompositionState()
+        for _ in pending.insertedText { textDocumentProxy.deleteBackward() }
+        textDocumentProxy.insertText(pending.letters)
+        // Raw crossing letters are a one-time request, not a new English dictionary entry.
+        if shiftState == .uppercased {
+            shiftState = .lowercased
+            rebuildKeyboard()
+        }
+        finishCommittedText(pending.letters, forcedLanguage: .english)
+        return true
     }
 
     @discardableResult
@@ -749,6 +822,7 @@ final class KeyboardViewController: UIInputViewController {
         }
         // The already committed character remains in the shared list. Selecting it is a no-op.
         guard text != pending.insertedText || !prefix.isEmpty else { return }
+        let raw = pendingRawSwipe
         resetCompositionState()
         for _ in prefix + pending.insertedText { textDocumentProxy.deleteBackward() }
         textDocumentProxy.insertText(text)
@@ -768,9 +842,11 @@ final class KeyboardViewController: UIInputViewController {
         if !showSwipeReplacements(for: text, snapshot: pending.snapshot) {
             finishCommittedText(text, forcedLanguage: .chinese)
         }
+        if let raw { rememberRawSwipe(raw.letters, insertedText: text) }
     }
 
     private func finalizeSwipeReplacement(preservingGesture: Bool = false) {
+        pendingRawSwipe = nil
         guard let pending = pendingSwipeReplacement else { return }
         pendingSwipeReplacement = nil
         // Learn the final retained text once, rather than a discarded automatic guess.
@@ -855,7 +931,7 @@ final class KeyboardViewController: UIInputViewController {
     }
 
     private func rebuildKeyboard() {
-        let hadSwipe = swipeContext != nil || pendingSwipeReplacement != nil
+        let hadSwipe = pendingSwipeContext != nil
         cancelSwipeInput()
         swipeLetterButtons.removeAll()
         if hadSwipe {
@@ -2061,7 +2137,20 @@ final class KeyboardViewController: UIInputViewController {
     }
 
     private func toggleShift() {
-        finalizeSwipeReplacement()
+        // Keep a valid swipe list available for Shift-tap forgetting or replacement.
+        let replacement = pendingSwipeReplacement.flatMap {
+            matchesSwipeContext($0.context) ? $0 : nil
+        }
+        let raw = pendingRawSwipe.flatMap {
+            matchesSwipeContext($0.context) ? $0 : nil
+        }
+        if replacement != nil || raw != nil {
+            pendingRawSwipe = nil
+            pendingSwipeReplacement = nil
+            swipeContext = nil
+        } else {
+            finalizeSwipeReplacement()
+        }
         let now = ProcessInfo.processInfo.systemUptime
         let isDoubleTap = now - lastShiftTapTime < 0.4
         lastShiftTapTime = now
@@ -2075,6 +2164,10 @@ final class KeyboardViewController: UIInputViewController {
             shiftState = .lowercased
         }
         rebuildKeyboard()
+        if let replacement {
+            _ = showSwipeReplacements(for: replacement.insertedText, snapshot: replacement.snapshot)
+        }
+        if let raw { rememberRawSwipe(raw.letters, insertedText: raw.insertedText) }
     }
 
     private func enterLetter(_ key: String) {
@@ -2154,7 +2247,7 @@ final class KeyboardViewController: UIInputViewController {
     }
 
     private func deleteBackward() {
-        if pendingSwipeReplacement != nil { resetCompositionState() }
+        if pendingSwipeReplacement != nil || pendingRawSwipe != nil { resetCompositionState() }
         if swipeContext != nil {
             resetCompositionState()
             refreshComposition()
@@ -2205,6 +2298,7 @@ final class KeyboardViewController: UIInputViewController {
     }
 
     private func commitSpace() {
+        if commitRawSwipeIfRequested() { return }
         finalizeSwipeReplacement()
         if swipeContext != nil { resetCompositionState() }
         if shiftState == .lowercased,
@@ -2452,7 +2546,66 @@ final class KeyboardViewController: UIInputViewController {
         refreshComposition()
     }
 
+    private func forgetLearnedCandidate(_ candidate: String) -> Bool {
+        guard shiftState != .lowercased,
+              pendingPunctuationSelection == nil,
+              candidate == learnedCandidate,
+              let index = currentCandidates.firstIndex(of: candidate),
+              currentCandidateActions.indices.contains(index) else { return false }
+        let pending = pendingSwipeReplacement
+        let raw = pendingRawSwipe
+        if let raw, !matchesSwipeContext(raw.context) { return false }
+        if let pending, !matchesSwipeContext(pending.context) { return false }
+
+        let code: String
+        switch currentCandidateActions[index] {
+        case .cangjie(let text, let candidateCode):
+            code = candidateCode
+            SmartCandidateRanker.shared.forget(code: code, candidate: text)
+        case .raw(let text):
+            guard !buffer.isEmpty else { return false }
+            code = buffer
+            SmartCandidateRanker.shared.forget(code: code, candidate: text)
+        case .association(let suggestion):
+            guard isSelectingAssociation, suggestion.isMostRecentSelection,
+                  let language = associationLanguage else { return false }
+            associationDictionary.forgetSelection(suggestion)
+            pendingRawSwipe = nil
+            if shiftState == .uppercased {
+                shiftState = .lowercased
+                rebuildKeyboard()
+            }
+            showAssociations(context: associationContext, language: language)
+            if let raw { rememberRawSwipe(raw.letters, insertedText: raw.insertedText) }
+            return true
+        case .dictionary, .translation:
+            return false
+        }
+
+        // Rebuilding Shift must not discard the already committed swipe or its context.
+        pendingRawSwipe = nil
+        if pending != nil {
+            pendingSwipeReplacement = nil
+            swipeContext = nil
+        }
+        if shiftState == .uppercased {
+            shiftState = .lowercased
+            rebuildKeyboard()
+        }
+        if let pending {
+            let snapshot = compositionCandidates(
+                for: code, precedingChinese: pending.snapshot.precedingChinese, mode: .swipe
+            )
+            _ = showSwipeReplacements(for: pending.insertedText, snapshot: snapshot)
+        } else {
+            refreshComposition()
+        }
+        if let raw { rememberRawSwipe(raw.letters, insertedText: raw.insertedText) }
+        return true
+    }
+
     private func selectCandidate(_ candidate: String) {
+        if forgetLearnedCandidate(candidate) { return }
         if pendingSwipeReplacement != nil {
             selectSwipeReplacement(candidate)
             return
@@ -2465,23 +2618,6 @@ final class KeyboardViewController: UIInputViewController {
         guard let index = currentCandidates.firstIndex(of: candidate),
               currentCandidateActions.indices.contains(index)
         else { return }
-
-        if isSelectingAssociation,
-           shiftState != .lowercased,
-           index == 0,
-           candidate == learnedCandidate,
-           case .association(let suggestion) = currentCandidateActions[index],
-           suggestion.isMostRecentSelection,
-           let language = associationLanguage
-        {
-            associationDictionary.forgetSelection(suggestion)
-            if shiftState == .uppercased {
-                shiftState = .lowercased
-                rebuildKeyboard()
-            }
-            showAssociations(context: associationContext, language: language)
-            return
-        }
 
         switch currentCandidateActions[index] {
         case .cangjie(let text, let code):
@@ -2569,7 +2705,9 @@ final class KeyboardViewController: UIInputViewController {
             return
         }
 
-        let snapshot = compositionCandidates(for: buffer, precedingChinese: chineseTextBeforeComposition())
+        let snapshot = compositionCandidates(
+            for: buffer, precedingChinese: chineseTextBeforeComposition(), mode: .typed
+        )
         currentCandidateActions = snapshot.actions
         currentCandidates = snapshot.actions.map(\.text)
         learnedCandidate = snapshot.learned
@@ -2603,8 +2741,15 @@ final class KeyboardViewController: UIInputViewController {
         return matches
     }
 
-    /// Both typed composition and an automatically committed swipe use this exact snapshot.
-    private func compositionCandidates(for code: String, precedingChinese: String) -> CompositionCandidates {
+    private enum CompositionInputMode {
+        case typed
+        case swipe
+    }
+
+    /// Typed input follows decoder order; swipes also offer repeated-root and nearby codes.
+    private func compositionCandidates(
+        for code: String, precedingChinese: String, mode: CompositionInputMode
+    ) -> CompositionCandidates {
         let hasCangjieCode = code.count <= 5
         let staticCangjieCandidates = hasCangjieCode
             ? decoder?.candidates(for: code, limit: .max) ?? []
@@ -2621,18 +2766,11 @@ final class KeyboardViewController: UIInputViewController {
             rankedCangjieCandidates,
             limit: 10
         ) ?? []
-        let matches = canonicalCompositionMatches(for: code)
+        let matches = mode == .swipe ? canonicalCompositionMatches(for: code) : []
         let expanded = rankedCompleteSwipeCandidates(matches: matches, includingNearby: true)
-        let primary = rankedCompleteSwipeCandidates(matches: matches).first
-        var cangjieCandidates = expanded.map { CangjieCandidate(text: $0.text, code: $0.code) } + prefixCandidates
-        if let primary {
-            cangjieCandidates.removeAll { $0.text == primary.text }
-            // Keep the first alternative, followed by the automatic character itself.
-            cangjieCandidates.insert(
-                CangjieCandidate(text: primary.text, code: primary.code),
-                at: min(1, cangjieCandidates.count)
-            )
-        }
+        // Preserve the primary code's first character, including the committed character,
+        // before alternatives such as mks → 功 and mmks → 勁.
+        let cangjieCandidates = expanded.map { CangjieCandidate(text: $0.text, code: $0.code) } + prefixCandidates
         let dictionaryCandidates = offlineLexicon.chineseCandidates(
             for: code,
             limit: 10
@@ -2920,6 +3058,10 @@ final class KeyboardViewController: UIInputViewController {
             let placeholder = UILabel()
             if swipeIsDecoding {
                 placeholder.text = "滑動辨識中…"
+            } else if let raw = pendingRawSwipe {
+                placeholder.text = raw.insertedText.isEmpty
+                    ? "未辨識字詞 · Shift＋Space 輸出滑過字母"
+                    : "Shift＋Space 輸出滑過字母"
             } else if swipeContext != nil {
                 let isDrawing = swipeGesture.state == .began || swipeGesture.state == .changed
                 placeholder.text = isDrawing ? "滑動選字 · 倉頡／英文" : "沒有滑動候選，請重新滑動"

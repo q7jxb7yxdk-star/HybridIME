@@ -26,6 +26,10 @@ final class SmartCandidateRanker {
         )
     }
 
+    func forget(code: String, candidate: String) {
+        learningStore.forgetSmartCandidate(code: code, candidate: candidate)
+    }
+
     func prediction(
         code: String,
         availableCandidates: [String]

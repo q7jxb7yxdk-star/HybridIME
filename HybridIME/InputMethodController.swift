@@ -112,21 +112,10 @@ final class InputMethodController: IMKInputController {
             )
         }
 
-        if isSelectingAssociation,
-           isShiftModified(event),
-           candidateIndex(for: event) == 0,
-           smartPredictionIndex == 0,
-           let firstAction = currentCandidateActions.first,
-           case .associate(let suggestion) = firstAction,
-           suggestion.isMostRecentSelection,
-           let language = associationLanguage
+        if isShiftModified(event),
+           let index = candidateIndex(for: event),
+           forgetLearnedCandidate(at: index, client: sender)
         {
-            associationDictionary?.forgetSelection(suggestion)
-            showAssociations(
-                context: associationContext,
-                language: language,
-                client: sender as? IMKTextInput
-            )
             return true
         }
 
@@ -717,6 +706,32 @@ final class InputMethodController: IMKInputController {
 
     private func commitBeforePunctuation(to sender: Any?) {
         commitWithoutAssociations(buffer, to: sender)
+    }
+
+    /// Consume the shortcut before shifted digits can become punctuation or commit text.
+    private func forgetLearnedCandidate(at index: Int, client sender: Any?) -> Bool {
+        guard !isSelectingPunctuation,
+              smartPredictionIndex == index,
+              currentCandidateActions.indices.contains(index) else { return false }
+        switch currentCandidateActions[index] {
+        case .cangjie(let text, let code):
+            smartCandidateRanker.forget(code: code, candidate: text)
+            refreshComposition(client: sender)
+        case .rawCommit(let text), .commit(let text):
+            guard !buffer.isEmpty else { return false }
+            smartCandidateRanker.forget(code: buffer, candidate: text)
+            refreshComposition(client: sender)
+        case .associate(let suggestion):
+            guard isSelectingAssociation, suggestion.isMostRecentSelection,
+                  let language = associationLanguage else { return false }
+            associationDictionary?.forgetSelection(suggestion)
+            showAssociations(
+                context: associationContext, language: language, client: sender as? IMKTextInput
+            )
+        case .dictionaryCommit, .translate:
+            return false
+        }
+        return true
     }
 
     private func commitCandidate(

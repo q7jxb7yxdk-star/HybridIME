@@ -64,6 +64,15 @@ final class KeyboardUserLearningStore {
         )
     }
 
+    func forgetSmartCandidate(code: String, candidate: String) {
+        let normalizedCode = code.lowercased()
+        guard !normalizedCode.isEmpty, !candidate.isEmpty else { return }
+        execute(
+            "DELETE FROM smart_candidate WHERE code = ? AND candidate = ?",
+            strings: [normalizedCode, candidate]
+        )
+    }
+
     func smartCandidates(
         code: String
     ) -> [(candidate: String, selectionCount: Int, lastUsed: Double)] {

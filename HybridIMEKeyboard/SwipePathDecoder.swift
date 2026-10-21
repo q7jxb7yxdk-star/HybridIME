@@ -28,6 +28,7 @@ struct SwipeCodeMatch: Sendable, Equatable {
 struct SwipePathDecoder {
     private struct Geometry {
         let points: [SwipePoint]
+        let turns: [SwipePoint]
         let keys: [String: SwipePoint]
         let spacing: Double
         let length: Double
@@ -43,6 +44,56 @@ struct SwipePathDecoder {
 
     private static let sampleCount = 24
     private static let maximumTemplates = 768
+
+    /// Compare an English word without rankCodes' five-root Cangjie limit.
+    static func geometricScore(path: [SwipePoint], keys: [SwipeKey], text: String) -> Double? {
+        let normalized = text.lowercased()
+        guard isLetters(normalized), normalized.count <= 24,
+              let geometry = geometry(path: path, keys: keys),
+              let template = shortlist([(normalized, 0)], geometry: geometry).first else { return nil }
+        return score(template, geometry: geometry)
+    }
+
+    static func prefersCangjie(chineseScore: Double, englishScore: Double?) -> Bool {
+        guard chineseScore.isFinite, chineseScore <= 0.50 else { return false }
+        // A nearly exact turn through a root distinguishes dup from dip/diop, even
+        // though the remaining collinear keys share a template. Equal paths stay English.
+        let margin = chineseScore <= 0.10 ? 0.05 : 0.10
+        return englishScore.map { $0 > chineseScore + margin } ?? true
+    }
+
+    /// Preserve letters crossed through key centers for an explicit Shift-Space request.
+    /// Segment intersections retain intervening keys even in sparse/coalesced samples.
+    static func lettersCrossed(path: [SwipePoint], keys: [SwipeKey]) -> String {
+        guard let geometry = geometry(path: path, keys: keys) else { return "" }
+        let radius = geometry.spacing * 0.20
+        var result = ""
+        for (start, end) in zip(path, path.dropFirst()) {
+            let dx = end.x - start.x
+            let dy = end.y - start.y
+            let lengthSquared = dx * dx + dy * dy
+            let crossings = geometry.keys.compactMap { letter, center -> (String, Double)? in
+                let ox = start.x - center.x
+                let oy = start.y - center.y
+                let c = ox * ox + oy * oy - radius * radius
+                if c <= 0 { return (letter, 0) }
+                guard lengthSquared > 0 else { return nil }
+                let b = ox * dx + oy * dy
+                let discriminant = b * b - lengthSquared * c
+                guard discriminant >= 0 else { return nil }
+                let entry = (-b - sqrt(discriminant)) / lengthSquared
+                guard (0...1).contains(entry) else { return nil }
+                return (letter, entry)
+            }.sorted {
+                if $0.1 != $1.1 { return $0.1 < $1.1 }
+                return $0.0 < $1.0
+            }
+            for (letter, _) in crossings where result.last.map(String.init) != letter {
+                result += letter
+            }
+        }
+        return result
+    }
 
     static func rank(
         path: [SwipePoint],
@@ -119,7 +170,8 @@ struct SwipePathDecoder {
         let length = pathLength(bounded)
         guard length.isFinite else { return nil }
         return Geometry(
-            points: resample(bounded), keys: keyPoints, spacing: spacing, length: length
+            points: resample(bounded), turns: turns(in: bounded, spacing: spacing),
+            keys: keyPoints, spacing: spacing, length: length
         )
     }
 
@@ -173,7 +225,59 @@ struct SwipePathDecoder {
         // A modest length penalty tolerates small loops around repeated-letter keys.
         let lengthError = abs(template.length - geometry.length)
             / max(geometry.spacing, max(template.length, geometry.length))
-        return shapeError + template.endpointScore * 0.65 + lengthError * 0.2
+        // Resampling alone barely distinguishes the bend at u in dup from i in dip.
+        // Compare stable bends as well, without treating crossed collinear keys as roots.
+        let expectedTurns = turns(in: template.points, spacing: geometry.spacing)
+        let turnError: Double
+        if geometry.turns.isEmpty && expectedTurns.isEmpty {
+            turnError = 0
+        } else if geometry.turns.isEmpty || expectedTurns.isEmpty {
+            turnError = 0.5
+        } else {
+            func meanNearest(_ points: [SwipePoint], to targets: [SwipePoint]) -> Double {
+                points.reduce(0) { total, point in
+                    total + min(2, (targets.map { distance(point, $0) }.min() ?? 0) / geometry.spacing)
+                } / Double(points.count)
+            }
+            turnError = (meanNearest(geometry.turns, to: expectedTurns)
+                + meanNearest(expectedTurns, to: geometry.turns)) * 0.5
+        }
+        return shapeError + template.endpointScore * 0.65 + lengthError * 0.2 + turnError * 0.2
+    }
+
+    /// Simplify small jitter before extracting bends; keep the original bend positions.
+    private static func turns(in points: [SwipePoint], spacing: Double) -> [SwipePoint] {
+        guard points.count > 2 else { return [] }
+        var retained: Set<Int> = [0, points.count - 1]
+        var segments = [(0, points.count - 1)]
+        let tolerance = spacing * 0.20
+        while let (start, end) = segments.popLast() {
+            guard end > start + 1 else { continue }
+            let a = points[start]
+            let b = points[end]
+            let dx = b.x - a.x
+            let dy = b.y - a.y
+            let lengthSquared = dx * dx + dy * dy
+            var farthest = start
+            var maximumDistance = tolerance
+            for index in (start + 1)..<end {
+                let point = points[index]
+                let fraction = lengthSquared > 0
+                    ? min(1, max(0, ((point.x - a.x) * dx + (point.y - a.y) * dy) / lengthSquared)) : 0
+                let projection = SwipePoint(x: a.x + fraction * dx, y: a.y + fraction * dy)
+                let deviation = distance(point, projection)
+                if deviation > maximumDistance {
+                    farthest = index
+                    maximumDistance = deviation
+                }
+            }
+            if farthest != start {
+                retained.insert(farthest)
+                segments.append((start, farthest))
+                segments.append((farthest, end))
+            }
+        }
+        return retained.sorted().filter { $0 != 0 && $0 != points.count - 1 }.map { points[$0] }
     }
 
     private static func resample(_ points: [SwipePoint]) -> [SwipePoint] {

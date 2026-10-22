@@ -194,11 +194,11 @@ Delete 按鈕的點按動作會呼叫一次 `deleteBackward()`。長按手勢在
 
 macOS 控制器以 `IMKTextInput.insertText` 直接插入字母，並用 `directComposition` 記錄宿主內可替換的 UTF-16 範圍；它不以 InputMethodKit marked text 保存這段組字。清除候選、標點、聯想或系統接管狀態時不需呼叫 `updateComposition()`。`composedString(_:)` 仍實作 InputMethodKit 協定，並明確把 Swift `String` 橋接為 `NSString`；這符合 SDK 所述可回傳 `NSString` 或 `NSAttributedString` 的介面契約。
 
-瀏覽器首字母由 `beginBrowserInputIfNeeded` 處理相容性例外。當組字 buffer 為空且前景應用程式符合程式內的瀏覽器識別碼清單時，選取範圍為 `(0,0)` 或 `NSNotFound`，並且起始文字無法取得或為空，控制器會回傳未處理，讓宿主收到原始按鍵。Safari／Safari Technology Preview 的 `(0,1)` 選取範圍另外直接允許此流程，不受起始文字檢查限制；這對應 Safari Google Sheets 尚未進入編輯時的實際診斷結果。此判斷依賴宿主狀態，不會讀取網頁 URL，因此也可能套用至符合條件的一般瀏覽器文字欄位。
+瀏覽器首個字母或符號由 `beginBrowserInputIfNeeded` 處理相容性例外。符號僅在沒有進行中的字母組字、標點候選或聯想選取時嘗試此流程。當組字 buffer 為空且前景應用程式符合程式內的瀏覽器識別碼清單時，選取範圍為 `(0,0)` 或 `NSNotFound`，並且起始文字無法取得或為空，控制器會回傳未處理，讓宿主收到原始按鍵。Safari／Safari Technology Preview 的 `(0,1)` 選取範圍另外直接允許此流程，不受起始文字檢查限制；這對應 Safari Google Sheets 尚未進入編輯時的實際診斷結果。此判斷依賴宿主狀態，不會讀取網頁 URL，因此也可能套用至符合條件的一般瀏覽器文字欄位。
 
-`pendingBrowserInput` 暫存首字母、文字用戶端身分與前景程序 PID。控制器於 50 ms 後或下一個 key-down 嘗試接續組字，只有用戶端與前景程序一致、游標位於首字母末端，且回讀的文字確實等於該字母時，才建立 `buffer`／`directComposition` 並更新候選，不會再次插入首字母。下一個 key-down 嘗試接續後會清除未接續的暫存；狀態重設也會清除。宿主不提供可確認的文字時，不會把該首字母納入候選組字。單憑 `insertText` 後游標前進，不能證明 Google Sheets 已啟動儲存格編輯。
+`pendingBrowserInput` 暫存首個字元、是否為標點、文字用戶端身分與前景程序 PID。控制器於 50 ms 後或下一個 key-down 嘗試接續，只有用戶端與前景程序一致、游標位於該字元末端，且回讀的文字確實相等時才接續。字母會建立 `buffer`／`directComposition` 並更新候選；符號則把已插入的原始符號作為首個候選，透過 `existingInsertion` 保存可替換範圍，不會再次送字。下一個 key-down 嘗試接續後會清除未接續的暫存；狀態重設也會清除。宿主不提供可確認的文字時，不會接續候選。單憑 `insertText` 後游標前進，不能證明 Google Sheets 已啟動儲存格編輯。
 
-標點由控制器以 `insertText` 插入並回傳已處理。`=` 已移除空閒狀態下直接傳遞原始按鍵的例外，統一進入標點候選流程，預設插入半形 `=`。直接插入文字與傳遞原始 key-down 的語義不同；Google Sheets 等試算表在選取但尚未編輯儲存格時的公式模式觸發，需要另行手動驗證。
+一般標點由控制器以 `insertText` 插入並回傳已處理，`=` 預設插入半形並提供四項候選。符合上述瀏覽器起始輸入條件時，標點（包括 `=`）會先傳遞原始 key-down，再在確認插入後建立候選；此流程也可能套用至空白瀏覽器文字欄位，因此初始符號保留原始按鍵內容，不套用一般標點的預設全半形轉換。Google Sheets 未編輯儲存格的符號輸入、候選替換及公式模式觸發仍需手動驗證。
 
 僅憑建置輸出無法驗證已安裝的輸入來源。對於已安裝、已選取但沒有回應的已簽署應用程式，先檢查 `~/Library/Logs/DiagnosticReports/HybridIME-*.ips` 是否有程序崩潰，再檢查統一日誌中是否有 `NO Endpoint`、無法辨識的 `InputMethodConnectionName`，或 `com.apple.inputmethodkit.setxpcendpoint`／`getxpcendpoint` 是否成功建立連線。開發環境的復原順序如下：
 
@@ -460,6 +460,11 @@ swiftc -module-cache-path /tmp/hybridime-module-cache-keyboard \
 - 使用者自行執行腳本並回報最後的 `Release artifacts are ready:`。依腳本流程，此回報涵蓋 Debug／Release build、靜態分析、Developer ID archive、App／DMG 簽署與公證、Staple、Gatekeeper、DMG 掛載與內容比對；代理沒有重新執行上述流程。
 - 代理唯讀檢查該次工作目錄內的 `app-notary.plist` 與 `dmg-notary.plist`，兩者 `status` 均為 `Accepted`；另重新計算 `HybridIME-v1.5.1.dmg` 的 SHA-256，與 checksum 檔案一致：`8f0d278aaa704d560727560a54c3f809b61be5cc1618348903ae4f4334f0358b`。
 - 本次封裝不證明真實文字用戶端的功能、iOS／iPadOS 裝置行為或 GitHub 公開下載已通過驗證。發佈前須保留成品並完成手動功能驗證，確認 tag 包含對應建置輸入；建立 tag 不會自動納入未提交的腳本修改。
+
+2026-10-22 的 macOS 瀏覽器符號首鍵修正：
+
+- 將既有瀏覽器首字母傳遞流程延伸至符號；確認用戶端、前景程序、回讀文字及游標一致後，沿用已插入的符號建立候選與替換範圍，避免重複送字。
+- `swiftc -frontend -parse HybridIME/InputMethodController.swift` 與 `git diff --check` 通過。未執行 Xcode Build/Test、安裝或瀏覽器操作；由使用者手動編譯並驗證 Google Sheets 尚未編輯儲存格時的符號、`=` 公式及候選切換。
 
 2026-10-21 的 Safari Google Sheets 起始輸入修正：
 

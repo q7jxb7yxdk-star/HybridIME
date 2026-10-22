@@ -18,6 +18,7 @@ final class InputMethodController: IMKInputController {
         let text: String
         let clientID: ObjectIdentifier
         let applicationPID: pid_t
+        let isPunctuation: Bool
     }
 
     private enum CandidateAction {
@@ -213,6 +214,17 @@ final class InputMethodController: IMKInputController {
             let punctuation = punctuationPair(for: character)
         {
             if buffer.isEmpty {
+                if !isSelectingPunctuation,
+                   !isSelectingAssociation,
+                   beginBrowserInputIfNeeded(
+                       String(character),
+                       isPunctuation: true,
+                       client: sender
+                   )
+                {
+                    learnedChineseContext = ""
+                    return false
+                }
                 guard
                     let textClient = sender as? IMKTextInput,
                     textClient.selectedRange().location != NSNotFound
@@ -274,6 +286,7 @@ final class InputMethodController: IMKInputController {
 
     private func beginBrowserInputIfNeeded(
         _ text: String,
+        isPunctuation: Bool = false,
         client sender: Any?
     ) -> Bool {
         guard buffer.isEmpty else {
@@ -295,7 +308,7 @@ final class InputMethodController: IMKInputController {
 
         let selection = inputClient.selectedRange()
         // Safari's inactive Sheets editor can report (0, 1).
-        // Its native key handler must receive the first letter to enter editing.
+        // Its native key handler must receive the first character to enter editing.
         let needsSafariSelectionPassthrough =
             (identifier == "com.apple.Safari" ||
                 identifier == "com.apple.SafariTechnologyPreview") &&
@@ -320,7 +333,8 @@ final class InputMethodController: IMKInputController {
         let pending = PendingBrowserInput(
             text: text,
             clientID: ObjectIdentifier(inputClient as AnyObject),
-            applicationPID: application.processIdentifier
+            applicationPID: application.processIdentifier,
+            isPunctuation: isPunctuation
         )
         pendingBrowserInput = pending
         // The browser processes the unhandled key asynchronously. A later key
@@ -356,6 +370,22 @@ final class InputMethodController: IMKInputController {
         }
 
         pendingBrowserInput = nil
+        if pending.isPunctuation {
+            guard let character = pending.text.first,
+                  let punctuation = punctuationPair(for: character)
+            else {
+                return
+            }
+            beginPunctuationSelection(
+                punctuation,
+                client: inputClient,
+                existingInsertion: PendingPunctuationReplacement(
+                    text: pending.text,
+                    range: range
+                )
+            )
+            return
+        }
         buffer = pending.text
         directComposition = DirectComposition(range: range)
         refreshComposition(client: sender)
@@ -1236,7 +1266,8 @@ final class InputMethodController: IMKInputController {
             chineseDefault: String?
         ),
         forceFullWidth: Bool? = nil,
-        client: IMKTextInput?
+        client: IMKTextInput?,
+        existingInsertion: PendingPunctuationReplacement? = nil
     ) {
         dismissAssociation(clearContext: true)
         let useFullWidth = forceFullWidth
@@ -1246,7 +1277,9 @@ final class InputMethodController: IMKInputController {
             ?? false
         nextPunctuationUsesFullWidth = nil
         lastPassthroughPunctuationUsesFullWidth = nil
-        let defaultCandidate = defaultPunctuationCandidate(
+        // Keep the verified native insertion as the initial candidate. Sending it
+        // again would duplicate the key that opened the browser's cell editor.
+        let defaultCandidate = existingInsertion?.text ?? defaultPunctuationCandidate(
             for: punctuation,
             useFullWidth: useFullWidth
         )
@@ -1261,11 +1294,15 @@ final class InputMethodController: IMKInputController {
         isSelectingPunctuation = true
         isSelectingAssociation = false
         let selection = client?.selectedRange()
-        client?.insertText(
-            defaultCandidate,
-            replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
-        )
-        if let selection, selection.location != NSNotFound {
+        if existingInsertion == nil {
+            client?.insertText(
+                defaultCandidate,
+                replacementRange: NSRange(location: NSNotFound, length: NSNotFound)
+            )
+        }
+        if let existingInsertion {
+            pendingPunctuationReplacement = existingInsertion
+        } else if let selection, selection.location != NSNotFound {
             pendingPunctuationReplacement = PendingPunctuationReplacement(
                 text: defaultCandidate,
                 range: NSRange(

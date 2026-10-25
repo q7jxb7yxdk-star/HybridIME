@@ -196,7 +196,7 @@ macOS 控制器以 `IMKTextInput.insertText` 直接插入字母，並用 `direct
 
 瀏覽器首個字母或符號由 `beginBrowserInputIfNeeded` 處理相容性例外。符號僅在沒有進行中的字母組字、標點候選或聯想選取時嘗試此流程。當組字 buffer 為空且前景應用程式符合程式內的瀏覽器識別碼清單時，選取範圍為 `(0,0)` 或 `NSNotFound`，並且起始文字無法取得或為空，控制器會回傳未處理，讓宿主收到原始按鍵。Safari／Safari Technology Preview 的 `(0,1)` 選取範圍另外直接允許此流程，不受起始文字檢查限制；這對應 Safari Google Sheets 尚未進入編輯時的實際診斷結果。此判斷依賴宿主狀態，不會讀取網頁 URL，因此也可能套用至符合條件的一般瀏覽器文字欄位。
 
-`pendingBrowserInput` 暫存首個字元、是否為標點、文字用戶端身分與前景程序 PID。控制器於 50 ms 後或下一個 key-down 嘗試接續，只有用戶端與前景程序一致、游標位於該字元末端，且回讀的文字確實相等時才接續。字母會建立 `buffer`／`directComposition` 並更新候選；符號則把已插入的原始符號作為首個候選，透過 `existingInsertion` 保存可替換範圍，不會再次送字。下一個 key-down 嘗試接續後會清除未接續的暫存；狀態重設也會清除。宿主不提供可確認的文字時，不會接續候選。單憑 `insertText` 後游標前進，不能證明 Google Sheets 已啟動儲存格編輯。
+`pendingBrowserInput` 暫存首個字元、是否為標點、文字用戶端身分與前景程序 PID。控制器於 50 ms 後或下一個 key-down 嘗試接續，只有用戶端與前景程序一致、選取起點位於該字元末端，且回讀的文字確實相等時才接續。一般情況要求選取長度為零；Safari／Safari Technology Preview 的首字母允許選取自動完成尾段，以免首字母被排除於組字之外，標點及其他瀏覽器仍要求零長度選取。字母會建立 `buffer`／`directComposition` 並更新候選，後續字母插入會替換選取尾段；符號則把已插入的原始符號作為首個候選，透過 `existingInsertion` 保存可替換範圍，不會再次送字。下一個 key-down 嘗試接續後會清除未接續的暫存；狀態重設也會清除。宿主不提供可確認的文字時，不會接續候選。單憑 `insertText` 後游標前進，不能證明 Google Sheets 已啟動儲存格編輯。
 
 一般標點由控制器以 `insertText` 插入並回傳已處理，`=` 預設插入半形並提供四項候選。符合上述瀏覽器起始輸入條件時，標點（包括 `=`）會先傳遞原始 key-down，再在確認插入後建立候選；此流程也可能套用至空白瀏覽器文字欄位，因此初始符號保留原始按鍵內容，不套用一般標點的預設全半形轉換。Google Sheets 未編輯儲存格的符號輸入、候選替換及公式模式觸發仍需手動驗證。
 
@@ -460,6 +460,12 @@ swiftc -module-cache-path /tmp/hybridime-module-cache-keyboard \
 - 使用者自行執行腳本並回報最後的 `Release artifacts are ready:`。依腳本流程，此回報涵蓋 Debug／Release build、靜態分析、Developer ID archive、App／DMG 簽署與公證、Staple、Gatekeeper、DMG 掛載與內容比對；代理沒有重新執行上述流程。
 - 代理唯讀檢查該次工作目錄內的 `app-notary.plist` 與 `dmg-notary.plist`，兩者 `status` 均為 `Accepted`；另重新計算 `HybridIME-v1.5.1.dmg` 的 SHA-256，與 checksum 檔案一致：`8f0d278aaa704d560727560a54c3f809b61be5cc1618348903ae4f4334f0358b`。
 - 本次封裝不證明真實文字用戶端的功能、iOS／iPadOS 裝置行為或 GitHub 公開下載已通過驗證。發佈前須保留成品並完成手動功能驗證，確認 tag 包含對應建置輸入；建立 tag 不會自動納入未提交的腳本修改。
+
+2026-10-25 的 Safari URL 欄首字母接回修正：
+
+- 使用者回報輸入 `egi` 預期取得「法」，但只解碼 `gi`。靜態檢查發現首鍵接回要求零長度選取，與 Safari URL 欄可能選取自動完成尾段的狀態不相容；此為依程式碼推斷的原因，尚未取得執行期追蹤確認。
+- Safari／Safari Technology Preview 的首字母接回改為允許選取尾段，仍要求選取起點位於首字母末端、回讀字元吻合，且用戶端及前景程序一致。標點及其他瀏覽器維持原有條件。
+- 控制器的 Swift 語法解析與 `git diff --check` 通過。未執行 Build/Test、安裝或 Safari 操作；由使用者手動建置並驗證 URL 欄的 `egi → 法`，以及 Google Sheets 首鍵文字及符號輸入。
 
 2026-10-22 的 macOS 瀏覽器符號首鍵修正：
 

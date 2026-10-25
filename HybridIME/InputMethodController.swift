@@ -352,15 +352,22 @@ final class InputMethodController: IMKInputController {
         guard let pending = pendingBrowserInput else { return }
         guard let inputClient = sender as? IMKTextInput,
               ObjectIdentifier(inputClient as AnyObject) == pending.clientID,
-              NSWorkspace.shared.frontmostApplication?.processIdentifier ==
-                pending.applicationPID
+              let application = NSWorkspace.shared.frontmostApplication,
+              application.processIdentifier == pending.applicationPID
         else {
             pendingBrowserInput = nil
             return
         }
         let range = NSRange(location: 0, length: pending.text.utf16.count)
-        guard inputClient.selectedRange() ==
-                NSRange(location: NSMaxRange(range), length: 0)
+        let selection = inputClient.selectedRange()
+        // Safari can select a URL autocomplete suffix after the first letter.
+        // Adopt the verified prefix using the same selection boundary as an
+        // ongoing direct composition, so the next letter replaces that suffix.
+        let allowsAutocompleteSelection = !pending.isPunctuation &&
+            (application.bundleIdentifier == "com.apple.Safari" ||
+                application.bundleIdentifier == "com.apple.SafariTechnologyPreview")
+        guard selection.location == NSMaxRange(range),
+              selection.length == 0 || allowsAutocompleteSelection
         else {
             return
         }
